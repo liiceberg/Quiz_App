@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
+    <com.google.android.material.button.MaterialButton
+        style="@style/DefaultButton"
+        android:layout_width="68dp"
+        android:layout_height="80dp"
+        tools:text="1"/>
+</layout>

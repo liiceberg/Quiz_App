@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Quiz App</string>
+
+        <!--  Buttons  -->
+    <string name="username_edit_bth_text">Edit</string>
+    <string name="play_bth_text">Play</string>
+    <string name="play_with_friends_bth_text">Play with friends</string>
+    <string name="back_btn">Back</string>
+    <string name="start_btn">Start</string>
+    <string name="exit_btn">Exit</string>
+    <string name="next_btn">Next</string>
+    <string name="overplay_btn">Overplay</string>
+
+        <!--    Text    -->
+    <string name="level_number">%d/50</string>
+    <string name="user_questions_number">Your questions: %d</string>
+    <string name="total_questions_number">Total questions: %d</string>
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_medium">Medium</string>
+    <string name="difficulty_high">High</string>
+    <string name="question_number">%d/%d</string>
+    <string name="title_category_choice">Choose the category</string>
+    <string name="title_multiplayer_options">Choose number of players</string>
+    <string name="results_title_text">Final score</string>
+    <string name="win_title_text">Win</string>
+    <string name="win_text">Amazing! Everything was good!</string>
+    <string name="lose_title_text">Loss</string>
+    <string name="lose_text">Oh, no! Try again</string>
+
+
+
+        <!--    EditText    -->
+    <string name="username_change_hint">Enter new username</string>
+    <string name="first_player_hint">First player</string>
+    <string name="second_player_hint">Second player</string>
+    <string name="third_player_hint">Third player</string>
+    <string name="fourth_player_hint">Fourth player</string>
+
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DefaultButton">
+        <item name="android:padding">8dp</item>
+        <item name="cornerRadius">48dp</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:gravity">center</item>
+        <item name="fontFamily">@font/plex_sans</item>
+    </style>
+
+    <style name="TitleTextView" parent="@style/TextAppearance.MaterialComponents.Headline5">
+        <item name="textAllCaps">true</item>
+        <item name="android:textColor">@color/grey</item>
+        <item name="fontFamily">@font/plex_sans_bold</item>
+    </style>
+
+    <style name="DefaultTextView" parent="@style/TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/grey</item>
+        <item name="fontFamily">@font/plex_sans</item>
+    </style>
+
+    <style name="DefaultEditText">
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxCornerRadiusBottomEnd">32dp</item>
+        <item name="boxCornerRadiusTopEnd">32dp</item>
+        <item name="boxCornerRadiusBottomStart">32dp</item>
+        <item name="boxCornerRadiusTopStart">32dp</item>
+    </style>
+</resources>

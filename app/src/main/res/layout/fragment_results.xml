@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/game_status_title_tv"
+        style="@style/TitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/win_title_text" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/results_tv"
+        style="@style/DefaultTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/game_status_title_tv"
+        tools:text="@string/win_text" />
+
+    <ImageView
+        android:id="@+id/image_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/results_tv"
+        tools:src="@drawable/clap_hands_svgrepo_com" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/results_title_tv"
+        style="@style/TitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:text="@string/results_title_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/image_iv" />
+
+    <TableLayout
+        android:id="@+id/score_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:stretchColumns="1"
+        app:layout_constraintTop_toBottomOf="@id/results_title_tv">
+
+        <TableRow>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/username_1_tv"
+                style="@style/DefaultTextView"
+                android:layout_column="1"
+                tools:text="Username" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/user_1_score_tv"
+                style="@style/DefaultTextView"
+                tools:text="9" />
+        </TableRow>
+
+        <TableRow>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/username_2_tv"
+                style="@style/DefaultTextView"
+                android:layout_column="1" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/user_2_score_tv"
+                style="@style/DefaultTextView" />
+        </TableRow>
+
+        <TableRow>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/username_3_tv"
+                style="@style/DefaultTextView"
+                android:layout_column="1" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/user_3_score_tv"
+                style="@style/DefaultTextView" />
+        </TableRow>
+
+        <TableRow>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/username_4_tv"
+                style="@style/DefaultTextView"
+                android:layout_column="1" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/user_4_score_tv"
+                style="@style/DefaultTextView" />
+        </TableRow>
+    </TableLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/exit_btn"
+        style="@style/DefaultButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="32dp"
+        android:backgroundTint="@color/yellow_green"
+        android:text="@string/exit_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/next_btn"
+        style="@style/DefaultButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="32dp"
+        android:text="@string/next_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
