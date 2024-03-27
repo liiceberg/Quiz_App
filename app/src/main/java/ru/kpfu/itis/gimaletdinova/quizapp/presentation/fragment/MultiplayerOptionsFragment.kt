@@ -1,6 +1,9 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment
 
+
+
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -15,6 +18,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
 import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
+
 
 class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_options) {
 
@@ -81,14 +85,12 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
 
     private fun deactivateView(view: ImageButton) {
         view.isEnabled = false
-//        TODO replace with secondaryColor
-        view.setColorFilter(resources.getColor(R.color.grey))
+        view.setColorFilter(getColor(com.google.android.material.R.attr.colorSecondary))
     }
 
     private fun activateView(view: ImageView) {
         view.isEnabled = true
-        //        TODO replace with primaryVariantColor
-        view.setColorFilter(resources.getColor(R.color.yellow_green))
+        view.setColorFilter(getColor(com.google.android.material.R.attr.colorPrimaryVariant))
     }
 
     private fun isPlayersCorrect(): Boolean {
@@ -122,6 +124,12 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
                 .subList(0, getPlayersNumber())
                 .toTypedArray()
         }
+    }
+
+    private fun getColor(resId: Int): Int {
+        val typedValue = TypedValue()
+        requireActivity().theme.resolveAttribute(resId, typedValue, true)
+        return typedValue.data
     }
 
 }
