@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/startFragment">
+
+    <fragment
+        android:id="@+id/startFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.StartFragment"
+        android:label="StartFragment"
+        tools:layout="@layout/fragment_start">
+        <action
+            android:id="@+id/action_startFragment_to_categoriesFragment"
+            app:destination="@id/categoriesFragment" />
+        <action
+            android:id="@+id/action_startFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_startFragment_to_multiplayerOptionsFragment"
+            app:destination="@id/multiplayerOptionsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.CategoriesFragment"
+        android:label="CategoriesFragment"
+        tools:layout="@layout/fragment_categories">
+        <action
+            android:id="@+id/action_categoriesFragment_to_levelsFragment"
+            app:destination="@id/levelsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_startFragment"
+            app:destination="@id/startFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/multiplayerOptionsFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.MultiplayerOptionsFragment"
+        android:label="MultiplayerOptionsFragment"
+        tools:layout="@layout/fragment_multiplayer_options">
+        <action
+            android:id="@+id/action_multiplayerOptionsFragment_to_prelaunchFragment"
+            app:destination="@id/prelaunchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/levelsFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.LevelsFragment"
+        android:label="LevelsFragment"
+        tools:layout="@layout/fragment_levels">
+        <action
+            android:id="@+id/action_levelsFragment_to_prelaunchFragment"
+            app:destination="@id/prelaunchFragment" />
+        <action
+            android:id="@+id/action_levelsFragment_to_resultsViewFragment"
+            app:destination="@id/resultsViewFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/questionFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.QuestionFragment"
+        android:label="QuestionFragment"
+        tools:layout="@layout/fragment_question">
+        <action
+            android:id="@+id/action_questionFragment_to_categoryChoiceFragment"
+            app:destination="@id/categoryChoiceFragment" />
+        <action
+            android:id="@+id/action_questionFragment_to_resultsFragment"
+            app:destination="@id/resultsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/prelaunchFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.PrelaunchFragment"
+        android:label="PrelaunchFragment"
+        tools:layout="@layout/fragment_prelaunch">
+        <action
+            android:id="@+id/action_prelaunchFragment_to_questionFragment"
+            app:destination="@id/questionFragment" />
+        <action
+            android:id="@+id/action_prelaunchFragment_to_categoryChoiceFragment"
+            app:destination="@id/categoryChoiceFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/categoryChoiceFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.CategoryChoiceFragment"
+        android:label="CategoryChoiceFragment"
+        tools:layout="@layout/fragment_category_choice">
+        <action
+            android:id="@+id/action_categoryChoiceFragment_to_questionFragment"
+            app:destination="@id/questionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/resultsFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.ResultsFragment"
+        android:label="ResultsFragment"
+        tools:layout="@layout/fragment_results">
+        <action
+            android:id="@+id/action_resultsFragment_to_startFragment"
+            app:destination="@id/startFragment" />
+        <action
+            android:id="@+id/action_resultsFragment_to_prelaunchFragment"
+            app:destination="@id/prelaunchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/resultsViewFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.ResultsViewFragment"
+        android:label="ResultsViewFragment"
+        tools:layout="@layout/fragment_results_view">
+        <action
+            android:id="@+id/action_resultsViewFragment_to_prelaunchFragment"
+            app:destination="@id/prelaunchFragment" />
+        <action
+            android:id="@+id/action_resultsViewFragment_to_levelsFragment"
+            app:destination="@id/levelsFragment" />
+    </fragment>
+
+</navigation>

@@ -21,27 +21,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="2"
         android:textColor="@color/pumpkin"
         android:textSize="72sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/multiplayer_options_title_tv" />
 
-    <ImageView
-        android:id="@+id/minus_iv"
+    <ImageButton
+        android:id="@+id/minus_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:src="@drawable/minus_svgrepo_com"
         app:layout_constraintBottom_toBottomOf="@id/players_number_tv"
         app:layout_constraintEnd_toStartOf="@id/players_number_tv"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/players_number_tv" />
 
-    <ImageView
-        android:id="@+id/plus_iv"
+    <ImageButton
+        android:id="@+id/plus_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:src="@drawable/plus_svgrepo_com"
         app:layout_constraintBottom_toBottomOf="@id/players_number_tv"
         app:layout_constraintEnd_toEndOf="parent"
@@ -63,7 +64,9 @@
             android:id="@+id/player_1_et"
             style="@style/DefaultTextView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -81,7 +84,9 @@
             android:id="@+id/player_2_et"
             style="@style/DefaultTextView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -100,7 +105,9 @@
             android:id="@+id/player_3_et"
             style="@style/DefaultTextView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:imeOptions="actionNext"
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -119,7 +126,9 @@
             android:id="@+id/player_4_et"
             style="@style/DefaultTextView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -128,7 +137,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
-        android:text="@string/start_btn"
+        android:text="@string/next_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
