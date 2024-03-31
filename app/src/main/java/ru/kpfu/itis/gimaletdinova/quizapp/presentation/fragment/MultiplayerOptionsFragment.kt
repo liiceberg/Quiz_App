@@ -1,23 +1,28 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment
 
 
-
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentMultiplayerOptionsBinding
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.InputAdapter
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.diffutil.InputDiffUtilItemCallback
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.InputModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MAX_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
-import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
+import ru.kpfu.itis.gimaletdinova.quizapp.util.ResourceUtil.getColor
+import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 
 
 class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_options) {
@@ -25,18 +30,22 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
     private val binding: FragmentMultiplayerOptionsBinding by viewBinding(
         FragmentMultiplayerOptionsBinding::bind
     )
+    private var inputAdapter: InputAdapter? = null
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
             playersNumberTv.text = MIN_PLAYERS_NUMBER.toString()
 
+            initRecyclerView()
+
             startBtn.setOnClickListener {
                 if (isPlayersCorrect()) {
+
                     binding.root.findNavController().navigate(
                         R.id.action_multiplayerOptionsFragment_to_prelaunchFragment,
                         bundleOf(
-                            IS_MULTIPLAYER to true,
-                            PLAYERS_NAMES to getPlayersNames()
+                            IS_MULTIPLAYER to true
                         )
                     )
                 }
@@ -51,6 +60,26 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
         }
     }
 
+    private fun initRecyclerView() {
+        inputAdapter = InputAdapter(diffCallback = InputDiffUtilItemCallback(),
+            ::onTextChanged)
+        inputAdapter?.setItems(createInputList())
+
+        binding.inputRv.apply {
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+            adapter = inputAdapter
+            val marginValue = 8.getValueInPx(resources.displayMetrics)
+            addItemDecoration(SimpleHorizontalMarginDecoration(marginValue))
+            addItemDecoration(SimpleVerticalMarginDecoration(marginValue))
+        }
+
+    }
+
+    private fun onTextChanged(newInputModel: InputModel) {
+        inputAdapter?.updateItem(newInputModel)
+    }
+
+
     private fun increasePlayersNumber() {
         with(binding) {
             val playersNumber = getPlayersNumber()
@@ -64,7 +93,7 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
                 }
             }
         }
-        verifyEditTextVisibility()
+        addInputItem()
     }
 
     private fun decreasePlayersNumber() {
@@ -80,56 +109,53 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
                 }
             }
         }
-        verifyEditTextVisibility()
+        removeInputItem()
+    }
+
+    private fun addInputItem() {
+        inputAdapter?.apply {
+            val newItem = InputModel(position = currentList.size + 1)
+            addItem(newItem)
+        }
+    }
+
+    private fun removeInputItem() {
+        inputAdapter?.apply {
+            removeItem(currentList.last())
+        }
     }
 
     private fun deactivateView(view: ImageButton) {
         view.isEnabled = false
-        view.setColorFilter(getColor(com.google.android.material.R.attr.colorSecondary))
+        val color = getColor(com.google.android.material.R.attr.colorSecondary, requireActivity())
+        view.setColorFilter(color)
     }
 
     private fun activateView(view: ImageView) {
         view.isEnabled = true
-        view.setColorFilter(getColor(com.google.android.material.R.attr.colorPrimaryVariant))
+        val color =
+            getColor(com.google.android.material.R.attr.colorPrimaryVariant, requireActivity())
+        view.setColorFilter(color)
     }
 
     private fun isPlayersCorrect(): Boolean {
-        with(binding) {
-            val validatingFields = listOf(player1Et, player2Et, player3Et, player4Et)
-            var isCorrect = true
-            for (field in validatingFields.subList(0, getPlayersNumber())) {
-                isCorrect = isCorrect && ValidationUtil.validateName(requireContext(), field)
+        inputAdapter?.currentList?.let { list ->
+            for (item in list) {
+                if (item.isCorrect.not()) return false
             }
-            return isCorrect
         }
+        return true
     }
 
-    private fun verifyEditTextVisibility() {
-        with(binding) {
-            val validatingFields =
-                listOf(player1EtLayout, player2EtLayout, player3EtLayout, player4EtLayout)
-            val number = getPlayersNumber()
-            for (ind in validatingFields.indices) {
-                validatingFields[ind].visibility = if (ind < number) View.VISIBLE else View.GONE
-            }
-        }
-    }
 
     private fun getPlayersNumber(): Int = binding.playersNumberTv.text.toString().toInt()
 
-    private fun getPlayersNames(): Array<String> {
-        with(binding) {
-            return listOf(player1Et, player2Et, player3Et, player4Et)
-                .map { et -> et.text.toString() }
-                .subList(0, getPlayersNumber())
-                .toTypedArray()
+    private fun createInputList() : List<InputModel> {
+        val list = mutableListOf<InputModel>()
+        for (pos in 1 .. MIN_PLAYERS_NUMBER) {
+            list.add(InputModel(position = pos))
         }
-    }
-
-    private fun getColor(resId: Int): Int {
-        val typedValue = TypedValue()
-        requireActivity().theme.resolveAttribute(resId, typedValue, true)
-        return typedValue.data
+        return list
     }
 
 }

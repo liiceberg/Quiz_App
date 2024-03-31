@@ -14,7 +14,6 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.Simple
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.Difficulty
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.Item
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.Level
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.EASY_LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MEDIUM_LEVELS_NUMBER
@@ -41,7 +40,7 @@ class LevelsFragment : BaseFragment(R.layout.fragment_levels) {
             val level = Level(1, LevelDifficulty.EASY, false)
             val dif = Difficulty("Easy")
             val list =
-                mutableListOf<Item>(dif, level, level, level, level, level, dif, level, level, level)
+                mutableListOf(dif, level, level, level, level, level, level, level, level)
             levelsAdapter = LevelsAdapter(list, ::onItemClicked)
             adapter = levelsAdapter
             val manager = GridLayoutManager(requireContext(), 5, RecyclerView.VERTICAL, false)
