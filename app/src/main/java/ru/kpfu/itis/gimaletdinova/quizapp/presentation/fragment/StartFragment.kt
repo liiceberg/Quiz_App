@@ -4,10 +4,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.navigation.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
+import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentStartBinding
-
+@AndroidEntryPoint
 class StartFragment : BaseFragment(R.layout.fragment_start) {
 
     private val binding: FragmentStartBinding by viewBinding(

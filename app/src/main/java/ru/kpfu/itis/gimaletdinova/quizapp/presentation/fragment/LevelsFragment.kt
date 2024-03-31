@@ -7,6 +7,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentLevelsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.LevelsAdapter
@@ -21,7 +22,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
-
+@AndroidEntryPoint
 class LevelsFragment : BaseFragment(R.layout.fragment_levels) {
     private val binding: FragmentLevelsBinding by viewBinding(
         FragmentLevelsBinding::bind

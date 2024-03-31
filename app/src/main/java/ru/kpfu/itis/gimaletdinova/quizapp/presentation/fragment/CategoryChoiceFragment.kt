@@ -8,11 +8,12 @@ import android.widget.ArrayAdapter
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
+import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 
-
+@AndroidEntryPoint
 class CategoryChoiceFragment : BaseFragment(R.layout.fragment_category_choice) {
     private val binding: FragmentCategoryChoiceBinding by viewBinding(
         FragmentCategoryChoiceBinding::bind

@@ -7,13 +7,14 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoriesBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.CategoriesAdapter
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.Category
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
-
+@AndroidEntryPoint
 class CategoriesFragment : BaseFragment(R.layout.fragment_categories) {
 
     private val binding: FragmentCategoriesBinding by viewBinding(

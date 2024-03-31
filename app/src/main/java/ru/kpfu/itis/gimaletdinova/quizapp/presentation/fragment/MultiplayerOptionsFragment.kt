@@ -10,6 +10,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentMultiplayerOptionsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.InputAdapter
@@ -24,7 +25,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.ResourceUtil.getColor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 
-
+@AndroidEntryPoint
 class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_options) {
 
     private val binding: FragmentMultiplayerOptionsBinding by viewBinding(
