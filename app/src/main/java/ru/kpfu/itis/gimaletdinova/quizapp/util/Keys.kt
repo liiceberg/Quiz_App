@@ -6,4 +6,6 @@ object Keys {
     const val PLAYERS_NUMBER = "PLAYERS_NUMBER"
     const val IS_MULTIPLAYER = "IS_MULTIPLAYER"
     const val PLAYERS_NAMES = "PLAYERS_NAMES"
+
+    const val SHARED_PREFERENCES_NAME = "SHARED_PREFERENCES_NAME"
 }

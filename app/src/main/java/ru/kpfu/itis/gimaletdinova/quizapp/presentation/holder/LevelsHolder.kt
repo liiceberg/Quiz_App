@@ -31,8 +31,8 @@ class LevelsHolder(
                     MEDIUM -> R.color.light_blue
                     HARD -> R.color.pumpkin
                 }
-//            TODO add theme
-            valueBtn.setBackgroundColor(root.resources.getColor(backgroundColor))
+
+            valueBtn.setBackgroundColor(root.resources.getColor(backgroundColor, root.context.theme))
             if (item.isBlocked) valueBtn.isEnabled = false
         }
     }

@@ -7,6 +7,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemInputBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.InputModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
+import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
 
 class InputHolder(
     private val binding: ItemInputBinding,
@@ -28,7 +29,7 @@ class InputHolder(
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE -> {
-                        ValidationUtil.hideKeyboard(context, rootView)
+                        hideKeyboard(context, rootView)
                         clearFocus()
                     }
                 }

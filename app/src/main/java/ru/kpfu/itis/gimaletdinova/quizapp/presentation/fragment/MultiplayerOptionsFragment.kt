@@ -22,7 +22,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.InputModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MAX_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.ResourceUtil.getColor
+import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 
 @AndroidEntryPoint
@@ -128,14 +128,15 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
 
     private fun deactivateView(view: ImageButton) {
         view.isEnabled = false
-        val color = getColor(com.google.android.material.R.attr.colorSecondary, requireActivity())
+        val color =
+            requireActivity().getThemeColor(com.google.android.material.R.attr.colorSecondary)
         view.setColorFilter(color)
     }
 
     private fun activateView(view: ImageView) {
         view.isEnabled = true
         val color =
-            getColor(com.google.android.material.R.attr.colorPrimaryVariant, requireActivity())
+            requireActivity().getThemeColor(com.google.android.material.R.attr.colorPrimaryVariant)
         view.setColorFilter(color)
     }
 

@@ -33,7 +33,6 @@
         <!--    EditText    -->
     <string name="username_change_hint">Enter new username</string>
     <string name="player_input_hint">Player %d</string>
-    <string name="player_input_id">input_%d_et</string>
 
     <string name="empty_username_error">Enter a username</string>
     <string name="incorrect_username_error">Username must contain only Latin alphabetic characters</string>

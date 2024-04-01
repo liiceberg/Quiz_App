@@ -1,23 +1,19 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentProfileBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.MainActivity
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
-//import ru.kpfu.itis.gimaletdinova.quizapp.presentation.viewmodel.ProfileViewModel
-import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil.hideKeyboard
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.viewmodel.ProfileViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil.validateName
+import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
+import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
@@ -26,10 +22,9 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
         FragmentProfileBinding::bind
     )
 
-//    private val profileViewModel: ProfileViewModel by viewModels()
+    private val profileViewModel: ProfileViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val prefs = requireActivity().getPreferences(Context.MODE_PRIVATE)
         with(binding) {
 
             backBtn.setOnClickListener { view ->
@@ -37,67 +32,51 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
                     .navigate(R.id.action_profileFragment_to_startFragment)
             }
 
-            usernameTv.text = prefs.getString(getString(R.string.username), "user")
+            profileViewModel.usernameFlow.observe(this@ProfileFragment) { username ->
+                usernameTv.text = username
+            }
 
             usernameEditBtn.setOnClickListener {
                 if (usernameEtLayout.visibility == View.GONE) {
                     usernameEtLayout.visibility = View.VISIBLE
                 } else {
-                    editUsername(prefs)
+                    editUsername()
                 }
             }
+
             usernameEt.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    editUsername(prefs)
+                    editUsername()
                 }
                 true
             }
 
-            setThemeButton()
-
             themeBtn.setOnClickListener {
-                changeTheme(prefs)
-                setThemeButton()
+                profileViewModel.changeTheme()
             }
 
-            val userQuestionsNumber = prefs.getInt(getString(R.string.user_questions), 0)
-            val totalQuestionsNumber = prefs.getInt(getString(R.string.total_questions), 0)
-            userQuestionsTv.text = getString(R.string.user_questions_number, userQuestionsNumber)
-            totalQuestionsTv.text = getString(R.string.total_questions_number, totalQuestionsNumber)
+            profileViewModel.themeFlow.observe(this@ProfileFragment) { isNightMode ->
+                val img =
+                    if (isNightMode) R.drawable.moon_svgrepo_com else R.drawable.sun_svgrepo_com
+                themeBtn.setImageResource(img)
+            }
+
+            userQuestionsTv.text =
+                getString(R.string.user_questions_number, profileViewModel.getUserQuestionsNumber())
+
+            totalQuestionsTv.text =
+                getString(R.string.total_questions_number, profileViewModel.getTotalQuestionsNumber())
         }
     }
 
-    private fun editUsername(prefs: SharedPreferences) {
+    private fun editUsername() {
         with(binding) {
             if (validateName(requireContext(), usernameEt)) {
-
-                val name = usernameEt.text.toString()
-
-                prefs.edit()
-                    .putString(getString(R.string.username), name)
-                    .apply()
-
-                usernameTv.text = name
+                profileViewModel.saveUsername(usernameEt.text.toString())
                 usernameEtLayout.visibility = View.GONE
-
                 hideKeyboard(context, view)
             }
         }
     }
 
-    private fun setThemeButton() {
-        val img = if (AppCompatDelegate.getDefaultNightMode() == MODE_NIGHT_YES)
-            R.drawable.moon_svgrepo_com else R.drawable.sun_svgrepo_com
-        binding.themeBtn.setImageResource(img)
-    }
-
-    private fun changeTheme(prefs: SharedPreferences) {
-        val isNightMode = AppCompatDelegate.getDefaultNightMode() == MODE_NIGHT_YES
-
-        prefs.edit()
-            .putBoolean(getString(R.string.night_mode), !isNightMode)
-            .apply()
-
-        (activity as? MainActivity)?.setTheme(!isNightMode)
-    }
 }
