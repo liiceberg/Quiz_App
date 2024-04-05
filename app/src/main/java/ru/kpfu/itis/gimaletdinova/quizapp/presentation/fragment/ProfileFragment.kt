@@ -11,7 +11,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentProfileBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.viewmodel.ProfileViewModel
-import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil.validateName
+import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
 import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
@@ -40,13 +40,13 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
                 if (usernameEtLayout.visibility == View.GONE) {
                     usernameEtLayout.visibility = View.VISIBLE
                 } else {
-                    editUsername()
+                    if (validateUserInput()) saveUsername()
                 }
             }
 
             usernameEt.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    editUsername()
+                    if (validateUserInput()) saveUsername()
                 }
                 true
             }
@@ -65,17 +65,34 @@ class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
                 getString(R.string.user_questions_number, profileViewModel.getUserQuestionsNumber())
 
             totalQuestionsTv.text =
-                getString(R.string.total_questions_number, profileViewModel.getTotalQuestionsNumber())
+                getString(
+                    R.string.total_questions_number,
+                    profileViewModel.getTotalQuestionsNumber()
+                )
         }
     }
 
-    private fun editUsername() {
+    private fun validateUserInput(): Boolean {
         with(binding) {
-            if (validateName(requireContext(), usernameEt)) {
-                profileViewModel.saveUsername(usernameEt.text.toString())
-                usernameEtLayout.visibility = View.GONE
-                hideKeyboard(context, view)
+            val name = usernameEt.text.toString()
+            if (ValidationUtil.validateName(name)) {
+                return true
+            } else {
+                if (name.trim().isEmpty()) {
+                    usernameEt.error = getString(R.string.empty_username_error)
+                } else if (name.matches(Regex("[A-Za-z]+")).not()) {
+                    usernameEt.error = getString(R.string.incorrect_username_error)
+                }
+                return false
             }
+        }
+    }
+
+    private fun saveUsername() {
+        with(binding) {
+            profileViewModel.saveUsername(usernameEt.text.toString())
+            usernameEtLayout.visibility = View.GONE
+            hideKeyboard(context, view)
         }
     }
 

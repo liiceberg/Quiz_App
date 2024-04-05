@@ -20,30 +20,39 @@ class InputHolder(
         binding.usernameEt.run {
             addTextChangedListener {
                 item?.let { input ->
-                    input.isCorrect = ValidationUtil.validateName(context, this)
-                    input.text = text.toString()
+                    val name = text.toString()
+                    input.isCorrect = ValidationUtil.validateName(name)
+                    if (input.isCorrect.not()) {
+                        if (name.trim().isEmpty()) {
+                            error = context.getString(R.string.empty_username_error)
+                        } else if (name.matches(Regex("[A-Za-z]+")).not()) {
+                            error = context.getString(R.string.incorrect_username_error)
+                        }
+
+                    }
+                    input.text = name
                     onTextChanged(input)
                 }
-            }
 
-            setOnEditorActionListener { _, actionId, _ ->
-                when (actionId) {
-                    EditorInfo.IME_ACTION_DONE -> {
-                        hideKeyboard(context, rootView)
-                        clearFocus()
+                setOnEditorActionListener { _, actionId, _ ->
+                    when (actionId) {
+                        EditorInfo.IME_ACTION_DONE -> {
+                            hideKeyboard(context, rootView)
+                            clearFocus()
+                        }
                     }
+                    true
                 }
-                true
             }
         }
     }
 
-    fun bindItem(item: InputModel) {
-        this.item = item
-        with(binding) {
-            usernameEtLayout.hint =
-                root.context.getString(R.string.player_input_hint, item.position)
+        fun bindItem(item: InputModel) {
+            this.item = item
+            with(binding) {
+                usernameEtLayout.hint =
+                    root.context.getString(R.string.player_input_hint, item.position)
+            }
         }
-    }
 
-}
+    }
