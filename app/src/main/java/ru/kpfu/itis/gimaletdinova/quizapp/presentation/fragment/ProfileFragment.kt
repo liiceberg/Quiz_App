@@ -32,10 +32,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                     .navigate(R.id.action_profileFragment_to_startFragment)
             }
 
-            profileViewModel.usernameFlow.observe(this@ProfileFragment) { username ->
-                usernameTv.text = username
-            }
-
             usernameEditBtn.setOnClickListener {
                 if (usernameEtLayout.visibility == View.GONE) {
                     usernameEtLayout.visibility = View.VISIBLE
@@ -55,20 +51,27 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 profileViewModel.changeTheme()
             }
 
-            profileViewModel.themeFlow.observe(this@ProfileFragment) { isNightMode ->
-                val img =
-                    if (isNightMode) R.drawable.moon_svgrepo_com else R.drawable.sun_svgrepo_com
-                themeBtn.setImageResource(img)
+
+            with(profileViewModel) {
+                usernameFlow.observe(this@ProfileFragment) { username ->
+                    usernameTv.text = username
+                }
+
+                themeFlow.observe(this@ProfileFragment) { isNightMode ->
+                    val img =
+                        if (isNightMode) R.drawable.moon_svgrepo_com else R.drawable.sun_svgrepo_com
+                    themeBtn.setImageResource(img)
+                }
+
+                userQuestionsFlow.observe(this@ProfileFragment) { number ->
+                    userQuestionsTv.text = getString(R.string.user_questions_number, number)
+                }
+
+                totalQuestionsFlow.observe(this@ProfileFragment) { number ->
+                    totalQuestionsTv.text = getString(R.string.total_questions_number, number)
+                }
+
             }
-
-            userQuestionsTv.text =
-                getString(R.string.user_questions_number, profileViewModel.getUserQuestionsNumber())
-
-            totalQuestionsTv.text =
-                getString(
-                    R.string.total_questions_number,
-                    profileViewModel.getTotalQuestionsNumber()
-                )
         }
     }
 

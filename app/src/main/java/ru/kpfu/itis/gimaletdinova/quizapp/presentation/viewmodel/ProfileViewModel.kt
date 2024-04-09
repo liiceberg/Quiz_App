@@ -1,38 +1,41 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.viewmodel
 
 
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.datastore.DataStore
+import androidx.datastore.preferences.Preferences
+import androidx.datastore.preferences.edit
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import ru.kpfu.itis.gimaletdinova.quizapp.R
-import ru.kpfu.itis.gimaletdinova.quizapp.util.setTheme
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
+import ru.kpfu.itis.gimaletdinova.quizapp.util.setCurrentTheme
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    @ApplicationContext private val ctx: Context,
-    private val prefs: SharedPreferences
+    private val prefs: DataStore<Preferences>,
+    private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    private val _usernameFlow =
-        MutableStateFlow(prefs.getString(ctx.getString(R.string.username), "user"))
-    val usernameFlow get() = _usernameFlow.asStateFlow()
+    val usernameFlow = prefs.data.map { it[PrefsKeys.USERNAME_KEY] ?: "user" }
 
-    private val _themeFlow =
-        MutableStateFlow(prefs.getBoolean(ctx.getString(R.string.night_mode), false))
-    val themeFlow get() = _themeFlow.asStateFlow()
+    val themeFlow = prefs.data.map { it[PrefsKeys.NIGHT_MODE_KEY] ?: false }
 
+    val totalQuestionsFlow = prefs.data.map { it[PrefsKeys.TOTAL_QUESTIONS_KEY] ?: 0 }
+
+    val userQuestionsFlow = prefs.data.map { it[PrefsKeys.USER_QUESTIONS_KEY] ?: 0 }
     fun saveUsername(name: String) {
-        if (prefs.edit()
-                .putString(ctx.getString(R.string.username), name)
-                .commit()
-        ) {
-            _usernameFlow.value = name
+        viewModelScope.launch {
+            withContext(dispatcher) {
+                prefs.edit {
+                    it[PrefsKeys.USERNAME_KEY] = name
+                }
+            }
         }
     }
 
@@ -40,16 +43,13 @@ class ProfileViewModel @Inject constructor(
         val isNightTheme =
             AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
 
-        if (prefs.edit()
-                .putBoolean(ctx.getString(R.string.night_mode), !isNightTheme)
-                .commit()
-        ) {
-            _themeFlow.value = !isNightTheme
-            setTheme(!isNightTheme)
+        viewModelScope.launch {
+            withContext(dispatcher) {
+                prefs.edit {
+                    it[PrefsKeys.NIGHT_MODE_KEY] = !isNightTheme
+                }
+            }
+            setCurrentTheme(!isNightTheme)
         }
-
     }
-
-    fun getUserQuestionsNumber(): Int = prefs.getInt(ctx.getString(R.string.user_questions), 0)
-    fun getTotalQuestionsNumber(): Int = prefs.getInt(ctx.getString(R.string.total_questions), 0)
 }

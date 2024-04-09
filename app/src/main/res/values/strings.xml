@@ -37,10 +37,4 @@
     <string name="empty_username_error">Enter a username</string>
     <string name="incorrect_username_error">Username must contain only Latin alphabetic characters</string>
 
-        <!--  Shared Pref  -->
-    <string name="night_mode">theme_night_mode</string>
-    <string name="username">username</string>
-    <string name="total_questions">total_questions</string>
-    <string name="user_questions">user_questions</string>
-
 </resources>

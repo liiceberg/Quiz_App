@@ -1,13 +1,17 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.di
 
 import android.content.Context
-import android.content.SharedPreferences
+import androidx.datastore.DataStore
+import androidx.datastore.preferences.Preferences
+import androidx.datastore.preferences.createDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.SHARED_PREFERENCES_NAME
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.DATA_STORE_NAME
 import javax.inject.Singleton
 
 @Module
@@ -16,6 +20,10 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences =
-        context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+        context.createDataStore(DATA_STORE_NAME)
+
+    @Provides
+    @Singleton
+    fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 }

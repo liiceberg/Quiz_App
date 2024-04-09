@@ -5,7 +5,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatDelegate
 
-fun setTheme(isNightTheme: Boolean) {
+fun setCurrentTheme(isNightTheme: Boolean) {
     val mode =
         if (isNightTheme) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
     AppCompatDelegate.setDefaultNightMode(mode)
