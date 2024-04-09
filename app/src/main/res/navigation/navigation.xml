@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/startFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.StartFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.navigation_views.StartFragment"
         android:label="StartFragment"
         tools:layout="@layout/fragment_start">
         <action
@@ -22,7 +22,7 @@
     </fragment>
     <fragment
         android:id="@+id/categoriesFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.CategoriesFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.CategoriesFragment"
         android:label="CategoriesFragment"
         tools:layout="@layout/fragment_categories">
         <action
@@ -31,7 +31,7 @@
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.ProfileFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.profile.ProfileFragment"
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile">
         <action
@@ -40,7 +40,7 @@
     </fragment>
     <fragment
         android:id="@+id/multiplayerOptionsFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.MultiplayerOptionsFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.options.MultiplayerOptionsFragment"
         android:label="MultiplayerOptionsFragment"
         tools:layout="@layout/fragment_multiplayer_options">
         <action
@@ -49,7 +49,7 @@
     </fragment>
     <fragment
         android:id="@+id/levelsFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.LevelsFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.LevelsFragment"
         android:label="LevelsFragment"
         tools:layout="@layout/fragment_levels">
         <action
@@ -62,7 +62,7 @@
 
     <fragment
         android:id="@+id/questionFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.QuestionFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.QuestionFragment"
         android:label="QuestionFragment"
         tools:layout="@layout/fragment_question">
         <action
@@ -74,7 +74,7 @@
     </fragment>
     <fragment
         android:id="@+id/prelaunchFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.PrelaunchFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.navigation_views.PrelaunchFragment"
         android:label="PrelaunchFragment"
         tools:layout="@layout/fragment_prelaunch">
         <action
@@ -86,7 +86,7 @@
     </fragment>
     <fragment
         android:id="@+id/categoryChoiceFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.CategoryChoiceFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.CategoryChoiceFragment"
         android:label="CategoryChoiceFragment"
         tools:layout="@layout/fragment_category_choice">
         <action
@@ -95,7 +95,7 @@
     </fragment>
     <fragment
         android:id="@+id/resultsFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.ResultsFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.ResultsFragment"
         android:label="ResultsFragment"
         tools:layout="@layout/fragment_results">
         <action
@@ -107,7 +107,7 @@
     </fragment>
     <fragment
         android:id="@+id/resultsViewFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.fragment.ResultsViewFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.ResultsViewFragment"
         android:label="ResultsViewFragment"
         tools:layout="@layout/fragment_results_view">
         <action
