@@ -6,9 +6,9 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+import androidx.fragment.app.Fragment
 @AndroidEntryPoint
-class ResultsFragment : BaseFragment(R.layout.fragment_results) {
+class ResultsFragment : Fragment(R.layout.fragment_results) {
     private val binding: FragmentResultsBinding by viewBinding(
         FragmentResultsBinding::bind
     )

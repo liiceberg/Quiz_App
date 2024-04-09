@@ -6,9 +6,9 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentQuestionBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+import androidx.fragment.app.Fragment
 @AndroidEntryPoint
-class QuestionFragment : BaseFragment(R.layout.fragment_question) {
+class QuestionFragment : Fragment(R.layout.fragment_question) {
     private val binding: FragmentQuestionBinding by viewBinding(
         FragmentQuestionBinding::bind
     )

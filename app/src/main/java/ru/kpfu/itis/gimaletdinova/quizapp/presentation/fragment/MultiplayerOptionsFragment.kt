@@ -17,7 +17,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.InputAdapter
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.diffutil.InputDiffUtilItemCallback
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+import androidx.fragment.app.Fragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.InputModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MAX_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_PLAYERS_NUMBER
@@ -26,7 +26,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 
 @AndroidEntryPoint
-class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_options) {
+class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_options) {
 
     private val binding: FragmentMultiplayerOptionsBinding by viewBinding(
         FragmentMultiplayerOptionsBinding::bind

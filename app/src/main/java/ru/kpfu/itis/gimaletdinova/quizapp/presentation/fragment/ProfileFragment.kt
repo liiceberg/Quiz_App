@@ -9,14 +9,14 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentProfileBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+import androidx.fragment.app.Fragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.viewmodel.ProfileViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
 import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
-class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
+class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val binding: FragmentProfileBinding by viewBinding(
         FragmentProfileBinding::bind

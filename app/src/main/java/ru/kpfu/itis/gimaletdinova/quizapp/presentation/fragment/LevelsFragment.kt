@@ -13,7 +13,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentLevelsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.LevelsAdapter
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+import androidx.fragment.app.Fragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.Difficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.model.Level
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.EASY_LEVELS_NUMBER
@@ -23,7 +23,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 @AndroidEntryPoint
-class LevelsFragment : BaseFragment(R.layout.fragment_levels) {
+class LevelsFragment : Fragment(R.layout.fragment_levels) {
     private val binding: FragmentLevelsBinding by viewBinding(
         FragmentLevelsBinding::bind
     )

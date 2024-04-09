@@ -11,10 +11,10 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+import androidx.fragment.app.Fragment
 
 @AndroidEntryPoint
-class CategoryChoiceFragment : BaseFragment(R.layout.fragment_category_choice) {
+class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
     private val binding: FragmentCategoryChoiceBinding by viewBinding(
         FragmentCategoryChoiceBinding::bind
     )
