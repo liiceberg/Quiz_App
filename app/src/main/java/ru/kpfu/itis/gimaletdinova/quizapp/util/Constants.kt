@@ -8,4 +8,5 @@ object Constants {
     const val MIN_PLAYERS_NUMBER = 2
     const val MAX_PLAYERS_NUMBER = 4
 
+    const val QUESTIONS_NUMBER = 10
 }

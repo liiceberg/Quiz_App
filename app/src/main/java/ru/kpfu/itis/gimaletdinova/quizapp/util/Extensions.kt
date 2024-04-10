@@ -2,6 +2,7 @@ package ru.kpfu.itis.gimaletdinova.quizapp.util
 
 import android.app.Activity
 import android.content.res.Resources
+import android.text.Html
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
@@ -30,3 +31,9 @@ fun Activity.getThemeColor(resId: Int): Int {
     theme.resolveAttribute(resId, typedValue, true)
     return typedValue.data
 }
+
+fun String.decodeFromHtml(): String {
+    return Html.fromHtml(this, Html.FROM_HTML_MODE_COMPACT).toString()
+}
+
+

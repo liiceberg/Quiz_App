@@ -19,7 +19,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.EASY_LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MEDIUM_LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.LevelDifficulty
+import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 @AndroidEntryPoint
 class LevelsFragment : Fragment(R.layout.fragment_levels) {

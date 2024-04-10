@@ -37,4 +37,14 @@
     <string name="empty_username_error">Enter a username</string>
     <string name="incorrect_username_error">Username must contain only Latin alphabetic characters</string>
 
+
+
+        <!--  Exceptions  -->
+    <string name="too_many_requests">The number of request attempts exceeded</string>
+    <string name="page_not_found">Trivia not found</string>
+    <string name="bad_request">Bad request</string>
+    <string name="server_exception">Server is not response</string>
+    <string name="empty_questions_list_response">Questions not found</string>
+    <string name="unknown_error">Unknown error occurred</string>
+
 </resources>
