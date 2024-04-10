@@ -12,25 +12,28 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
 import androidx.fragment.app.Fragment
+import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.Category
 
 @AndroidEntryPoint
 class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
+
     private val binding: FragmentCategoryChoiceBinding by viewBinding(
         FragmentCategoryChoiceBinding::bind
     )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         with(binding) {
             usernameTv.text = ""
+
             categoryChoiceSpinner.apply {
-                ArrayAdapter.createFromResource(
-                    requireContext(),
-                    R.array.categories,
-                    R.layout.spinner_category_item
-                ).also { spinnerAdapter ->
-                    spinnerAdapter.setDropDownViewResource(R.layout.spinner_category_item)
-                    adapter = spinnerAdapter
-                }
+
+                val list = mutableListOf<Any>()
+                list.add("Select the category")
+                list.addAll(Category.entries)
+
+                adapter = ArrayAdapter(requireContext(), R.layout.spinner_category_item, list)
+
 
                 onItemSelectedListener =
                     object : AdapterView.OnItemSelectedListener {
@@ -53,5 +56,6 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
                     }
             }
         }
+
     }
 }
