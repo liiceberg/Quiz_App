@@ -12,7 +12,7 @@
     <string name="overplay_btn">Overplay</string>
 
         <!--    Text    -->
-    <string name="level_number">%d/50</string>
+    <string name="level_number">%d/%d</string>
     <string name="user_questions_number">Your questions: %d</string>
     <string name="total_questions_number">Total questions: %d</string>
     <string name="difficulty_easy">Easy</string>
@@ -26,14 +26,15 @@
     <string name="win_text">Amazing! Everything was good!</string>
     <string name="lose_title_text">Loss</string>
     <string name="lose_text">Oh, no! Try again</string>
+    <string name="warning_text">Click when you are ready to start</string>
 
 
 
         <!--    EditText    -->
     <string name="username_change_hint">Enter new username</string>
-    <string name="first_player_hint">First player</string>
-    <string name="second_player_hint">Second player</string>
-    <string name="third_player_hint">Third player</string>
-    <string name="fourth_player_hint">Fourth player</string>
+    <string name="player_input_hint">Player %d</string>
+
+    <string name="empty_username_error">Enter a username</string>
+    <string name="incorrect_username_error">Username must contain only Latin alphabetic characters</string>
 
 </resources>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.imageview.ShapeableImageView
+    <ImageView
         android:id="@+id/profile_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,7 +14,6 @@
         android:src="@drawable/baseline_account_circle_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:tint="@color/grey"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -38,7 +37,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="@string/play_with_friends_bth_text"
-        app:backgroundTint="@color/yellow_green"
+        app:backgroundTint="?attr/colorPrimaryVariant"
         app:layout_constraintTop_toBottomOf="@id/play_btn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

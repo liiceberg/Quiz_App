@@ -9,15 +9,20 @@
         <item name="fontFamily">@font/plex_sans</item>
     </style>
 
+    <style name="DefaultButton.ResultAnswerButton">
+        <item name="backgroundTint">@color/white</item>
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
     <style name="TitleTextView" parent="@style/TextAppearance.MaterialComponents.Headline5">
         <item name="textAllCaps">true</item>
-        <item name="android:textColor">@color/grey</item>
+        <item name="android:textColor">?attr/colorSecondary</item>
         <item name="fontFamily">@font/plex_sans_bold</item>
     </style>
 
     <style name="DefaultTextView" parent="@style/TextAppearance.MaterialComponents.Body1">
         <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@color/grey</item>
+        <item name="android:textColor">?attr/colorSecondary</item>
         <item name="fontFamily">@font/plex_sans</item>
     </style>
 
