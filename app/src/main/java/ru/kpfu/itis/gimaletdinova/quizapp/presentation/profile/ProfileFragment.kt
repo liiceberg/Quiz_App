@@ -50,16 +50,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 profileViewModel.changeTheme()
             }
 
-
             with(profileViewModel) {
                 usernameFlow.observe(this@ProfileFragment) { username ->
                     usernameTv.text = username
-                }
-
-                themeFlow.observe(this@ProfileFragment) { isNightMode ->
-                    val img =
-                        if (isNightMode) R.drawable.moon_svgrepo_com else R.drawable.sun_svgrepo_com
-                    themeBtn.setImageResource(img)
                 }
 
                 userQuestionsFlow.observe(this@ProfileFragment) { number ->
@@ -70,6 +63,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                     totalQuestionsTv.text = getString(R.string.total_questions_number, number)
                 }
 
+                themeFlow.observe(this@ProfileFragment) { isNightMode ->
+                    val img =
+                        if (isNightMode) R.drawable.moon_svgrepo_com else R.drawable.sun_svgrepo_com
+                    themeBtn.setImageResource(img)
+                }
             }
         }
     }
