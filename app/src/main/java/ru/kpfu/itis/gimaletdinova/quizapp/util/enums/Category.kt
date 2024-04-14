@@ -1,33 +1,33 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.util.enums
 
-enum class Category(val id: Int, private val displayName: String) {
-    GENERAL_KNOWLEDGE(9, "General Knowledge"),
-    BOOKS(10, "Books"),
-    FILMS(11, "Films"),
-    MUSIC(12, "Music"),
-    MUSICALS_AND_THEATRES(13, "Musicals & Theatres"),
-    TELEVISION(14, "Television"),
-    VIDEO_GAMES(15, "Video Games"),
-    BOARD_GAMES(16, "Board Games"),
-    SCIENCE_AND_NATURE(17, "Science & Nature"),
-    COMPUTERS(18, "Computers"),
-    MATHEMATICS(19, "Mathematics"),
-    MYTHOLOGY(20, "Mythology"),
-    SPORTS(21, "Sports"),
-    GEOGRAPHY(22, "Geography"),
-    HISTORY(23, "History"),
-    POLITICS(24, "Politics"),
-    ART(25, "Art"),
-    CELEBRITIES(26, "Celebrities"),
-    ANIMALS(27, "Animals"),
-    VEHICLES(28, "Vehicles"),
-    COMICS(29, "Comics"),
-    GADGETS(30, "Gadgets"),
-    ANIME_AND_MANGA(31, "Anime & Manga"),
-    CARTOON_AND_ANIMATIONS(32, "Cartoon & Animations");
+enum class Category(private val displayName: String) {
+    GENERAL_KNOWLEDGE("General Knowledge"),
+    BOOKS("Books"),
+    FILMS("Films"),
+    MUSIC("Music"),
+    MUSICALS_AND_THEATRES("Musicals & Theatres"),
+    TELEVISION("Television"),
+    VIDEO_GAMES("Video Games"),
+    BOARD_GAMES("Board Games"),
+    SCIENCE_AND_NATURE("Science & Nature"),
+    COMPUTERS("Computers"),
+    MATHEMATICS("Mathematics"),
+    MYTHOLOGY("Mythology"),
+    SPORTS("Sports"),
+    GEOGRAPHY("Geography"),
+    HISTORY("History"),
+    POLITICS("Politics"),
+    ART("Art"),
+    CELEBRITIES("Celebrities"),
+    ANIMALS("Animals"),
+    VEHICLES("Vehicles"),
+    COMICS("Comics"),
+    GADGETS("Gadgets"),
+    ANIME_AND_MANGA("Anime & Manga"),
+    CARTOON_AND_ANIMATIONS("Cartoon & Animations"),
+    OTHER("Other");
 
-    override fun toString(): String {
+    fun getName() : String {
         return displayName
     }
-
 }

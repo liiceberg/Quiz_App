@@ -45,6 +45,7 @@
     <string name="bad_request">Bad request</string>
     <string name="server_exception">Server is not response</string>
     <string name="empty_questions_list_response">Questions not found</string>
+    <string name="empty_categories_list_response">Categories not found</string>
     <string name="unknown_error">Unknown error occurred</string>
 
 </resources>

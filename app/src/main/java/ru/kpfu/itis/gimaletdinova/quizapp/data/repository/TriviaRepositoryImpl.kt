@@ -3,32 +3,49 @@ package ru.kpfu.itis.gimaletdinova.quizapp.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import ru.kpfu.itis.gimaletdinova.quizapp.R
+import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.EmptyCategoriesListException
 import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.EmptyQuestionsListException
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.mapper.QuestionsListMapper
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.TriviaApi
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.mapper.CategoriesMapper
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.mapper.QuestionsListMapper
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.isEmptyResponse
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.TriviaRepository
+import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.LevelDifficulty
+import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.QuestionType
 import javax.inject.Inject
 
 class TriviaRepositoryImpl @Inject constructor(
     private val api: TriviaApi,
     @ApplicationContext private val ctx: Context,
-    private val mapper: QuestionsListMapper
+    private val questionsListMapper: QuestionsListMapper,
+    private val categoriesMapper: CategoriesMapper,
 ): TriviaRepository {
     override suspend fun getTrivia(
         amount: Int,
         category: Int,
-        difficulty: String,
-        type: String
+        difficulty: LevelDifficulty,
+        type: QuestionType
     ): QuestionsList {
-        val domainModel = mapper.mapResponseToQuestionsList(
+        val domainModel = questionsListMapper.mapResponseToQuestionsList(
             api.getQuestions(amount, category, difficulty, type)
         )
-        return if (domainModel != null && domainModel.isEmptyResponse().not()) {
+        return if (domainModel != null && domainModel.questions.isNotEmpty()) {
             domainModel
         } else {
             throw EmptyQuestionsListException(ctx.getString(R.string.empty_questions_list_response))
+        }
+    }
+
+    override suspend fun getCategories(): CategoriesList {
+        val categories = categoriesMapper.mapResponseToCategoriesList(
+            api.getCategories()
+        )
+        return if (categories != null && categories.categoriesList.isNotEmpty()) {
+            categories
+        }
+        else {
+            throw EmptyCategoriesListException(ctx.getString(R.string.empty_categories_list_response))
         }
     }
 }

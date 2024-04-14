@@ -1,23 +1,25 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.response
 
 import com.google.gson.annotations.SerializedName
+import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.LevelDifficulty
+import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.QuestionType
 
 data class TriviaResponse(
     @SerializedName("results")
-    val questions: List<QuestionData>? = null
+    val questions: List<QuestionData>
 )
 
 data class QuestionData(
     @SerializedName("type")
-    val type: String? = null,
+    val type: QuestionType,
     @SerializedName("difficulty")
-    val difficulty: String? = null,
+    val difficulty: LevelDifficulty,
     @SerializedName("category")
-    val category: String? = null,
+    val category: String,
     @SerializedName("question")
-    val question: String? = null,
+    val question: String,
     @SerializedName("correct_answer")
-    val correctAnswer: String? = null,
+    val correctAnswer: String,
     @SerializedName("incorrect_answers")
-    val incorrectAnswers: List<String>? = null,
+    val incorrectAnswers: List<String>
 )
