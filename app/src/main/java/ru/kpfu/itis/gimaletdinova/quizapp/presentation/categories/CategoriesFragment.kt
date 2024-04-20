@@ -14,6 +14,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoriesBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.model.Category
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 import java.util.stream.Collectors
@@ -63,7 +64,8 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
         binding.root.findNavController().navigate(
             R.id.action_categoriesFragment_to_levelsFragment,
             bundleOf(
-                CATEGORY_NAME to category.name
+                CATEGORY_NAME to category.name,
+                CATEGORY_ID to category.id
             )
         )
     }

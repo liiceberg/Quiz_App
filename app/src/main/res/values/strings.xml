@@ -13,8 +13,8 @@
 
         <!--    Text    -->
     <string name="level_number">%d/%d</string>
-    <string name="user_questions_number">Your questions: %d</string>
-    <string name="total_questions_number">Total questions: %d</string>
+    <string name="user_questions_number">Your scores: %d</string>
+    <string name="total_questions_number">Total scores: %d</string>
     <string name="difficulty_easy">Easy</string>
     <string name="difficulty_medium">Medium</string>
     <string name="difficulty_high">High</string>
@@ -48,4 +48,7 @@
     <string name="empty_categories_list_response">Categories not found</string>
     <string name="unknown_error">Unknown error occurred</string>
 
+        <!--    Arguments    -->
+    <string name="category_id_arg">category_id</string>
+    <string name="level_number_arg">level_number</string>
 </resources>

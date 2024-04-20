@@ -20,8 +20,10 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.options.
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MAX_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
+import java.util.stream.Collectors
 
 @AndroidEntryPoint
 class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_options) {
@@ -41,10 +43,15 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
             startBtn.setOnClickListener {
                 if (isPlayersCorrect()) {
 
+                    val players = inputAdapter?.currentList?.stream()
+                        ?.map { model -> model.text }
+                        ?.collect(Collectors.toList())
+
                     binding.root.findNavController().navigate(
                         R.id.action_multiplayerOptionsFragment_to_prelaunchFragment,
                         bundleOf(
-                            IS_MULTIPLAYER to true
+                            IS_MULTIPLAYER to true,
+                            PLAYERS_NAMES to players
                         )
                     )
                 }

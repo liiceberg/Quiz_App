@@ -27,7 +27,7 @@
         tools:layout="@layout/fragment_categories">
         <action
             android:id="@+id/action_categoriesFragment_to_levelsFragment"
-            app:destination="@id/levelsFragment" />
+            app:destination="@id/levelsFragment"/>
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -58,6 +58,7 @@
         <action
             android:id="@+id/action_levelsFragment_to_resultsViewFragment"
             app:destination="@id/resultsViewFragment" />
+
     </fragment>
 
     <fragment
@@ -74,7 +75,7 @@
     </fragment>
     <fragment
         android:id="@+id/prelaunchFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.navigation_views.PrelaunchFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.PrelaunchFragment"
         android:label="PrelaunchFragment"
         tools:layout="@layout/fragment_prelaunch">
         <action
@@ -95,7 +96,7 @@
     </fragment>
     <fragment
         android:id="@+id/resultsFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.ResultsFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.results.ResultsFragment"
         android:label="ResultsFragment"
         tools:layout="@layout/fragment_results">
         <action
@@ -107,7 +108,7 @@
     </fragment>
     <fragment
         android:id="@+id/resultsViewFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.ResultsViewFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.results.ResultsViewFragment"
         android:label="ResultsViewFragment"
         tools:layout="@layout/fragment_results_view">
         <action

@@ -16,7 +16,11 @@ class LevelsHolder(
 
     init {
         binding.valueBtn.setOnClickListener {
-            item?.let(onItemClicked)
+            item?.let {
+                if (it.isBlocked.not()) {
+                    it.let(onItemClicked)
+                }
+            }
         }
     }
 
