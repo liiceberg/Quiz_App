@@ -21,7 +21,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.LevelDifficulty
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 
 @AndroidEntryPoint

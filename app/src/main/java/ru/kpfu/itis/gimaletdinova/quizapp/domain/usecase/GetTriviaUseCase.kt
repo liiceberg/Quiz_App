@@ -6,9 +6,9 @@ import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoryModel
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.TriviaRepository
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.Category
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.LevelDifficulty
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.QuestionType
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.Category
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
 import javax.inject.Inject
 
 class GetTriviaUseCase @Inject constructor(

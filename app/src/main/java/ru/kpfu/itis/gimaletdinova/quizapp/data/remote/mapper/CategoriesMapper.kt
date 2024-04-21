@@ -4,7 +4,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.response.CategoryData
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.response.CategoryResponse
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoryModel
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.Category
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.Category
 import java.util.stream.Collectors
 import javax.inject.Inject
 

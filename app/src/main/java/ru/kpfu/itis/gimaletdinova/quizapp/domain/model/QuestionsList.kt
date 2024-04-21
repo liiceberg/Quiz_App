@@ -1,7 +1,7 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.domain.model
 
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.LevelDifficulty
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.QuestionType
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
 
 data class QuestionsList(
     val questions: List<QuestionModel>

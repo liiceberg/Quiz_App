@@ -1,7 +1,7 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.response
 
 import com.google.gson.annotations.SerializedName
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.Category
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.Category
 
 data class CategoryResponse (
     @SerializedName("trivia_categories")

@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.util.enums
+package ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums
 
 import com.google.gson.annotations.SerializedName
 

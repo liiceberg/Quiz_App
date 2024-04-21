@@ -15,9 +15,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentQuestionBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.QUESTIONS_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYER_SCORES
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
@@ -30,12 +32,14 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
 
     private val questionViewModel: QuestionViewModel by activityViewModels()
 
-    private var correctAnswersNumber = 0
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         questionViewModel.updateTimer()
 
         binding.run {
+
+            if (questionViewModel.isMultiplayer.not()) {
+                usernameTv.visibility = View.GONE
+            }
 
             for (i in 0 until answersLl.childCount) {
                 (answersLl.getChildAt(i) as? Button)?.setOnClickListener {
@@ -51,8 +55,9 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
             with(questionViewModel) {
                 questionsFlow.observe(this@QuestionFragment) { q ->
                     q?.let {
+                        usernameTv.text = questionViewModel.getPlayer()
                         questionNumberTv.text =
-                            getString(R.string.question_number, q.number, QUESTIONS_NUMBER)
+                            getString(R.string.question_number, q.number, questionsListSize)
                         questionTv.text = q.question
 
                         for (i in 0 until answersLl.childCount) {
@@ -75,6 +80,11 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
 
                 timeFlow.observe(this@QuestionFragment) {
                     timerPb.progress = it
+                    if (it == 0) {
+                        lifecycleScope.launch {
+                            verifyAnswer(-1)
+                        }
+                    }
                 }
             }
         }
@@ -84,12 +94,19 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
         val correctAnswerPosition = questionViewModel.questionsFlow.value?.correctAnswerPosition
         setAnswerColor(userAnswerPosition, correctAnswerPosition)
 
-        if (userAnswerPosition == correctAnswerPosition) correctAnswersNumber++
+        if (userAnswerPosition == correctAnswerPosition) {
+            questionViewModel.saveScores(binding.usernameTv.text.toString())
+        }
 
         delay(1_000)
-
         questionViewModel.updateTimer()
-        if (questionViewModel.timeFlow.value == -1) navigateToResults()
+        if (questionViewModel.timeFlow.value == -1) {
+            if (questionViewModel.isGameOver()) {
+                navigateToResults()
+            } else {
+                findNavController().navigate(R.id.action_questionFragment_to_categoryChoiceFragment)
+            }
+        }
     }
 
     private fun setAnswerColor(userAnswerPosition: Int, correctAnswerPosition: Int?) {
@@ -119,19 +136,25 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
     }
 
     private fun navigateToResults() {
-        val isMultiplayer = requireArguments().getBoolean(IS_MULTIPLAYER)
-        val bundle = if (isMultiplayer) {
-            bundleOf(IS_MULTIPLAYER to true)
-        } else {
-            bundleOf(
-                IS_MULTIPLAYER to false,
-                PLAYER_SCORES to correctAnswersNumber
-            )
+
+        val playersNames = mutableListOf<String>()
+        val playersScores = mutableListOf<Int>()
+        questionViewModel.scores.toList().sortedByDescending { it.second }.map {
+            playersNames.add(it.first)
+            playersScores.add(it.second)
         }
+
         findNavController().navigate(
             R.id.action_questionFragment_to_resultsFragment,
-            bundle
+            bundleOf(
+                IS_MULTIPLAYER to questionViewModel.isMultiplayer,
+                PLAYERS_NAMES to playersNames,
+                PLAYERS_SCORES to playersScores,
+                CATEGORY_ID to arguments?.getInt(CATEGORY_ID),
+                LEVEL_NUMBER to arguments?.getInt(LEVEL_NUMBER),
+            )
         )
+        questionViewModel.clear()
     }
 
 

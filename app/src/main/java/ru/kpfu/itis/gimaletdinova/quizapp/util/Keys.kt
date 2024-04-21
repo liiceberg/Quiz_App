@@ -7,7 +7,7 @@ object Keys {
 
     const val IS_MULTIPLAYER = "IS_MULTIPLAYER"
     const val PLAYERS_NAMES = "PLAYERS_NAMES"
-    const val PLAYER_SCORES = "PLAYER_SCORES"
+    const val PLAYERS_SCORES = "PLAYERS_SCORES"
 
     const val DATA_STORE_NAME = "DATA_STORE_NAME"
 }

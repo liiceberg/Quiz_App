@@ -1,8 +1,8 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.response
 
 import com.google.gson.annotations.SerializedName
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.LevelDifficulty
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.QuestionType
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
 
 data class TriviaResponse(
     @SerializedName("results")

@@ -87,7 +87,7 @@
     </fragment>
     <fragment
         android:id="@+id/categoryChoiceFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.CategoryChoiceFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.CategoryChoiceFragment"
         android:label="CategoryChoiceFragment"
         tools:layout="@layout/fragment_category_choice">
         <action

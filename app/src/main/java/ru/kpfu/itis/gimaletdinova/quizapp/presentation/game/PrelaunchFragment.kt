@@ -5,9 +5,11 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentPrelaunchBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
@@ -15,8 +17,8 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.LevelDifficulty
-import ru.kpfu.itis.gimaletdinova.quizapp.util.enums.exception.LevelDifficultyNotFoundException
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.exception.LevelDifficultyNotFoundException
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
@@ -30,10 +32,14 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val isMultiplayer = requireArguments().getBoolean(IS_MULTIPLAYER)
+        questionViewModel.setMode(requireArguments().getBoolean(IS_MULTIPLAYER))
 
-        if (isMultiplayer) {
-            val players = requireArguments().getStringArray(PLAYERS_NAMES)
+        lifecycleScope.launch {
+            questionViewModel.setPlayers(arguments?.getStringArrayList(PLAYERS_NAMES))
+        }
+
+        if (questionViewModel.isMultiplayer) {
+            questionViewModel.getCategoriesList()
         } else {
             val categoryId = requireArguments().getInt(CATEGORY_ID)
             val level = requireArguments().getInt(LEVEL_NUMBER)
@@ -54,12 +60,19 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
             }
 
             playBtn.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_prelaunchFragment_to_questionFragment,
-                    bundleOf(
-                        IS_MULTIPLAYER to isMultiplayer
+                if (questionViewModel.isMultiplayer) {
+                    findNavController().navigate(
+                        R.id.action_prelaunchFragment_to_categoryChoiceFragment
                     )
-                )
+                } else {
+                    findNavController().navigate(
+                        R.id.action_prelaunchFragment_to_questionFragment,
+                        bundleOf(
+                            CATEGORY_ID to requireArguments().getInt(CATEGORY_ID),
+                            LEVEL_NUMBER to requireArguments().getInt(LEVEL_NUMBER),
+                        )
+                    )
+                }
 
             }
         }

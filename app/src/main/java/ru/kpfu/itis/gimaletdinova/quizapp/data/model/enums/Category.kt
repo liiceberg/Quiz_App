@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.util.enums
+package ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums
 
 import com.google.gson.annotations.SerializedName
 
@@ -27,7 +27,7 @@ enum class Category(private val displayName: String) {
     @SerializedName("Entertainment: Board Games")
     BOARD_GAMES("Board Games"),
 
-    @SerializedName("Science &amp; Nature")
+    @SerializedName("Science & Nature")
     SCIENCE_AND_NATURE("Science & Nature"),
 
     @SerializedName("Science: Computers")

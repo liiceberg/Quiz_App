@@ -13,4 +13,5 @@ object Constants {
     const val QUESTION_TIME = 20_000L
 
     const val MIN_CORRECT_ANSWERS_NUMBER_TO_WIN = QUESTIONS_NUMBER - 2
+    const val PLAYERS_QUESTIONS_NUMBER_PROPORTION = 3
 }

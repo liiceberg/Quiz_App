@@ -7,8 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
@@ -32,14 +30,6 @@ class ResultsViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    suspend fun getUsername() : String {
-         return viewModelScope.async {
-            withContext(dispatcher) {
-                prefs.data.firstOrNull()?.get(PrefsKeys.USERNAME_KEY) ?: "user"
-            }
-        }.await()
     }
 
 }

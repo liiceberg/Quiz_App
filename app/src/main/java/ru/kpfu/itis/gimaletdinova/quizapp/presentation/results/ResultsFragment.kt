@@ -17,8 +17,10 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.results.model.ScoreModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYER_SCORES
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
 
 @AndroidEntryPoint
 class ResultsFragment : Fragment(R.layout.fragment_results) {
@@ -33,14 +35,26 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
         val isMultiplayerMode = requireArguments().getBoolean(IS_MULTIPLAYER)
 
+        val scores = getScoresList()
+
         with(binding) {
             if (isMultiplayerMode) {
                 gameStatusTitleTv.visibility = View.GONE
                 resultsTv.visibility = View.GONE
                 imageIv.visibility = View.GONE
+
+                nextBtn.setOnClickListener {
+                    findNavController().navigate(
+                        R.id.action_resultsFragment_to_prelaunchFragment,
+                        bundleOf(
+                            IS_MULTIPLAYER to true,
+                            PLAYERS_NAMES to scores.stream().map { model -> model.user }.toArray()
+                        )
+                    )
+                }
             } else {
-                val scores = requireArguments().getInt(PLAYER_SCORES)
-                val isWin = scores >= MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
+
+                val isWin = scores[0].score >= MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 
                 val title = if (isWin) R.string.win_title_text else R.string.lose_title_text
                 gameStatusTitleTv.text = getString(title)
@@ -53,12 +67,26 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                 imageIv.setImageResource(img)
 
                 resultsViewModel.saveScores(
-                    scores,
+                    scores[0].score,
                     Constants.QUESTIONS_NUMBER
                 )
+
+                nextBtn.setOnClickListener {
+                    var level = requireArguments().getInt(Keys.LEVEL_NUMBER)
+                    if (isWin) ++level
+
+                    findNavController().navigate(
+                        R.id.action_resultsFragment_to_prelaunchFragment,
+                        bundleOf(
+                            IS_MULTIPLAYER to false,
+                            Keys.CATEGORY_ID to requireArguments().getInt(Keys.CATEGORY_ID),
+                            Keys.LEVEL_NUMBER to level
+                        )
+                    )
+                }
             }
             lifecycleScope.launch {
-                initRv()
+                initRv(scores)
             }
 
             exitBtn.setOnClickListener {
@@ -67,35 +95,24 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                 )
             }
 
-
-            val bundle = if (isMultiplayerMode) {
-                bundleOf(IS_MULTIPLAYER to true)
-            } else {
-                bundleOf(IS_MULTIPLAYER to false)
-            }
-            nextBtn.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_resultsFragment_to_prelaunchFragment,
-                    bundle
-                )
-            }
         }
     }
 
-    private suspend fun initRv() {
+    private fun initRv(scores: List<ScoreModel>) {
         binding.scoresRv.apply {
-            adapter = ResultsAdapter(getScoresList())
+            adapter = ResultsAdapter(scores)
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
     }
 
-    private suspend fun getScoresList() : List<ScoreModel> {
+    private fun getScoresList(): List<ScoreModel> {
         val list = mutableListOf<ScoreModel>()
-        if (requireArguments().getBoolean(IS_MULTIPLAYER)) {
-        } else {
-            val user = resultsViewModel.getUsername()
-            val score = requireArguments().getInt(PLAYER_SCORES)
-            list.add(ScoreModel(user, score))
+        val players = requireArguments().getStringArrayList(PLAYERS_NAMES)
+        val scores = requireArguments().getIntegerArrayList(PLAYERS_SCORES)
+        if (players != null && scores != null) {
+            for (i in players.indices) {
+                list.add(ScoreModel(players[i], scores[i]))
+            }
         }
         return list
     }
