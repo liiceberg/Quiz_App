@@ -1,12 +1,14 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.options
 
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.core.os.bundleOf
-import androidx.navigation.findNavController
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -15,7 +17,6 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentMultiplayerOptionsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
-import androidx.fragment.app.Fragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.options.model.InputModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MAX_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_PLAYERS_NUMBER
@@ -47,13 +48,17 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
                         ?.map { model -> model.text }
                         ?.collect(Collectors.toList())
 
-                    binding.root.findNavController().navigate(
+                    findNavController().navigate(
                         R.id.action_multiplayerOptionsFragment_to_prelaunchFragment,
                         bundleOf(
                             IS_MULTIPLAYER to true,
                             PLAYERS_NAMES to players
                         )
                     )
+                } else {
+                    inputAdapter?.currentList?.stream()?.filter { it.text == "" }?.count()?.let {
+                        emptyFieldsNumber -> if (emptyFieldsNumber > 0) showWarning()
+                    }
                 }
             }
 
@@ -67,8 +72,10 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
     }
 
     private fun initRecyclerView() {
-        inputAdapter = InputAdapter(diffCallback = InputDiffUtilItemCallback(),
-            ::onTextChanged)
+        inputAdapter = InputAdapter(
+            diffCallback = InputDiffUtilItemCallback(),
+            ::onTextChanged
+        )
         inputAdapter?.setItems(createInputList())
 
         binding.inputRv.apply {
@@ -157,12 +164,21 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
 
     private fun getPlayersNumber(): Int = binding.playersNumberTv.text.toString().toInt()
 
-    private fun createInputList() : List<InputModel> {
+    private fun createInputList(): List<InputModel> {
         val list = mutableListOf<InputModel>()
-        for (pos in 1 .. MIN_PLAYERS_NUMBER) {
+        for (pos in 1..MIN_PLAYERS_NUMBER) {
             list.add(InputModel(position = pos))
         }
         return list
+    }
+
+    private fun showWarning() {
+        AlertDialog.Builder(context)
+            .setMessage(getString(R.string.options_dialog_text))
+            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                dialog.cancel()
+            }
+            .show()
     }
 
 }

@@ -27,7 +27,7 @@
         tools:layout="@layout/fragment_categories">
         <action
             android:id="@+id/action_categoriesFragment_to_levelsFragment"
-            app:destination="@id/levelsFragment"/>
+            app:destination="@id/levelsFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -68,10 +68,20 @@
         tools:layout="@layout/fragment_question">
         <action
             android:id="@+id/action_questionFragment_to_categoryChoiceFragment"
-            app:destination="@id/categoryChoiceFragment" />
+            app:destination="@id/categoryChoiceFragment"
+            app:popUpTo="@id/multiplayerOptionsFragment" />
         <action
             android:id="@+id/action_questionFragment_to_resultsFragment"
-            app:destination="@id/resultsFragment" />
+            app:destination="@id/resultsFragment"
+            app:popUpTo="@id/levelsFragment"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
+        <action
+            android:id="@+id/action_questionFragment_to_resultsFragment_multiplayer"
+            app:destination="@id/resultsFragment"
+            app:popUpTo="@id/multiplayerOptionsFragment"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
     </fragment>
     <fragment
         android:id="@+id/prelaunchFragment"
@@ -80,10 +90,14 @@
         tools:layout="@layout/fragment_prelaunch">
         <action
             android:id="@+id/action_prelaunchFragment_to_questionFragment"
-            app:destination="@id/questionFragment" />
+            app:destination="@id/questionFragment"
+            app:popUpTo="@id/levelsFragment"
+            app:popUpToSaveState="true"
+            app:restoreState="true" />
         <action
             android:id="@+id/action_prelaunchFragment_to_categoryChoiceFragment"
-            app:destination="@id/categoryChoiceFragment" />
+            app:destination="@id/categoryChoiceFragment"
+            app:popUpTo="@id/multiplayerOptionsFragment" />
     </fragment>
     <fragment
         android:id="@+id/categoryChoiceFragment"
@@ -92,7 +106,8 @@
         tools:layout="@layout/fragment_category_choice">
         <action
             android:id="@+id/action_categoryChoiceFragment_to_questionFragment"
-            app:destination="@id/questionFragment" />
+            app:destination="@id/questionFragment"
+            app:popUpTo="@id/multiplayerOptionsFragment" />
     </fragment>
     <fragment
         android:id="@+id/resultsFragment"

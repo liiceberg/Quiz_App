@@ -47,12 +47,12 @@ class InputHolder(
         }
     }
 
-        fun bindItem(item: InputModel) {
-            this.item = item
-            with(binding) {
-                usernameEtLayout.hint =
-                    root.context.getString(R.string.player_input_hint, item.position)
-            }
+    fun bindItem(item: InputModel) {
+        this.item = item
+        with(binding) {
+            usernameEtLayout.hint =
+                root.context.getString(R.string.player_input_hint, item.position)
         }
-
     }
+
+}

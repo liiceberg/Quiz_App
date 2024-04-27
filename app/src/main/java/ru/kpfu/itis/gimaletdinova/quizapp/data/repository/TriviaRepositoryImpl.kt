@@ -21,6 +21,8 @@ class TriviaRepositoryImpl @Inject constructor(
     private val questionsListMapper: QuestionsListMapper,
     private val categoriesMapper: CategoriesMapper,
 ): TriviaRepository {
+
+    private var categoriesList: CategoriesList? = null
     override suspend fun getTrivia(
         amount: Int,
         category: Int,
@@ -38,11 +40,15 @@ class TriviaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCategories(): CategoriesList {
+        if (categoriesList != null) {
+            return categoriesList!!
+        }
         val categories = categoriesMapper.mapResponseToCategoriesList(
             api.getCategories()
         )
-        return if (categories != null && categories.categoriesList.isNotEmpty()) {
-            categories
+        if (categories != null && categories.categoriesList.isNotEmpty()) {
+            categoriesList = categories
+            return categoriesList!!
         }
         else {
             throw EmptyCategoriesListException(ctx.getString(R.string.empty_categories_list_response))

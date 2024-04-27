@@ -1,6 +1,7 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.game
 
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -12,6 +13,10 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
@@ -40,6 +45,19 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
                         }
                         View.GONE
                     }
+                }
+            }
+
+            lifecycleScope.launch {
+                questionViewModel.errorsChannel.consumeEach {
+                    AlertDialog.Builder(context)
+                        .setTitle(getString(R.string.unknown_error))
+                        .setMessage(getString(R.string.network_error_dialog_text))
+                        .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                            dialog.cancel()
+                            findNavController().popBackStack()
+                        }
+                        .show()
                 }
             }
 

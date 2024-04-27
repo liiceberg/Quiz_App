@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -64,7 +65,10 @@ class QuestionViewModel @Inject constructor(
     private var categoryChoiceCounter = 0
     private var playersIterator = players.iterator()
 
+    var onPause = false
+
     val scores = HashMap<String, Int>()
+    val errorsChannel = Channel<Throwable>()
 
     fun setMode(isMultiplayer: Boolean) {
         _isMultiplayer = isMultiplayer
@@ -89,6 +93,8 @@ class QuestionViewModel @Inject constructor(
                 )
             }.onSuccess { data ->
                 questionsList = data.questions
+            }.onFailure { ex ->
+                errorsChannel.send(ex)
             }
             _loadingFlow.value = false
         }
@@ -148,6 +154,8 @@ class QuestionViewModel @Inject constructor(
                 getCategoriesUseCase.invoke()
             }.onSuccess {
                 _categoriesList = it
+            }.onFailure { ex ->
+                errorsChannel.send(ex)
             }
             _loadingFlow.value = false
         }
@@ -164,9 +172,17 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun clear() {
+        timer?.cancel()
         scores.clear()
         categoryChoiceCounter = 0
         players.clear()
+        onPause = false
+        counter = 0
+    }
+
+    override fun onCleared() {
+        errorsChannel.close()
+        super.onCleared()
     }
 
 }

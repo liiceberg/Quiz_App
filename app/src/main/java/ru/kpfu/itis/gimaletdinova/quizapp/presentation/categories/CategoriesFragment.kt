@@ -1,15 +1,19 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoriesBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
@@ -28,6 +32,7 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
     private val categoriesViewModel: CategoriesViewModel by viewModels()
     private var categoriesAdapter: CategoriesAdapter? = null
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(categoriesViewModel) {
             getCategories()
@@ -42,6 +47,19 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
                         }
                         View.GONE
                     }
+                }
+            }
+
+            lifecycleScope.launch {
+                errorsChannel.consumeEach {
+                    AlertDialog.Builder(context)
+                        .setTitle(getString(R.string.unknown_error))
+                        .setMessage(getString(R.string.network_error_dialog_text))
+                        .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                            dialog.cancel()
+                            findNavController().popBackStack()
+                        }
+                        .show()
                 }
             }
         }
@@ -61,7 +79,7 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
     }
 
     private fun onItemClicked(category: Category) {
-        binding.root.findNavController().navigate(
+        findNavController().navigate(
             R.id.action_categoriesFragment_to_levelsFragment,
             bundleOf(
                 CATEGORY_NAME to category.name,

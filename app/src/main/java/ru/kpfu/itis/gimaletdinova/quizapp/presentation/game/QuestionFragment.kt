@@ -33,7 +33,12 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
     private val questionViewModel: QuestionViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        questionViewModel.updateTimer()
+
+        if (questionViewModel.onPause.not()) {
+            questionViewModel.updateTimer()
+        } else {
+            questionViewModel.onPause = false
+        }
 
         binding.run {
 
@@ -143,9 +148,13 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
             playersNames.add(it.first)
             playersScores.add(it.second)
         }
-
+        val action = if (questionViewModel.isMultiplayer) {
+            R.id.action_questionFragment_to_resultsFragment_multiplayer
+        } else {
+            R.id.action_questionFragment_to_resultsFragment
+        }
         findNavController().navigate(
-            R.id.action_questionFragment_to_resultsFragment,
+            action,
             bundleOf(
                 IS_MULTIPLAYER to questionViewModel.isMultiplayer,
                 PLAYERS_NAMES to playersNames,
@@ -157,5 +166,8 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
         questionViewModel.clear()
     }
 
-
+    override fun onDestroyView() {
+        questionViewModel.onPause = true
+        super.onDestroyView()
+    }
 }

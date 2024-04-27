@@ -1,5 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.game
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
@@ -9,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentPrelaunchBinding
@@ -32,6 +34,7 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        questionViewModel.clear()
         questionViewModel.setMode(requireArguments().getBoolean(IS_MULTIPLAYER))
 
         lifecycleScope.launch {
@@ -56,6 +59,19 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
                         playBtn.isEnabled = true
                         View.GONE
                     }
+                }
+            }
+
+            lifecycleScope.launch {
+                questionViewModel.errorsChannel.consumeEach {
+                    AlertDialog.Builder(context)
+                        .setTitle(getString(R.string.unknown_error))
+                        .setMessage(getString(R.string.network_error_dialog_text))
+                        .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                            dialog.cancel()
+                            findNavController().popBackStack()
+                        }
+                        .show()
                 }
             }
 

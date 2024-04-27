@@ -21,6 +21,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
+import java.util.stream.Collectors
 
 @AndroidEntryPoint
 class ResultsFragment : Fragment(R.layout.fragment_results) {
@@ -48,7 +49,9 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                         R.id.action_resultsFragment_to_prelaunchFragment,
                         bundleOf(
                             IS_MULTIPLAYER to true,
-                            PLAYERS_NAMES to scores.stream().map { model -> model.user }.toArray()
+                            PLAYERS_NAMES to scores.stream()
+                                .map { model -> model.user }
+                                .collect(Collectors.toList())
                         )
                     )
                 }

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentLevelsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
@@ -21,7 +22,6 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 
 @AndroidEntryPoint
@@ -61,9 +61,10 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
             }
             layoutManager = manager
 
-            val marginValue = 2.getValueInPx(resources.displayMetrics)
-            addItemDecoration(SimpleHorizontalMarginDecoration(marginValue))
-            addItemDecoration(SimpleVerticalMarginDecoration(marginValue))
+            val verticalMarginValue = 2.getValueInPx(resources.displayMetrics)
+            val horizontalMarginValue = 8.getValueInPx(resources.displayMetrics)
+            addItemDecoration(SimpleHorizontalMarginDecoration(horizontalMarginValue))
+            addItemDecoration(SimpleVerticalMarginDecoration(verticalMarginValue))
         }
     }
 

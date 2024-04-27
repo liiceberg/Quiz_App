@@ -27,6 +27,9 @@
     <string name="lose_title_text">Loss</string>
     <string name="lose_text">Oh, no! Try again</string>
     <string name="warning_text">Click when you are ready to start</string>
+    <string name="ok">OK</string>
+    <string name="options_dialog_text">You have to enter the names of the players</string>
+    <string name="network_error_dialog_text">Please, check Internet connection and try again</string>
 
 
 
@@ -48,7 +51,4 @@
     <string name="empty_categories_list_response">Categories not found</string>
     <string name="unknown_error">Unknown error occurred</string>
 
-        <!--    Arguments    -->
-    <string name="category_id_arg">category_id</string>
-    <string name="level_number_arg">level_number</string>
 </resources>
