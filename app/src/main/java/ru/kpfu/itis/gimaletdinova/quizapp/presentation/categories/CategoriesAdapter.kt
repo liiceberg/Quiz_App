@@ -7,7 +7,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemCategoryBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.model.Category
 
 class CategoriesAdapter(
-    private val items: MutableList<Category>,
+    private val items: List<Category>,
     private val onItemClicked: ((Category) -> Unit)
 ) : RecyclerView.Adapter<CategoriesHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoriesHolder =

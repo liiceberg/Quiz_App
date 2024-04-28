@@ -90,4 +90,9 @@ dependencies {
 
     val loggingVersion = "4.12.0"
     implementation("com.squareup.okhttp3:logging-interceptor:$loggingVersion")
+
+    val roomVersion = "2.6.0"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
 }

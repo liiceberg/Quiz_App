@@ -3,24 +3,27 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.LevelsRepository
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.usecase.GetCategoriesUseCase
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.model.Category
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val exceptionHandlerDelegate: ExceptionHandlerDelegate
+    private val levelsRepository: LevelsRepository,
+    private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
+    private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
-
-    private var _categoriesList: CategoriesList? = null
-    val categoriesList get() = _categoriesList
+    val categoriesList = mutableListOf<Category>()
 
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
@@ -31,7 +34,18 @@ class CategoriesViewModel @Inject constructor(
             runCatching(exceptionHandlerDelegate) {
                 getCategoriesUseCase.invoke()
             }.onSuccess {
-                _categoriesList = it
+                withContext(dispatcher) {
+                    for (category in it.categoriesList) {
+                        val levelsNumber = levelsRepository.getNumberByCategory(category.id)
+                        categoriesList.add(
+                            Category(
+                                id = category.id,
+                                name = category.displayName,
+                                levelsNumber = levelsNumber
+                            )
+                        )
+                    }
+                }
             }.onFailure { ex ->
                 errorsChannel.send(ex)
             }
