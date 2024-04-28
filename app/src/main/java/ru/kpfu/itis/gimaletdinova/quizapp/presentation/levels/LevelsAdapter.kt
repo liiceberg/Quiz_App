@@ -12,7 +12,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Item
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Level
 
 class LevelsAdapter(
-    private val items: MutableList<Item>,
+    private val items: List<Item>,
     private val onItemClicked: ((Level) -> Unit)
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
