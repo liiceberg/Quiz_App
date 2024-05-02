@@ -28,11 +28,14 @@ class LevelsViewModel @Inject constructor(
 
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
+    private var _levelsNumber: Int = -1
+    val levelsNumber get() = _levelsNumber
     fun getLevels(id: Int) {
+        levelsList.clear()
         viewModelScope.launch {
             _loadingFlow.value = true
             withContext(dispatcher) {
-                val levelsNumber = levelsRepository.getNumberByCategory(id)
+                _levelsNumber = levelsRepository.getNumberByCategory(id)
                 levelsList.add(Difficulty(LevelDifficulty.EASY.name))
                 for (i in 1..Constants.LEVELS_NUMBER) {
                     when (i - 1) {

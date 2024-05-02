@@ -51,6 +51,7 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
                     AlertDialog.Builder(context)
                         .setTitle(getString(R.string.unknown_error))
                         .setMessage(getString(R.string.network_error_dialog_text))
+                        .setCancelable(false)
                         .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
                             dialog.cancel()
                             findNavController().popBackStack()

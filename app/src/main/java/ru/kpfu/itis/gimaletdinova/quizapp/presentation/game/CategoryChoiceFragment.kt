@@ -40,6 +40,7 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
                         View.VISIBLE
                     } else {
                         if (isQuestionsLoaded) {
+                            questionViewModel.onPause = false
                             findNavController()
                                 .navigate(R.id.action_categoryChoiceFragment_to_questionFragment)
                         }
@@ -53,6 +54,7 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
                     AlertDialog.Builder(context)
                         .setTitle(getString(R.string.unknown_error))
                         .setMessage(getString(R.string.network_error_dialog_text))
+                        .setCancelable(false)
                         .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
                             dialog.cancel()
                             findNavController().popBackStack()

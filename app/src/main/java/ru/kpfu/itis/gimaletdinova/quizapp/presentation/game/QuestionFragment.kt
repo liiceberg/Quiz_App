@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentQuestionBinding
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
@@ -33,7 +34,6 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
     private val questionViewModel: QuestionViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         if (questionViewModel.onPause.not()) {
             questionViewModel.updateTimer()
         } else {
@@ -70,7 +70,7 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
                             answersLl.getChildAt(i).apply {
 
                                 setBackgroundColor(
-                                    requireActivity().getThemeColor(
+                                    context.getThemeColor(
                                         com.google.android.material.R.attr.colorPrimary
                                     )
                                 )
@@ -79,6 +79,7 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
                                 (this as? Button)?.text = q.answers[i]
                             }
                         }
+                        println(q.correctAnswerPosition)
                     }
 
                 }
@@ -96,20 +97,24 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
     }
 
     private suspend fun verifyAnswer(userAnswerPosition: Int) {
-        val correctAnswerPosition = questionViewModel.questionsFlow.value?.correctAnswerPosition
-        setAnswerColor(userAnswerPosition, correctAnswerPosition)
+        with(questionViewModel) {
+            if (isMultiplayer.not()) saveUserAnswer(userAnswerPosition)
 
-        if (userAnswerPosition == correctAnswerPosition) {
-            questionViewModel.saveScores(binding.usernameTv.text.toString())
-        }
+            val correctAnswerPosition = questionsFlow.value?.correctAnswerPosition
+            setAnswerColor(userAnswerPosition, correctAnswerPosition)
 
-        delay(1_000)
-        questionViewModel.updateTimer()
-        if (questionViewModel.timeFlow.value == -1) {
-            if (questionViewModel.isGameOver()) {
-                navigateToResults()
-            } else {
-                findNavController().navigate(R.id.action_questionFragment_to_categoryChoiceFragment)
+            if (userAnswerPosition == correctAnswerPosition) {
+                saveScores(binding.usernameTv.text.toString())
+            }
+
+            delay(1_000)
+            updateTimer()
+            if (timeFlow.value == -1) {
+                if (isGameOver()) {
+                    finishGame()
+                } else {
+                    findNavController().navigate(R.id.action_questionFragment_to_categoryChoiceFragment)
+                }
             }
         }
     }
@@ -123,13 +128,13 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
             for (i in 0 until childCount) {
                 if (i == correctAnswerPosition) {
                     getChildAt(i).setBackgroundColor(
-                        requireActivity().getThemeColor(
+                        context.getThemeColor(
                             correctAnswerColor
                         )
                     )
                 } else if (i == userAnswerPosition) {
                     getChildAt(i).setBackgroundColor(
-                        requireActivity().getThemeColor(
+                        context.getThemeColor(
                             incorrectAnswerColor
                         )
                     )
@@ -138,6 +143,18 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
         }
 
 
+    }
+
+    private fun finishGame() {
+        with(questionViewModel) {
+            if (isMultiplayer.not() && scores.values.first() >= MIN_CORRECT_ANSWERS_NUMBER_TO_WIN) {
+                saveLevel(
+                    categoryId = requireArguments().getInt(CATEGORY_ID),
+                    levelNumber = requireArguments().getInt(LEVEL_NUMBER)
+                )
+            }
+        }
+        navigateToResults()
     }
 
     private fun navigateToResults() {
@@ -163,7 +180,6 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
                 LEVEL_NUMBER to arguments?.getInt(LEVEL_NUMBER),
             )
         )
-        questionViewModel.clear()
     }
 
     override fun onDestroyView() {

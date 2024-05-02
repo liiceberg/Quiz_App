@@ -16,6 +16,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.results.model.ScoreModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
@@ -46,7 +47,7 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
                 nextBtn.setOnClickListener {
                     findNavController().navigate(
-                        R.id.action_resultsFragment_to_prelaunchFragment,
+                        R.id.action_resultsFragment_to_prelaunchFragment_multiplayer,
                         bundleOf(
                             IS_MULTIPLAYER to true,
                             PLAYERS_NAMES to scores.stream()
@@ -74,8 +75,13 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                     Constants.QUESTIONS_NUMBER
                 )
 
+                var level = requireArguments().getInt(Keys.LEVEL_NUMBER)
+
+                if (level == LEVELS_NUMBER) {
+                    nextBtn.isEnabled = false
+                }
                 nextBtn.setOnClickListener {
-                    var level = requireArguments().getInt(Keys.LEVEL_NUMBER)
+
                     if (isWin) ++level
 
                     findNavController().navigate(

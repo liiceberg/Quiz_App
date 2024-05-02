@@ -44,6 +44,7 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
         } else {
             val categoryId = requireArguments().getInt(CATEGORY_ID)
             val level = requireArguments().getInt(LEVEL_NUMBER)
+
             questionViewModel.getQuestions(categoryId, LevelDifficulty.get(level))
         }
 
@@ -65,6 +66,7 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
                     AlertDialog.Builder(context)
                         .setTitle(getString(R.string.unknown_error))
                         .setMessage(getString(R.string.network_error_dialog_text))
+                        .setCancelable(false)
                         .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
                             dialog.cancel()
                             findNavController().popBackStack()
@@ -87,7 +89,7 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
                         )
                     )
                 }
-
+                requireArguments().clear()
             }
         }
     }

@@ -1,7 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.util
 
-import android.app.Activity
-import android.content.res.Resources
+import android.content.Context
 import android.text.Html
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -26,7 +25,7 @@ inline fun <T> Flow<T>.observe(fragment: Fragment, crossinline block: (T) -> Uni
     }
 }
 
-fun Activity.getThemeColor(resId: Int): Int {
+fun Context.getThemeColor(resId: Int): Int {
     val typedValue = TypedValue()
     theme.resolveAttribute(resId, typedValue, true)
     return typedValue.data

@@ -9,7 +9,7 @@ object Constants {
     const val MIN_PLAYERS_NUMBER = 2
     const val MAX_PLAYERS_NUMBER = 4
 
-    const val QUESTIONS_NUMBER = 6
+    const val QUESTIONS_NUMBER = 7
     const val QUESTION_TIME = 20_000L
 
     const val MIN_CORRECT_ANSWERS_NUMBER_TO_WIN = QUESTIONS_NUMBER - 2

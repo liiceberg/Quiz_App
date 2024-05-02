@@ -27,6 +27,8 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.QUESTION_TIME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.LevelsRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,7 +37,8 @@ class QuestionViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val prefs: DataStore<Preferences>,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val levelsRepository: LevelsRepository
 ) : ViewModel() {
 
     private var _isMultiplayer = false
@@ -44,8 +47,8 @@ class QuestionViewModel @Inject constructor(
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
 
-    private var questionsList: List<QuestionModel>? = null
-    val questionsListSize get() = questionsList?.size
+    private var questionsList: QuestionsList? = null
+    val questionsListSize get() = questionsList?.questions?.size
     private var counter = 0
 
     private val _questionsFlow = MutableStateFlow<QuestionModel?>(null)
@@ -63,7 +66,7 @@ class QuestionViewModel @Inject constructor(
 
     private val players = mutableListOf<String>()
     private var categoryChoiceCounter = 0
-    private var playersIterator = players.iterator()
+    private var playersIterator: MutableIterator<String>? = null
 
     var onPause = false
 
@@ -91,12 +94,22 @@ class QuestionViewModel @Inject constructor(
                     difficulty = difficulty,
                     type = QuestionType.MULTIPLE_CHOICE
                 )
-            }.onSuccess { data ->
-                questionsList = data.questions
+            }.onSuccess {
+                questionsList = it
             }.onFailure { ex ->
                 errorsChannel.send(ex)
             }
             _loadingFlow.value = false
+        }
+    }
+
+    fun saveLevel(categoryId: Int, levelNumber: Int) {
+        if (questionsList != null) {
+            viewModelScope.launch {
+                withContext(dispatcher) {
+                    levelsRepository.saveQuestions(levelNumber, categoryId, questionsList!!)
+                }
+            }
         }
     }
 
@@ -108,7 +121,7 @@ class QuestionViewModel @Inject constructor(
             _timeFlow.value = -1
             return
         }
-        _questionsFlow.value = questionsList?.get(counter)
+        _questionsFlow.value = questionsList?.questions?.get(counter)
         counter++
 
         _timeFlow.value = 100
@@ -136,11 +149,15 @@ class QuestionViewModel @Inject constructor(
         for (player in players) {
             scores[player] = 0
         }
+        playersIterator = players.iterator()
     }
 
     fun getPlayer(): String {
-        if (playersIterator.hasNext().not()) playersIterator = players.iterator()
-        return playersIterator.next()
+        if (playersIterator != null) {
+            if (playersIterator!!.hasNext().not()) playersIterator = players.iterator()
+            return playersIterator!!.next()
+        }
+        return ""
     }
 
     fun getPlayerToCategoryChoice(): String {
@@ -166,8 +183,14 @@ class QuestionViewModel @Inject constructor(
         scores[player] = score + 1
     }
 
+    fun saveUserAnswer(position: Int) {
+        questionsList?.questions?.get(counter - 1)?.userAnswerPosition = position
+    }
+
     fun isGameOver() : Boolean {
-        if (isMultiplayer.not()) return true
+        if (isMultiplayer.not()) {
+            return true
+        }
         return categoryChoiceCounter == players.size
     }
 

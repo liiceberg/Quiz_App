@@ -5,7 +5,7 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -83,14 +83,25 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
     }
 
     private fun onItemClicked(level: Level) {
-        binding.root.findNavController().navigate(
-            R.id.action_levelsFragment_to_prelaunchFragment,
-            bundleOf(
-                LEVEL_NUMBER to level.number,
-                CATEGORY_ID to arguments?.getInt(CATEGORY_ID),
-                IS_MULTIPLAYER to false
+        if (level.number <= levelsViewModel.levelsNumber) {
+            findNavController().navigate(
+                R.id.action_levelsFragment_to_resultsViewFragment,
+                bundleOf(
+                    LEVEL_NUMBER to level.number,
+                    CATEGORY_ID to requireArguments().getInt(CATEGORY_ID),
+                    CATEGORY_NAME to requireArguments().getString(CATEGORY_NAME)
+                )
             )
-        )
+        } else {
+            findNavController().navigate(
+                R.id.action_levelsFragment_to_prelaunchFragment,
+                bundleOf(
+                    LEVEL_NUMBER to level.number,
+                    CATEGORY_ID to arguments?.getInt(CATEGORY_ID),
+                    IS_MULTIPLAYER to false
+                )
+            )
+        }
     }
 
 }
