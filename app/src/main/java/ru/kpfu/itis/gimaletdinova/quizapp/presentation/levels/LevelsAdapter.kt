@@ -18,12 +18,12 @@ class LevelsAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             R.layout.item_level -> LevelsHolder(
-                ItemLevelBinding.inflate(LayoutInflater.from(parent.context)),
+                ItemLevelBinding.inflate(LayoutInflater.from(parent.context), parent, false),
                 onItemClicked
             )
 
             R.layout.item_level_difficulty -> DifficultyHolder(
-                ItemLevelDifficultyBinding.inflate(LayoutInflater.from(parent.context))
+                ItemLevelDifficultyBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
             else -> throw ViewTypeNotFoundException()
         }

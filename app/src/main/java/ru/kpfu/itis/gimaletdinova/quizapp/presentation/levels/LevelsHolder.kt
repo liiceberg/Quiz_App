@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemLevelBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Level
-import ru.kpfu.itis.gimaletdinova.quizapp.util.LevelDifficulty.*
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty.*
 
 class LevelsHolder(
     private val binding: ItemLevelBinding,
@@ -15,8 +15,12 @@ class LevelsHolder(
     private var item: Level? = null
 
     init {
-        binding.root.setOnClickListener {
-            item?.let(onItemClicked)
+        binding.valueBtn.setOnClickListener {
+            item?.let {
+                if (it.isBlocked.not()) {
+                    it.let(onItemClicked)
+                }
+            }
         }
     }
 

@@ -49,66 +49,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/image_iv" />
 
-    <TableLayout
-        android:id="@+id/score_table"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/scores_rv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:stretchColumns="1"
-        app:layout_constraintTop_toBottomOf="@id/results_title_tv">
-
-        <TableRow>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/username_1_tv"
-                style="@style/DefaultTextView"
-                android:layout_column="1"
-                tools:text="Username" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/user_1_score_tv"
-                style="@style/DefaultTextView"
-                tools:text="9" />
-        </TableRow>
-
-        <TableRow>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/username_2_tv"
-                style="@style/DefaultTextView"
-                android:layout_column="1" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/user_2_score_tv"
-                style="@style/DefaultTextView" />
-        </TableRow>
-
-        <TableRow>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/username_3_tv"
-                style="@style/DefaultTextView"
-                android:layout_column="1" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/user_3_score_tv"
-                style="@style/DefaultTextView" />
-        </TableRow>
-
-        <TableRow>
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/username_4_tv"
-                style="@style/DefaultTextView"
-                android:layout_column="1" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/user_4_score_tv"
-                style="@style/DefaultTextView" />
-        </TableRow>
-    </TableLayout>
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintTop_toBottomOf="@id/results_title_tv"
+        app:layout_constraintBottom_toTopOf="@id/exit_btn"
+        tools:listitem="@layout/item_score"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/exit_btn"

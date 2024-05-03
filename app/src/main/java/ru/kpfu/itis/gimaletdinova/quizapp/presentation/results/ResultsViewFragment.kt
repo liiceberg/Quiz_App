@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.game
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.results
 
 import android.os.Bundle
 import android.view.View

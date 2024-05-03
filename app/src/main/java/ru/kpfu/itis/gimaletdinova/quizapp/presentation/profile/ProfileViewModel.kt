@@ -1,7 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.profile
 
 
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.DataStore
 import androidx.datastore.preferences.Preferences
 import androidx.datastore.preferences.edit
@@ -9,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,11 +24,11 @@ class ProfileViewModel @Inject constructor(
 
     val usernameFlow = prefs.data.map { it[PrefsKeys.USERNAME_KEY] ?: "user" }
 
-    val themeFlow = prefs.data.map { it[PrefsKeys.NIGHT_MODE_KEY] ?: false }
-
     val totalQuestionsFlow = prefs.data.map { it[PrefsKeys.TOTAL_QUESTIONS_KEY] ?: 0 }
 
     val userQuestionsFlow = prefs.data.map { it[PrefsKeys.USER_QUESTIONS_KEY] ?: 0 }
+    val themeFlow = prefs.data.map { it[PrefsKeys.NIGHT_MODE_KEY] ?: false }
+
     fun saveUsername(name: String) {
         viewModelScope.launch {
             withContext(dispatcher) {
@@ -40,16 +40,14 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun changeTheme() {
-        val isNightTheme =
-            AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
-
         viewModelScope.launch {
             withContext(dispatcher) {
                 prefs.edit {
-                    it[PrefsKeys.NIGHT_MODE_KEY] = !isNightTheme
+                    it[PrefsKeys.THEME_CHANGED_KEY] = true
+                    it[PrefsKeys.NIGHT_MODE_KEY] = !themeFlow.first()
                 }
             }
-            setCurrentTheme(!isNightTheme)
+            setCurrentTheme(themeFlow.first())
         }
     }
 }

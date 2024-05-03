@@ -1,45 +1,91 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoriesBinding
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.model.Category
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
+import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import java.util.stream.Collectors
+
 @AndroidEntryPoint
 class CategoriesFragment : Fragment(R.layout.fragment_categories) {
 
     private val binding: FragmentCategoriesBinding by viewBinding(
         FragmentCategoriesBinding::bind
     )
+    private val categoriesViewModel: CategoriesViewModel by viewModels()
     private var categoriesAdapter: CategoriesAdapter? = null
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initRecyclerView()
+        with(categoriesViewModel) {
+            getCategories()
+
+            loadingFlow.observe(this@CategoriesFragment) { isLoad ->
+                binding.progressBar.apply {
+                    visibility = if (isLoad) {
+                        View.VISIBLE
+                    } else {
+                        categoriesList?.let {
+                            initRecyclerView(it)
+                        }
+                        View.GONE
+                    }
+                }
+            }
+
+            lifecycleScope.launch {
+                errorsChannel.consumeEach {
+                    AlertDialog.Builder(context)
+                        .setTitle(getString(R.string.unknown_error))
+                        .setMessage(getString(R.string.network_error_dialog_text))
+                        .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                            dialog.cancel()
+                            findNavController().popBackStack()
+                        }
+                        .show()
+                }
+            }
+        }
     }
 
-    private fun initRecyclerView() {
+    private fun initRecyclerView(list: CategoriesList) {
         binding.levelsRv.apply {
-//            TODO create categories list
-            val c = Category("first", 2, 50)
-            categoriesAdapter = CategoriesAdapter(mutableListOf(c, c, c, c), ::onItemClicked)
+//            TODO add levels number
+            val c = list.categoriesList
+                .stream()
+                .map { c -> Category(id = c.id, name = c.displayName) }
+                .collect(Collectors.toList())
+            categoriesAdapter = CategoriesAdapter(c, ::onItemClicked)
             adapter = categoriesAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
     }
 
     private fun onItemClicked(category: Category) {
-        binding.root.findNavController().navigate(
-                R.id.action_categoriesFragment_to_levelsFragment,
-                bundleOf(CATEGORY_NAME to category.name)
+        findNavController().navigate(
+            R.id.action_categoriesFragment_to_levelsFragment,
+            bundleOf(
+                CATEGORY_NAME to category.name,
+                CATEGORY_ID to category.id
             )
+        )
     }
 
 }

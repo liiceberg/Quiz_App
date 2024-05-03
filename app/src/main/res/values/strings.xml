@@ -13,8 +13,8 @@
 
         <!--    Text    -->
     <string name="level_number">%d/%d</string>
-    <string name="user_questions_number">Your questions: %d</string>
-    <string name="total_questions_number">Total questions: %d</string>
+    <string name="user_questions_number">Your scores: %d</string>
+    <string name="total_questions_number">Total scores: %d</string>
     <string name="difficulty_easy">Easy</string>
     <string name="difficulty_medium">Medium</string>
     <string name="difficulty_high">High</string>
@@ -27,6 +27,9 @@
     <string name="lose_title_text">Loss</string>
     <string name="lose_text">Oh, no! Try again</string>
     <string name="warning_text">Click when you are ready to start</string>
+    <string name="ok">OK</string>
+    <string name="options_dialog_text">You have to enter the names of the players</string>
+    <string name="network_error_dialog_text">Please, check Internet connection and try again</string>
 
 
 
@@ -36,5 +39,16 @@
 
     <string name="empty_username_error">Enter a username</string>
     <string name="incorrect_username_error">Username must contain only Latin alphabetic characters</string>
+
+
+
+        <!--  Exceptions  -->
+    <string name="too_many_requests">The number of request attempts exceeded</string>
+    <string name="page_not_found">Trivia not found</string>
+    <string name="bad_request">Bad request</string>
+    <string name="server_exception">Server is not response</string>
+    <string name="empty_questions_list_response">Questions not found</string>
+    <string name="empty_categories_list_response">Categories not found</string>
+    <string name="unknown_error">Unknown error occurred</string>
 
 </resources>

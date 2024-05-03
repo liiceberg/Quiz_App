@@ -16,14 +16,14 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+class AppModule {
 
     @Provides
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
         context.createDataStore(DATA_STORE_NAME)
 
+
     @Provides
-    @Singleton
     fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 }

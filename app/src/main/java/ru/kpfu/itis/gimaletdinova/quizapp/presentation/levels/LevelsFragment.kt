@@ -3,24 +3,27 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentLevelsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
-import androidx.fragment.app.Fragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Difficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Level
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.EASY_LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MEDIUM_LEVELS_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
+
 @AndroidEntryPoint
 class LevelsFragment : Fragment(R.layout.fragment_levels) {
     private val binding: FragmentLevelsBinding by viewBinding(
@@ -47,7 +50,7 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
             manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return if (position == 0 ||
-                        position == EASY_LEVELS_NUMBER + 1||
+                        position == EASY_LEVELS_NUMBER + 1 ||
                         position == EASY_LEVELS_NUMBER + MEDIUM_LEVELS_NUMBER + 2
                     ) {
                         5
@@ -58,16 +61,22 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
             }
             layoutManager = manager
 
-            val marginValue = 8.getValueInPx(resources.displayMetrics)
-            addItemDecoration(SimpleHorizontalMarginDecoration(marginValue))
-            addItemDecoration(SimpleVerticalMarginDecoration(marginValue))
+            val verticalMarginValue = 2.getValueInPx(resources.displayMetrics)
+            val horizontalMarginValue = 8.getValueInPx(resources.displayMetrics)
+            addItemDecoration(SimpleHorizontalMarginDecoration(horizontalMarginValue))
+            addItemDecoration(SimpleVerticalMarginDecoration(verticalMarginValue))
         }
     }
 
     private fun onItemClicked(level: Level) {
         binding.root.findNavController().navigate(
             R.id.action_levelsFragment_to_prelaunchFragment,
-            bundleOf(LEVEL_NUMBER to level.number)
+            bundleOf(
+                LEVEL_NUMBER to level.number,
+                CATEGORY_ID to arguments?.getInt(CATEGORY_ID),
+                IS_MULTIPLAYER to false
+            )
         )
     }
+
 }
