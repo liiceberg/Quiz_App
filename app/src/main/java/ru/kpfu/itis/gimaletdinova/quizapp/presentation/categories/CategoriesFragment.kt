@@ -32,6 +32,7 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initRecyclerView()
         with(categoriesViewModel) {
             getCategories()
 
@@ -40,9 +41,14 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
                     visibility = if (isLoad) {
                         View.VISIBLE
                     } else {
-                        initRecyclerView(categoriesList)
                         View.GONE
                     }
+                }
+            }
+
+            categoriesFlow.observe(this@CategoriesFragment) {
+                it?.let {
+                    categoriesAdapter?.setItems(it)
                 }
             }
 
@@ -62,9 +68,9 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
         }
     }
 
-    private fun initRecyclerView(list: List<Category>) {
+    private fun initRecyclerView() {
         binding.levelsRv.apply {
-            categoriesAdapter = CategoriesAdapter(list, ::onItemClicked)
+            categoriesAdapter = CategoriesAdapter(CategoryDiffUtilItemCallback(), ::onItemClicked)
             adapter = categoriesAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }

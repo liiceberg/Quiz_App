@@ -14,7 +14,6 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentLevelsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Item
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Level
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.EASY_LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MEDIUM_LEVELS_NUMBER
@@ -38,6 +37,7 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         binding.categoryTv.text = requireArguments().getString(CATEGORY_NAME)
+        initRecyclerView()
 
         with(levelsViewModel) {
             val catId = requireArguments().getInt(CATEGORY_ID)
@@ -48,17 +48,23 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
                     visibility = if (isLoad) {
                         View.VISIBLE
                     } else {
-                        initRecyclerView(levelsList)
                         View.GONE
                     }
                 }
             }
+
+            levelsFlow.observe(this@LevelsFragment) {
+                it?.let {
+                    levelsAdapter?.setItems(it)
+                }
+            }
+
         }
     }
 
-    private fun initRecyclerView(list: List<Item>) {
+    private fun initRecyclerView() {
         binding.levelsRv.apply {
-            levelsAdapter = LevelsAdapter(list, ::onItemClicked)
+            levelsAdapter = LevelsAdapter(LevelsDiffUtilItemCallback(), ::onItemClicked)
             adapter = levelsAdapter
             val manager = GridLayoutManager(requireContext(), 5, RecyclerView.VERTICAL, false)
             manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {

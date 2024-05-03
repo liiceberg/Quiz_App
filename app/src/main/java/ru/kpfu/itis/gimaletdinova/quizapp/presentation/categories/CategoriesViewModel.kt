@@ -23,7 +23,9 @@ class CategoriesViewModel @Inject constructor(
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
-    val categoriesList = mutableListOf<Category>()
+
+    private val _categoriesFlow = MutableStateFlow<List<Category>?>(null)
+    val categoriesFlow get() = _categoriesFlow
 
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
@@ -35,6 +37,7 @@ class CategoriesViewModel @Inject constructor(
                 getCategoriesUseCase.invoke()
             }.onSuccess {
                 withContext(dispatcher) {
+                    val categoriesList = mutableListOf<Category>()
                     for (category in it.categoriesList) {
                         val levelsNumber = levelsRepository.getNumberByCategory(category.id)
                         categoriesList.add(
@@ -45,6 +48,7 @@ class CategoriesViewModel @Inject constructor(
                             )
                         )
                     }
+                    _categoriesFlow.value = categoriesList
                 }
             }.onFailure { ex ->
                 errorsChannel.send(ex)

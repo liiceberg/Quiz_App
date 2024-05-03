@@ -37,27 +37,15 @@
         tools:listitem="@layout/item_question" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/overplay_btn"
-        style="@style/DefaultButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="?attr/colorPrimaryVariant"
-        android:text="@string/overplay_btn"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <com.google.android.material.button.MaterialButton
         android:id="@+id/back_btn"
         style="@style/DefaultButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
         android:layout_marginBottom="16dp"
         android:text="@string/back_btn"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <ProgressBar
         android:id="@+id/progress_bar"

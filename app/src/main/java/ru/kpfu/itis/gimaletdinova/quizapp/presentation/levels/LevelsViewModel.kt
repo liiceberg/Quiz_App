@@ -24,18 +24,20 @@ class LevelsViewModel @Inject constructor(
     private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    val levelsList = mutableListOf<Item>()
+
+    private val _levelsFlow = MutableStateFlow<List<Item>?>(null)
+    val levelsFlow get() = _levelsFlow
 
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
     private var _levelsNumber: Int = -1
     val levelsNumber get() = _levelsNumber
     fun getLevels(id: Int) {
-        levelsList.clear()
         viewModelScope.launch {
             _loadingFlow.value = true
             withContext(dispatcher) {
                 _levelsNumber = levelsRepository.getNumberByCategory(id)
+                val levelsList = mutableListOf<Item>()
                 levelsList.add(Difficulty(LevelDifficulty.EASY.name))
                 for (i in 1..Constants.LEVELS_NUMBER) {
                     when (i - 1) {
@@ -50,6 +52,7 @@ class LevelsViewModel @Inject constructor(
                             difficulty = LevelDifficulty.get(i))
                     )
                 }
+                _levelsFlow.value = levelsList
             }
             _loadingFlow.value = false
         }
