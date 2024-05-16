@@ -5,7 +5,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.EmptyCategoriesListException
 import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.EmptyQuestionsListException
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.TriviaApi
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.mapper.CategoriesMapper
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.mapper.QuestionsListMapper
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
@@ -13,10 +12,11 @@ import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.TriviaRepository
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.TriviaService
 import javax.inject.Inject
 
 class TriviaRepositoryImpl @Inject constructor(
-    private val api: TriviaApi,
+    private val api: TriviaService,
     @ApplicationContext private val ctx: Context,
     private val questionsListMapper: QuestionsListMapper,
     private val categoriesMapper: CategoriesMapper,

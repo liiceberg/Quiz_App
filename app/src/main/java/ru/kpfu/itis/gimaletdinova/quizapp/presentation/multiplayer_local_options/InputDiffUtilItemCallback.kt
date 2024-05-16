@@ -1,7 +1,7 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.options
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options
 
 import androidx.recyclerview.widget.DiffUtil
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.options.model.InputModel
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options.model.InputModel
 
 class InputDiffUtilItemCallback : DiffUtil.ItemCallback<InputModel>() {
     override fun areItemsTheSame(oldItem: InputModel, newItem: InputModel): Boolean {

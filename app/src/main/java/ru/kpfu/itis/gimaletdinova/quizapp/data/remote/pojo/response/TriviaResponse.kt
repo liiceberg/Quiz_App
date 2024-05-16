@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.response
+package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response
 
 import com.google.gson.annotations.SerializedName
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty

@@ -4,6 +4,7 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.profile
 import androidx.datastore.DataStore
 import androidx.datastore.preferences.Preferences
 import androidx.datastore.preferences.edit
+import androidx.datastore.preferences.remove
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +13,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
+import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.USERNAME_KEY
+import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.USER_ID_KEY
 import ru.kpfu.itis.gimaletdinova.quizapp.util.setCurrentTheme
 import javax.inject.Inject
 
@@ -20,6 +24,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val prefs: DataStore<Preferences>,
     private val dispatcher: CoroutineDispatcher,
+    private val tokenManager: JwtTokenManager
 ) : ViewModel() {
 
     val usernameFlow = prefs.data.map { it[PrefsKeys.USERNAME_KEY] ?: "user" }
@@ -48,6 +53,18 @@ class ProfileViewModel @Inject constructor(
                 }
             }
             setCurrentTheme(themeFlow.first())
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            tokenManager.clearAllTokens()
+            withContext(dispatcher) {
+                prefs.edit {
+                    it.remove(USERNAME_KEY)
+                    it.remove(USER_ID_KEY)
+                }
+            }
         }
     }
 }

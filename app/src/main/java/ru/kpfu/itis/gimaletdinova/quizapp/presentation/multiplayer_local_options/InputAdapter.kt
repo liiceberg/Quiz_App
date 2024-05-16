@@ -1,11 +1,11 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.options
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemInputBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.options.model.InputModel
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options.model.InputModel
 
 class InputAdapter(
     diffCallback: DiffUtil.ItemCallback<InputModel>,

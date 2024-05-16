@@ -10,6 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentProfileBinding
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
 import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
@@ -26,9 +27,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
 
-            backBtn.setOnClickListener { view ->
-                view.findNavController()
-                    .navigate(R.id.action_profileFragment_to_startFragment)
+            backBtn.setOnClickListener {
+                findNavController().navigate(R.id.action_profileFragment_to_startFragment)
+            }
+
+            logoutBtn.setOnClickListener {
+                profileViewModel.logout()
+                findNavController().navigate(R.id.action_profileFragment_to_signInFragment)
             }
 
             usernameEditBtn.setOnClickListener {

@@ -1,6 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.mapper
 
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.response.CategoryResponse
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.CategoryResponse
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoryModel
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.Category

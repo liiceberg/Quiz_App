@@ -5,11 +5,14 @@
     <string name="username_edit_bth_text">Edit</string>
     <string name="play_bth_text">Play</string>
     <string name="play_with_friends_bth_text">Play with friends</string>
+    <string name="play_online_text">Play online</string>
     <string name="back_btn">Back</string>
     <string name="start_btn">Start</string>
     <string name="exit_btn">Exit</string>
+    <string name="logout_btn">Log out</string>
     <string name="next_btn">Next</string>
     <string name="overplay_btn">Overplay</string>
+    <string name="create_btn">Create</string>
 
         <!--    Text    -->
     <string name="level_number">%d/%d</string>
@@ -17,7 +20,7 @@
     <string name="total_questions_number">Total scores: %d</string>
     <string name="difficulty_easy">Easy</string>
     <string name="difficulty_medium">Medium</string>
-    <string name="difficulty_high">High</string>
+    <string name="difficulty_high">Hard</string>
     <string name="question_number">%d/%d</string>
     <string name="title_category_choice">Choose the category</string>
     <string name="title_multiplayer_options">Choose number of players</string>
@@ -30,15 +33,32 @@
     <string name="ok">OK</string>
     <string name="options_dialog_text">You have to enter the names of the players</string>
     <string name="network_error_dialog_text">Please, check Internet connection and try again</string>
-
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up_text">Don\'t have an account?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="create_room">New room</string>
+    <string name="players_number">Players number</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="category">Category</string>
+    <string name="room_created">Room with code %s created</string>
 
 
         <!--    EditText    -->
     <string name="username_change_hint">Enter new username</string>
     <string name="player_input_hint">Player %d</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="search_room">Search room by code</string>
 
     <string name="empty_username_error">Enter a username</string>
     <string name="incorrect_username_error">Username must contain only Latin alphabetic characters</string>
+    <string name="email_error">Incorrect email</string>
+    <string name="password_error">Password must be at least 8 characters long</string>
+    <string name="passwords_not_equals_error">Passwords not equals</string>
+    <string name="account_created">Account was successfully created</string>
+    <string name="login_error">Email or password entered incorrectly</string>
+    <string name="email_already_exist">This email already registered</string>
 
 
 
