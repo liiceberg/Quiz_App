@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.UserRepository
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
 import ru.kpfu.itis.gimaletdinova.quizapp.util.setCurrentTheme
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class ProfileViewModel @Inject constructor(
     private val prefs: DataStore<Preferences>,
     private val dispatcher: CoroutineDispatcher,
     private val tokenManager: JwtTokenManager,
-    private val userRepository: UserRepository,
+    private val userInteractor: UserInteractor,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate
 ) : ViewModel() {
 
@@ -37,9 +37,9 @@ class ProfileViewModel @Inject constructor(
     val userQuestionsFlow = prefs.data.map { it[PrefsKeys.USER_QUESTIONS_KEY] ?: 0 }
     val themeFlow = prefs.data.map { it[PrefsKeys.NIGHT_MODE_KEY] ?: false }
 
-    private suspend fun getUsername() : String {
+    private suspend fun getUsername(): String {
         runCatching(exceptionHandlerDelegate) {
-            userRepository.getUsername()
+            userInteractor.getUsername()
         }.onSuccess {
             return it
         }
@@ -48,8 +48,8 @@ class ProfileViewModel @Inject constructor(
 
     fun saveUsername(name: String) {
         viewModelScope.launch {
+            userInteractor.setUsername(name)
             withContext(dispatcher) {
-                userRepository.setUsername(name)
                 prefs.edit {
                     it[PrefsKeys.USERNAME_KEY] = name
                 }
@@ -69,14 +69,12 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun logout() {
-        viewModelScope.launch {
-            tokenManager.clearAllTokens()
-            withContext(dispatcher) {
-                prefs.edit {
-                    it.remove(PrefsKeys.USERNAME_KEY)
-                    it.remove(PrefsKeys.USER_ID_KEY)
-                }
+    suspend fun logout() {
+        tokenManager.clearAllTokens()
+        withContext(dispatcher) {
+            prefs.edit {
+                it.remove(PrefsKeys.USERNAME_KEY)
+                it.remove(PrefsKeys.USER_ID_KEY)
             }
         }
     }

@@ -14,4 +14,5 @@ interface TriviaRepository {
     ): QuestionsList
 
     suspend fun getCategories() : CategoriesList
+
 }

@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.UserRepository
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val userInteractor: UserInteractor,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
 ) : ViewModel() {
     private val _loadingFlow = MutableStateFlow(false)
@@ -23,7 +23,7 @@ class SignUpViewModel @Inject constructor(
         viewModelScope.async {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
-                userRepository.register(email, password)
+                userInteractor.register(email, password)
             }.onSuccess {
                 registered = true
             }

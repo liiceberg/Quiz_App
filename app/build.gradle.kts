@@ -22,6 +22,7 @@ android {
             useSupportLibrary = true
         }
         buildConfigField("String", "BASE_URL", "\"http://172.20.10.3:8080/\"")
+//        buildConfigField("String", "BASE_URL", "\"http://10.17.63.77:8080/\"")
     }
 
     buildTypes {

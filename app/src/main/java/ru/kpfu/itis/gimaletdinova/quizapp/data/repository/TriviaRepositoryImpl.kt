@@ -20,7 +20,7 @@ class TriviaRepositoryImpl @Inject constructor(
     @ApplicationContext private val ctx: Context,
     private val questionsListMapper: QuestionsListMapper,
     private val categoriesMapper: CategoriesMapper,
-): TriviaRepository {
+) : TriviaRepository {
 
     private var categoriesList: CategoriesList? = null
     override suspend fun getTrivia(
@@ -49,9 +49,9 @@ class TriviaRepositoryImpl @Inject constructor(
         if (categories != null && categories.categoriesList.isNotEmpty()) {
             categoriesList = categories
             return categoriesList!!
-        }
-        else {
+        } else {
             throw EmptyCategoriesListException(ctx.getString(R.string.empty_categories_list_response))
         }
     }
+
 }

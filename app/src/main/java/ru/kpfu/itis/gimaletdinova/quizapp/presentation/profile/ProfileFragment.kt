@@ -3,14 +3,15 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.profile
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentProfileBinding
-import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
 import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
@@ -32,8 +33,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             }
 
             logoutBtn.setOnClickListener {
-                profileViewModel.logout()
-                findNavController().navigate(R.id.action_profileFragment_to_signInFragment)
+                lifecycleScope.launch {
+                    profileViewModel.logout()
+                    findNavController().navigate(R.id.action_profileFragment_to_signInFragment)
+                }
             }
 
             usernameEditBtn.setOnClickListener {

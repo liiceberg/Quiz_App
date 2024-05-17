@@ -7,7 +7,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.EmptyQuestionsListExce
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.mapper.QuestionsListMapper
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.CreateRoomRequest
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.RoomResponse
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.TriviaService
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.RoomRepository
@@ -22,7 +22,7 @@ class RoomRepositoryImpl @Inject constructor(
         return triviaService.createRoom(CreateRoomRequest(capacity, categoryId, difficulty)).code
     }
 
-    override suspend fun getAll(): List<RoomResponse> {
+    override suspend fun getAll(): List<Room> {
         return triviaService.getAll()
     }
 

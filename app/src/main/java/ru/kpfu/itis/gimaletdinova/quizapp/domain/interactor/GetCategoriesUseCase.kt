@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.domain.usecase
+package ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

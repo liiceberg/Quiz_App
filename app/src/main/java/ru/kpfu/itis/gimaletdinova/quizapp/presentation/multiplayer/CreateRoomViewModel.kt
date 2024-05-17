@@ -11,14 +11,14 @@ import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.GetCategoriesUseCase
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.RoomInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.usecase.GetCategoriesUseCase
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.usecase.RoomInteractor
 import javax.inject.Inject
 
 @HiltViewModel
 class CreateRoomViewModel @Inject constructor(
-    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val categoriesUseCase: GetCategoriesUseCase,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val roomInteractor: RoomInteractor
 ): ViewModel() {
@@ -47,7 +47,7 @@ class CreateRoomViewModel @Inject constructor(
         viewModelScope.launch {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
-                getCategoriesUseCase.invoke()
+                categoriesUseCase.invoke()
             }.onSuccess {
                 _categoriesFlow.value = it
             }.onFailure { ex ->

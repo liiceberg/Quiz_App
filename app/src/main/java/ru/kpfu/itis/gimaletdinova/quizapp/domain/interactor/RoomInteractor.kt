@@ -1,9 +1,9 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.domain.usecase
+package ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.RoomResponse
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.RoomRepository
 import javax.inject.Inject
@@ -17,7 +17,7 @@ class RoomInteractor @Inject constructor(
             roomRepository.createRoom(capacity, categoryId, difficulty)
         }
     }
-    suspend fun getAll(): List<RoomResponse> {
+    suspend fun getAll(): List<Room> {
         return withContext(dispatcher) {
             roomRepository.getAll()
         }

@@ -16,29 +16,29 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.GetCategoriesUseCase
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.GetTriviaUseCase
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.LevelInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionModel
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.usecase.GetCategoriesUseCase
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.usecase.GetTriviaUseCase
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.PLAYERS_QUESTIONS_NUMBER_PROPORTION
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.QUESTIONS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.QUESTION_TIME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
-import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
-import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.LevelsRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class QuestionViewModel @Inject constructor(
     private val getTriviaUseCase: GetTriviaUseCase,
-    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val categoriesUseCase: GetCategoriesUseCase,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val prefs: DataStore<Preferences>,
     private val dispatcher: CoroutineDispatcher,
-    private val levelsRepository: LevelsRepository
+    private val levelInteractor: LevelInteractor
 ) : ViewModel() {
 
     private var _isMultiplayer = false
@@ -106,9 +106,7 @@ class QuestionViewModel @Inject constructor(
     fun saveLevel(categoryId: Int, levelNumber: Int) {
         if (questionsList != null) {
             viewModelScope.launch {
-                withContext(dispatcher) {
-                    levelsRepository.saveQuestions(levelNumber, categoryId, questionsList!!)
-                }
+                levelInteractor.saveQuestions(levelNumber, categoryId, questionsList!!)
             }
         }
     }
@@ -168,7 +166,7 @@ class QuestionViewModel @Inject constructor(
         viewModelScope.launch {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
-                getCategoriesUseCase.invoke()
+                categoriesUseCase.invoke()
             }.onSuccess {
                 _categoriesList = it
             }.onFailure { ex ->
@@ -187,7 +185,7 @@ class QuestionViewModel @Inject constructor(
         questionsList?.questions?.get(counter - 1)?.userAnswerPosition = position
     }
 
-    fun isGameOver() : Boolean {
+    fun isGameOver(): Boolean {
         if (isMultiplayer.not()) {
             return true
         }

@@ -2,8 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation"
-    app:startDestination="@id/signInFragment">
+    android:id="@+id/navigation">
 
     <fragment
         android:id="@+id/startFragment"
@@ -45,7 +44,7 @@
             app:destination="@id/signInFragment"
             app:launchSingleTop="true"
             app:popUpTo="@+id/navigation"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/multiplayerOptionsFragment"
@@ -177,6 +176,9 @@
         <action
             android:id="@+id/action_roomsListFragment_to_createRoomFragment"
             app:destination="@id/createRoomFragment" />
+        <action
+            android:id="@+id/action_roomsListFragment_to_roomFragment"
+            app:destination="@id/roomFragment" />
     </fragment>
     <fragment
         android:id="@+id/createRoomFragment"
@@ -185,7 +187,13 @@
         tools:layout="@layout/fragment_create_room">
         <action
             android:id="@+id/action_createRoomFragment_to_roomsListFragment"
-            app:destination="@id/roomsListFragment" />
+            app:destination="@id/roomsListFragment"
+            app:popUpTo="@id/roomsListFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/roomFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomFragment"
+        android:label="RoomFragment"
+        tools:layout="@layout/fragment_room" />
 
 </navigation>

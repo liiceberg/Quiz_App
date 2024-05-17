@@ -9,14 +9,18 @@ import androidx.datastore.DataStore
 import androidx.datastore.preferences.Preferences
 import androidx.datastore.preferences.edit
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.NIGHT_MODE_KEY
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.THEME_CHANGED_KEY
+import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.USER_ID_KEY
 import ru.kpfu.itis.gimaletdinova.quizapp.util.setCurrentTheme
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -29,6 +33,32 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setTheme()
+
+        setStartDestination()
+    }
+
+    private fun setStartDestination() {
+        lifecycleScope.launch {
+            val id = dataStore.data.map {
+                it[USER_ID_KEY]
+            }.firstOrNull()
+            println(id)
+
+            val navHost =
+                supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment?
+            val navController = navHost!!.navController
+
+            val navInflater = navController.navInflater
+            val graph = navInflater.inflate(R.navigation.navigation)
+
+            if (id == null) {
+                graph.setStartDestination(R.id.signInFragment)
+            } else {
+                graph.setStartDestination(R.id.startFragment)
+            }
+
+            navController.graph = graph
+        }
     }
 
     private fun setTheme() {

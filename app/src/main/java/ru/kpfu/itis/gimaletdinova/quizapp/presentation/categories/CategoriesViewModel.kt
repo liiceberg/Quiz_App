@@ -3,25 +3,22 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.LevelsRepository
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.usecase.GetCategoriesUseCase
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.GetCategoriesUseCase
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.LevelInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.model.Category
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
-    private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val levelsRepository: LevelsRepository,
+    private val categoriesUseCase: GetCategoriesUseCase,
+    private val levelsInteractor: LevelInteractor,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
-    private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _categoriesFlow = MutableStateFlow<List<Category>?>(null)
@@ -34,22 +31,20 @@ class CategoriesViewModel @Inject constructor(
         viewModelScope.launch {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
-                getCategoriesUseCase.invoke()
+                categoriesUseCase.invoke()
             }.onSuccess {
-                withContext(dispatcher) {
-                    val categoriesList = mutableListOf<Category>()
-                    for (category in it.categoriesList) {
-                        val levelsNumber = levelsRepository.getNumberByCategory(category.id)
-                        categoriesList.add(
-                            Category(
-                                id = category.id,
-                                name = category.displayName,
-                                levelsNumber = levelsNumber
-                            )
+                val categoriesList = mutableListOf<Category>()
+                for (category in it.categoriesList) {
+                    val levelsNumber = levelsInteractor.getNumberByCategory(category.id)
+                    categoriesList.add(
+                        Category(
+                            id = category.id,
+                            name = category.displayName,
+                            levelsNumber = levelsNumber
                         )
-                    }
-                    _categoriesFlow.value = categoriesList
+                    )
                 }
+                _categoriesFlow.value = categoriesList
             }.onFailure { ex ->
                 errorsChannel.send(ex)
             }

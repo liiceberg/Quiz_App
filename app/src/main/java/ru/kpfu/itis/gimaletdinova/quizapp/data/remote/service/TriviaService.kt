@@ -9,7 +9,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.CreateRoomRequest
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.CategoryResponse
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.CreateRoomResponse
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.RoomResponse
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.TriviaResponse
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.UsernameResponse
 
@@ -26,21 +26,21 @@ interface TriviaService {
     @GET("api/trivia/categories")
     suspend fun getCategories() : CategoryResponse?
 
-    @POST("room/create")
+    @POST("api/room/create")
     suspend fun createRoom(@Body room: CreateRoomRequest) : CreateRoomResponse
 
-    @GET("room/all")
-    suspend fun getAll() : List<RoomResponse>
+    @GET("api/room/all")
+    suspend fun getAll() : List<Room>
 
-    @GET("room/results")
+    @GET("api/room/results")
     suspend fun getResults(code: String)
 
-    @GET("room/game")
+    @GET("api/room/game")
     suspend fun getGameContent(code: String) : TriviaResponse
 
-    @GET("user/get/name")
+    @GET("api/user/get/name")
     suspend fun getUsername(id: Long) : UsernameResponse
 
-    @GET("user/update/name")
-    suspend fun updateUsername(id: Long, name: String) : UsernameResponse
+    @GET("api/user/update/name")
+    suspend fun updateUsername(@Query("id") id: Long, @Query("name") name: String)
 }

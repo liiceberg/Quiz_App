@@ -9,6 +9,8 @@ object Keys {
     const val PLAYERS_NAMES = "PLAYERS_NAMES"
     const val PLAYERS_SCORES = "PLAYERS_SCORES"
 
+    const val ROOM_CODE = "ROOM_CODE"
+
     const val DATA_STORE_NAME = "DATA_STORE_NAME"
     const val DATABASE_NAME = "QUIZ_DATABASE_NAME"
 
