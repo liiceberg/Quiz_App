@@ -8,6 +8,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.mapper.QuestionsListMapper
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.CreateRoomRequest
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.TriviaService
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.RoomRepository
@@ -26,8 +27,8 @@ class RoomRepositoryImpl @Inject constructor(
         return triviaService.getAll()
     }
 
-    override suspend fun getResults(code: String) {
-        triviaService.getResults(code)
+    override suspend fun getResults(code: String) : List<Score> {
+        return triviaService.getResults(code)
     }
 
     override suspend fun getGameContent(code: String): QuestionsList {

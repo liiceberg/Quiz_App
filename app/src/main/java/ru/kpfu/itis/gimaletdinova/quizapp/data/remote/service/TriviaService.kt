@@ -10,6 +10,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.CreateRoomReq
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.CategoryResponse
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.CreateRoomResponse
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.TriviaResponse
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.UsernameResponse
 
@@ -33,13 +34,13 @@ interface TriviaService {
     suspend fun getAll() : List<Room>
 
     @GET("api/room/results")
-    suspend fun getResults(code: String)
+    suspend fun getResults(@Query("code") code: String) : List<Score>
 
     @GET("api/room/game")
-    suspend fun getGameContent(code: String) : TriviaResponse
+    suspend fun getGameContent(@Query("code") code: String) : TriviaResponse
 
     @GET("api/user/get/name")
-    suspend fun getUsername(id: Long) : UsernameResponse
+    suspend fun getUsername(@Query("id") id: Long) : UsernameResponse
 
     @GET("api/user/update/name")
     suspend fun updateUsername(@Query("id") id: Long, @Query("name") name: String)

@@ -5,7 +5,7 @@ object Keys {
     const val CATEGORY_ID = "CATEGORY_ID"
     const val LEVEL_NUMBER = "LEVEL_NUMBER"
 
-    const val IS_MULTIPLAYER = "IS_MULTIPLAYER"
+    const val MODE = "MODE"
     const val PLAYERS_NAMES = "PLAYERS_NAMES"
     const val PLAYERS_SCORES = "PLAYERS_SCORES"
 

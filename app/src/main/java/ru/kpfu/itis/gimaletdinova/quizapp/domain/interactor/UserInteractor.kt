@@ -21,7 +21,7 @@ class UserInteractor @Inject constructor(
         }
     }
 
-    suspend fun getUsername(): String {
+    suspend fun getUsername(): String? {
         return withContext(dispatcher) {
             userRepository.getUsername()
         }

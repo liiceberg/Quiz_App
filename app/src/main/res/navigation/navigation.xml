@@ -88,6 +88,9 @@
             app:destination="@id/resultsFragment"
             app:popUpTo="@id/multiplayerOptionsFragment"
             app:popUpToSaveState="true" />
+        <action
+            android:id="@+id/action_questionFragment_to_roomFragment"
+            app:destination="@id/roomFragment" />
     </fragment>
     <fragment
         android:id="@+id/prelaunchFragment"
@@ -131,6 +134,9 @@
             android:id="@+id/action_resultsFragment_to_prelaunchFragment_multiplayer"
             app:destination="@id/prelaunchFragment"
             app:popUpTo="@id/multiplayerOptionsFragment" />
+        <action
+            android:id="@+id/action_resultsFragment_to_roomFragment"
+            app:destination="@id/roomFragment" />
     </fragment>
     <fragment
         android:id="@+id/resultsViewFragment"
@@ -194,6 +200,22 @@
         android:id="@+id/roomFragment"
         android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomFragment"
         android:label="RoomFragment"
-        tools:layout="@layout/fragment_room" />
+        tools:layout="@layout/fragment_room">
+        <action
+            android:id="@+id/action_roomFragment_to_questionFragment"
+            app:destination="@id/questionFragment"
+            app:popUpTo="@id/roomsListFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_roomFragment_to_roomsListFragment"
+            app:destination="@id/roomsListFragment"
+            app:popUpTo="@id/roomsListFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_roomFragment_to_resultsFragment"
+            app:destination="@id/resultsFragment"
+            app:popUpTo="@id/roomFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -20,8 +21,9 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.Simple
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options.model.InputModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MAX_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_PLAYERS_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 import java.util.stream.Collectors
@@ -51,7 +53,7 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
                     findNavController().navigate(
                         R.id.action_multiplayerOptionsFragment_to_prelaunchFragment,
                         bundleOf(
-                            IS_MULTIPLAYER to true,
+                            MODE to Mode.MULTIPLAYER,
                             PLAYERS_NAMES to players
                         )
                     )
@@ -173,12 +175,7 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
     }
 
     private fun showWarning() {
-        AlertDialog.Builder(context)
-            .setMessage(getString(R.string.options_dialog_text))
-            .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                dialog.cancel()
-            }
-            .show()
+        Toast.makeText(context, R.string.options_dialog_text, Toast.LENGTH_LONG).show()
     }
 
 }

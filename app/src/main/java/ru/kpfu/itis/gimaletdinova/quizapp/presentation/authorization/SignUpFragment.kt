@@ -62,7 +62,19 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
             }
             val password = passwordEt.text.toString().trim()
             if (password.matches(Regex("\\w{8,}")).not()) {
-                passwordEt.error = getString(R.string.password_error)
+                passwordEt.error = getString(R.string.password_length_error)
+                return false
+            }
+            if (password.matches(Regex(".*[A-Z].*")).not()) {
+                passwordEt.error = getString(R.string.password_upper_case_char_error)
+                return false
+            }
+            if (password.matches(Regex(".*[a-z].*")).not()) {
+                passwordEt.error = getString(R.string.password_lower_case_char_error)
+                return false
+            }
+            if (password.matches(Regex(".*\\d.*")).not()) {
+                passwordEt.error = getString(R.string.password_digit_char_error)
                 return false
             }
             val repeatPassword = repeatPasswordEt.text.toString().trim()

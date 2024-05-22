@@ -14,10 +14,14 @@ class ExceptionHandlerDelegate @Inject constructor(
     @ApplicationContext private val ctx: Context
 ) {
     fun handleException(ex: Throwable): Throwable {
+        println(ex.javaClass)
         return when (ex) {
             is HttpException -> {
                 when (ex.code()) {
-                    400 -> BadRequestException(message = ctx.getString(R.string.bad_request))
+                    400 -> {
+                        println(ex.response()?.errorBody()?.string())
+                        BadRequestException(message = ctx.getString(R.string.bad_request))
+                    }
                     404 -> PageNotFoundException(message = ctx.getString(R.string.page_not_found))
                     429 -> TooManyRequestsException(message = ctx.getString(R.string.too_many_requests))
                     in 500..599 -> ServerException(message = ctx.getString(R.string.server_exception))

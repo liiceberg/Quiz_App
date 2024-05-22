@@ -54,6 +54,5 @@ class CategoriesViewModel @Inject constructor(
 
     override fun onCleared() {
         errorsChannel.close()
-        super.onCleared()
     }
 }

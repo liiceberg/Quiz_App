@@ -25,7 +25,6 @@ class CreateRoomViewModel @Inject constructor(
     private val _categoriesFlow = MutableStateFlow<CategoriesList?>(null)
     val categoriesFlow get() = _categoriesFlow
 
-
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
     val errorsChannel = Channel<Throwable>()

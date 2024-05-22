@@ -22,7 +22,6 @@ android {
             useSupportLibrary = true
         }
         buildConfigField("String", "BASE_URL", "\"http://172.20.10.3:8080/\"")
-//        buildConfigField("String", "BASE_URL", "\"http://10.17.63.77:8080/\"")
     }
 
     buildTypes {
@@ -95,4 +94,8 @@ dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
+
+    implementation("dev.gustavoavila:java-android-websocket-client:2.0.2")
+    implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.4")
+    implementation ("io.reactivex.rxjava2:rxandroid:2.1.1")
 }

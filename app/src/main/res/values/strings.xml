@@ -13,6 +13,7 @@
     <string name="next_btn">Next</string>
     <string name="overplay_btn">Overplay</string>
     <string name="create_btn">Create</string>
+    <string name="ready_btn">Ready</string>
 
         <!--    Text    -->
     <string name="level_number">%d/%d</string>
@@ -54,7 +55,10 @@
     <string name="empty_username_error">Enter a username</string>
     <string name="incorrect_username_error">Username must contain only Latin alphabetic characters</string>
     <string name="email_error">Incorrect email</string>
-    <string name="password_error">Password must be at least 8 characters long</string>
+    <string name="password_length_error">Password must be at least 8 characters long</string>
+    <string name="password_upper_case_char_error">Password must contain upper case character</string>
+    <string name="password_lower_case_char_error">Password must contain lower case character</string>
+    <string name="password_digit_char_error">Password must contain digit</string>
     <string name="passwords_not_equals_error">Passwords not equals</string>
     <string name="account_created">Account was successfully created</string>
     <string name="login_error">Email or password entered incorrectly</string>

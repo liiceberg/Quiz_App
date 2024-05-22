@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -28,6 +29,7 @@ class SignInViewModel @Inject constructor(
 
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
+    val errorsChannel = Channel<Throwable>()
     suspend fun login(email: String, password: String) : Boolean {
         var loggedIn = false
         viewModelScope.async {
@@ -37,6 +39,8 @@ class SignInViewModel @Inject constructor(
                 saveUser(id)
             }.onSuccess {
                 loggedIn = true
+            }.onFailure {
+                errorsChannel.send(it)
             }
         }.await()
         _loadingFlow.value = false
@@ -51,5 +55,9 @@ class SignInViewModel @Inject constructor(
                 }
             }
         }
+    }
+    override fun onCleared() {
+        errorsChannel.close()
+        super.onCleared()
     }
 }

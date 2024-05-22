@@ -26,6 +26,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private val profileViewModel: ProfileViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        lifecycleScope.launch {
+            profileViewModel.getUsername()
+        }
+
         with(binding) {
 
             backBtn.setOnClickListener {

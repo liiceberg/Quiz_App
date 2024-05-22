@@ -28,6 +28,12 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
     private val binding: FragmentRoomsListBinding by viewBinding(FragmentRoomsListBinding::bind)
     private val roomsListViewModel: RoomsListViewModel by viewModels()
     private var roomAdapter: RoomAdapter? = null
+    private val UPDATE_INTERVAL = 1000L
+
+    override fun onStart() {
+        repeatCheckingRoomsForUpdates()
+        super.onStart()
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         lifecycleScope.launch {
@@ -79,6 +85,17 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
         }
     }
 
+    private fun repeatCheckingRoomsForUpdates() {
+
+        roomsListViewModel.run {
+            doRepeatWork(
+                UPDATE_INTERVAL
+            ) {
+                getRoomList()
+            }
+        }
+    }
+
     private fun filterRoomList(text: String) {
         val query = text.trim().lowercase()
         roomsListViewModel.currentRoomList
@@ -113,5 +130,10 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
                 Keys.ROOM_CODE to room.code
             )
         )
+    }
+
+    override fun onStop() {
+        roomsListViewModel.stopRepeatWork()
+        super.onStop()
     }
 }

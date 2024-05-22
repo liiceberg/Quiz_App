@@ -1,5 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.authorization
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -8,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentSignInBinding
@@ -40,13 +42,24 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
 
             }
 
-            viewModel.loadingFlow.observe(this@SignInFragment) { isLoad ->
-                progressBar.apply {
-                    visibility = if (isLoad) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
+            with(viewModel) {
+                loadingFlow.observe(this@SignInFragment) { isLoad ->
+                    progressBar.apply {
+                        visibility = if (isLoad) {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
+                        }
                     }
+                }
+                errorsChannel.consumeAsFlow().observe(this@SignInFragment) {
+                    AlertDialog.Builder(context)
+                        .setTitle(getString(R.string.unknown_error))
+                        .setMessage(it.message)
+                        .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                            dialog.cancel()
+                        }
+                        .show()
                 }
             }
         }
@@ -63,7 +76,7 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
             }
             val password = passwordEt.text.toString().trim()
             if (password.matches(Regex("\\w{8,}")).not()) {
-                passwordEt.error = getString(R.string.password_error)
+                passwordEt.error = getString(R.string.password_length_error)
                 return false
             }
             return true

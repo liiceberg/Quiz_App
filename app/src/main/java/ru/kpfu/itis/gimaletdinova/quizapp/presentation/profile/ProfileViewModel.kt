@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -30,29 +31,31 @@ class ProfileViewModel @Inject constructor(
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate
 ) : ViewModel() {
 
-    val usernameFlow = prefs.data.map { it[PrefsKeys.USERNAME_KEY] ?: getUsername() }
+    val usernameFlow = MutableStateFlow("")
 
     val totalQuestionsFlow = prefs.data.map { it[PrefsKeys.TOTAL_QUESTIONS_KEY] ?: 0 }
 
     val userQuestionsFlow = prefs.data.map { it[PrefsKeys.USER_QUESTIONS_KEY] ?: 0 }
     val themeFlow = prefs.data.map { it[PrefsKeys.NIGHT_MODE_KEY] ?: false }
 
-    private suspend fun getUsername(): String {
+    suspend fun getUsername() {
         runCatching(exceptionHandlerDelegate) {
             userInteractor.getUsername()
         }.onSuccess {
-            return it
+            if (it != null) {
+                usernameFlow.value = it
+            } else {
+                usernameFlow.value = "user"
+            }
         }
-        return "user"
     }
 
     fun saveUsername(name: String) {
         viewModelScope.launch {
-            userInteractor.setUsername(name)
-            withContext(dispatcher) {
-                prefs.edit {
-                    it[PrefsKeys.USERNAME_KEY] = name
-                }
+            runCatching(exceptionHandlerDelegate) {
+                userInteractor.setUsername(name)
+            }.onSuccess {
+                usernameFlow.value = name
             }
         }
     }
@@ -73,7 +76,6 @@ class ProfileViewModel @Inject constructor(
         tokenManager.clearAllTokens()
         withContext(dispatcher) {
             prefs.edit {
-                it.remove(PrefsKeys.USERNAME_KEY)
                 it.remove(PrefsKeys.USER_ID_KEY)
             }
         }

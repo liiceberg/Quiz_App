@@ -17,10 +17,11 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentQuestionBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
@@ -42,7 +43,7 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
 
         binding.run {
 
-            if (questionViewModel.isMultiplayer.not()) {
+            if (questionViewModel.mode != Mode.MULTIPLAYER) {
                 usernameTv.visibility = View.GONE
             }
 
@@ -98,7 +99,7 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
 
     private suspend fun verifyAnswer(userAnswerPosition: Int) {
         with(questionViewModel) {
-            if (isMultiplayer.not()) saveUserAnswer(userAnswerPosition)
+            if (mode == Mode.SINGLE) saveUserAnswer(userAnswerPosition)
 
             val correctAnswerPosition = questionsFlow.value?.correctAnswerPosition
             setAnswerColor(userAnswerPosition, correctAnswerPosition)
@@ -147,7 +148,7 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
 
     private fun finishGame() {
         with(questionViewModel) {
-            if (isMultiplayer.not() && scores.values.first() >= MIN_CORRECT_ANSWERS_NUMBER_TO_WIN) {
+            if (mode == Mode.SINGLE && scores.values.first() >= MIN_CORRECT_ANSWERS_NUMBER_TO_WIN) {
                 saveLevel(
                     categoryId = requireArguments().getInt(CATEGORY_ID),
                     levelNumber = requireArguments().getInt(LEVEL_NUMBER)
@@ -165,15 +166,15 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
             playersNames.add(it.first)
             playersScores.add(it.second)
         }
-        val action = if (questionViewModel.isMultiplayer) {
-            R.id.action_questionFragment_to_resultsFragment_multiplayer
-        } else {
-            R.id.action_questionFragment_to_resultsFragment
+        val action = when (questionViewModel.mode) {
+            Mode.SINGLE -> R.id.action_questionFragment_to_resultsFragment
+            Mode.MULTIPLAYER -> R.id.action_questionFragment_to_resultsFragment_multiplayer
+            Mode.ONLINE -> R.id.action_questionFragment_to_roomFragment
         }
         findNavController().navigate(
             action,
             bundleOf(
-                IS_MULTIPLAYER to questionViewModel.isMultiplayer,
+                MODE to questionViewModel.mode,
                 PLAYERS_NAMES to playersNames,
                 PLAYERS_SCORES to playersScores,
                 CATEGORY_ID to arguments?.getInt(CATEGORY_ID),

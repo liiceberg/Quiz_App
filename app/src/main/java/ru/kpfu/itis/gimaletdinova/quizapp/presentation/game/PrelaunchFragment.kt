@@ -16,9 +16,10 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentPrelaunchBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
@@ -33,13 +34,14 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         questionViewModel.clear()
-        questionViewModel.setMode(requireArguments().getBoolean(IS_MULTIPLAYER))
+        val mode = requireArguments().getSerializable(MODE) as Mode
+        questionViewModel.setMode(mode)
 
         lifecycleScope.launch {
             questionViewModel.setPlayers(arguments?.getStringArrayList(PLAYERS_NAMES))
         }
 
-        if (questionViewModel.isMultiplayer) {
+        if (questionViewModel.mode == Mode.MULTIPLAYER) {
             questionViewModel.getCategoriesList()
         } else {
             val categoryId = requireArguments().getInt(CATEGORY_ID)
@@ -76,7 +78,7 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
             }
 
             playBtn.setOnClickListener {
-                if (questionViewModel.isMultiplayer) {
+                if (questionViewModel.mode == Mode.MULTIPLAYER) {
                     findNavController().navigate(
                         R.id.action_prelaunchFragment_to_categoryChoiceFragment
                     )
