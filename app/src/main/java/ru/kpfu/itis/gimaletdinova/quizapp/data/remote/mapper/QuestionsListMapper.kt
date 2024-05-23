@@ -1,6 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.mapper
 
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.response.TriviaResponse
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.TriviaResponse
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionModel
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
 import ru.kpfu.itis.gimaletdinova.quizapp.util.decodeFromHtml

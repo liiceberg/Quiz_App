@@ -2,12 +2,11 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation"
-    app:startDestination="@id/startFragment">
+    android:id="@+id/navigation">
 
     <fragment
         android:id="@+id/startFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.navigation_views.StartFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.main.StartFragment"
         android:label="StartFragment"
         tools:layout="@layout/fragment_start">
         <action
@@ -19,6 +18,9 @@
         <action
             android:id="@+id/action_startFragment_to_multiplayerOptionsFragment"
             app:destination="@id/multiplayerOptionsFragment" />
+        <action
+            android:id="@+id/action_startFragment_to_roomsListFragmentContainer"
+            app:destination="@id/roomsListFragmentContainer" />
     </fragment>
     <fragment
         android:id="@+id/categoriesFragment"
@@ -37,10 +39,16 @@
         <action
             android:id="@+id/action_profileFragment_to_startFragment"
             app:destination="@id/startFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_signInFragment"
+            app:destination="@id/signInFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@+id/navigation"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/multiplayerOptionsFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_mode.options.MultiplayerOptionsFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options.MultiplayerOptionsFragment"
         android:label="MultiplayerOptionsFragment"
         tools:layout="@layout/fragment_multiplayer_options">
         <action
@@ -74,14 +82,15 @@
             android:id="@+id/action_questionFragment_to_resultsFragment"
             app:destination="@id/resultsFragment"
             app:popUpTo="@id/levelsFragment"
-            app:popUpToSaveState="true"
-            app:restoreState="true" />
+            app:popUpToSaveState="true" />
         <action
             android:id="@+id/action_questionFragment_to_resultsFragment_multiplayer"
             app:destination="@id/resultsFragment"
             app:popUpTo="@id/multiplayerOptionsFragment"
-            app:popUpToSaveState="true"
-            app:restoreState="true" />
+            app:popUpToSaveState="true" />
+        <action
+            android:id="@+id/action_questionFragment_to_roomFragment"
+            app:destination="@id/roomFragment" />
     </fragment>
     <fragment
         android:id="@+id/prelaunchFragment"
@@ -92,8 +101,7 @@
             android:id="@+id/action_prelaunchFragment_to_questionFragment"
             app:destination="@id/questionFragment"
             app:popUpTo="@id/levelsFragment"
-            app:popUpToSaveState="true"
-            app:restoreState="true" />
+            app:popUpToSaveState="true" />
         <action
             android:id="@+id/action_prelaunchFragment_to_categoryChoiceFragment"
             app:destination="@id/categoryChoiceFragment"
@@ -119,11 +127,20 @@
             app:destination="@id/startFragment" />
         <action
             android:id="@+id/action_resultsFragment_to_prelaunchFragment"
-            app:destination="@id/prelaunchFragment" />
+            app:destination="@id/prelaunchFragment"
+            app:popUpTo="@id/levelsFragment"
+            app:popUpToSaveState="true" />
+        <action
+            android:id="@+id/action_resultsFragment_to_prelaunchFragment_multiplayer"
+            app:destination="@id/prelaunchFragment"
+            app:popUpTo="@id/multiplayerOptionsFragment" />
+        <action
+            android:id="@+id/action_resultsFragment_to_roomFragment"
+            app:destination="@id/roomFragment" />
     </fragment>
     <fragment
         android:id="@+id/resultsViewFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.results.ResultsViewFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.results_view.ResultsViewFragment"
         android:label="ResultsViewFragment"
         tools:layout="@layout/fragment_results_view">
         <action
@@ -132,6 +149,73 @@
         <action
             android:id="@+id/action_resultsViewFragment_to_levelsFragment"
             app:destination="@id/levelsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.authorization.SignUpFragment"
+        android:label="SignUpFragment"
+        tools:layout="@layout/fragment_sign_up">
+        <action
+            android:id="@+id/action_signUpFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.authorization.SignInFragment"
+        android:label="SignInFragment"
+        tools:layout="@layout/fragment_sign_in">
+        <action
+            android:id="@+id/action_signInFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_signInFragment_to_startFragment"
+            app:destination="@id/startFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@+id/navigation"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/roomsListFragmentContainer"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomsListContainerFragment"
+        android:label="RoomsListFragmentContainer"
+        tools:layout="@layout/fragment_rooms_list_container">
+        <action
+            android:id="@+id/action_roomsListFragmentContainer_to_createRoomFragment"
+            app:destination="@id/createRoomFragment" />
+        <action
+            android:id="@+id/action_roomsListFragmentContainer_to_roomFragment"
+            app:destination="@id/roomFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createRoomFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.CreateRoomFragment"
+        android:label="CreateRoomFragment"
+        tools:layout="@layout/fragment_create_room">
+        <action
+            android:id="@+id/action_createRoomFragment_to_roomsListFragmentContainer"
+            app:destination="@id/roomsListFragmentContainer"
+            app:popUpTo="@id/roomsListFragmentContainer" />
+    </fragment>
+    <fragment
+        android:id="@+id/roomFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomFragment"
+        android:label="RoomFragment"
+        tools:layout="@layout/fragment_room">
+        <action
+            android:id="@+id/action_roomFragment_to_questionFragment"
+            app:destination="@id/questionFragment"
+            app:popUpTo="@id/roomsListFragmentContainer"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_roomFragment_to_roomsListFragmentContainer"
+            app:destination="@id/roomsListFragmentContainer"
+            app:popUpTo="@id/roomsListFragmentContainer"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_roomFragment_to_resultsFragment"
+            app:destination="@id/resultsFragment"
+            app:popUpTo="@id/roomFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>

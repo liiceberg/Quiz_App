@@ -1,8 +1,8 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,12 +16,10 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoriesBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.model.Category
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import java.util.stream.Collectors
 
 @AndroidEntryPoint
 class CategoriesFragment : Fragment(R.layout.fragment_categories) {
@@ -34,6 +32,7 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initRecyclerView()
         with(categoriesViewModel) {
             getCategories()
 
@@ -42,37 +41,28 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
                     visibility = if (isLoad) {
                         View.VISIBLE
                     } else {
-                        categoriesList?.let {
-                            initRecyclerView(it)
-                        }
                         View.GONE
                     }
                 }
             }
 
+            categoriesFlow.observe(this@CategoriesFragment) {
+                it?.let {
+                    categoriesAdapter?.setItems(it)
+                }
+            }
+
             lifecycleScope.launch {
                 errorsChannel.consumeEach {
-                    AlertDialog.Builder(context)
-                        .setTitle(getString(R.string.unknown_error))
-                        .setMessage(getString(R.string.network_error_dialog_text))
-                        .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                            dialog.cancel()
-                            findNavController().popBackStack()
-                        }
-                        .show()
+                    Toast.makeText(context, getString(R.string.network_error_dialog_text), Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun initRecyclerView(list: CategoriesList) {
+    private fun initRecyclerView() {
         binding.levelsRv.apply {
-//            TODO add levels number
-            val c = list.categoriesList
-                .stream()
-                .map { c -> Category(id = c.id, name = c.displayName) }
-                .collect(Collectors.toList())
-            categoriesAdapter = CategoriesAdapter(c, ::onItemClicked)
+            categoriesAdapter = CategoriesAdapter(CategoryDiffUtilItemCallback(), ::onItemClicked)
             adapter = categoriesAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }

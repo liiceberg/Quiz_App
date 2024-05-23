@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -13,14 +14,19 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.results.model.ScoreModel
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.IS_MULTIPLAYER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.ROOM_CODE
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
+import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 import java.util.stream.Collectors
 
 @AndroidEntryPoint
@@ -31,68 +37,114 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
     )
 
     private val resultsViewModel: ResultsViewModel by viewModels()
+    private val roomViewModel: RoomViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val isMultiplayerMode = requireArguments().getBoolean(IS_MULTIPLAYER)
-
-        val scores = getScoresList()
+        val mode = requireArguments().getSerializable(MODE) as Mode
 
         with(binding) {
-            if (isMultiplayerMode) {
-                gameStatusTitleTv.visibility = View.GONE
-                resultsTv.visibility = View.GONE
-                imageIv.visibility = View.GONE
+            when (mode) {
+                Mode.MULTIPLAYER -> {
+                    gameStatusTitleTv.visibility = View.GONE
+                    resultsTv.visibility = View.GONE
+                    imageIv.visibility = View.GONE
 
-                nextBtn.setOnClickListener {
-                    findNavController().navigate(
-                        R.id.action_resultsFragment_to_prelaunchFragment,
-                        bundleOf(
-                            IS_MULTIPLAYER to true,
-                            PLAYERS_NAMES to scores.stream()
-                                .map { model -> model.user }
-                                .collect(Collectors.toList())
+                    val scores = getScoresList()
+
+                    nextBtn.setOnClickListener {
+                        findNavController().navigate(
+                            R.id.action_resultsFragment_to_prelaunchFragment_multiplayer,
+                            bundleOf(
+                                MODE to Mode.MULTIPLAYER,
+                                PLAYERS_NAMES to scores.stream()
+                                    .map { model -> model.username }
+                                    .collect(Collectors.toList())
+                            )
                         )
-                    )
+                    }
+                    lifecycleScope.launch {
+                        initRv(scores)
+                    }
                 }
-            } else {
 
-                val isWin = scores[0].score >= MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
+                Mode.SINGLE -> {
 
-                val title = if (isWin) R.string.win_title_text else R.string.lose_title_text
-                gameStatusTitleTv.text = getString(title)
+                    val scores = getScoresList()
 
-                val text = if (isWin) R.string.win_text else R.string.lose_text
-                resultsTv.text = getString(text)
+                    val isWin = scores[0].value >= MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 
-                val img =
-                    if (isWin) R.drawable.clap_hands_svgrepo_com else R.drawable.sad_svgrepo_com
-                imageIv.setImageResource(img)
+                    val title = if (isWin) R.string.win_title_text else R.string.lose_title_text
+                    gameStatusTitleTv.text = getString(title)
 
-                resultsViewModel.saveScores(
-                    scores[0].score,
-                    Constants.QUESTIONS_NUMBER
-                )
+                    val text = if (isWin) R.string.win_text else R.string.lose_text
+                    resultsTv.text = getString(text)
 
-                nextBtn.setOnClickListener {
+                    val img =
+                        if (isWin) R.drawable.clap_hands_svgrepo_com else R.drawable.sad_svgrepo_com
+                    imageIv.setImageResource(img)
+
+                    resultsViewModel.saveScores(
+                        scores[0].value,
+                        Constants.QUESTIONS_NUMBER
+                    )
+
                     var level = requireArguments().getInt(Keys.LEVEL_NUMBER)
-                    if (isWin) ++level
 
-                    findNavController().navigate(
-                        R.id.action_resultsFragment_to_prelaunchFragment,
-                        bundleOf(
-                            IS_MULTIPLAYER to false,
-                            Keys.CATEGORY_ID to requireArguments().getInt(Keys.CATEGORY_ID),
-                            Keys.LEVEL_NUMBER to level
+                    if (level == LEVELS_NUMBER) {
+                        nextBtn.isEnabled = false
+                    }
+                    nextBtn.setOnClickListener {
+
+                        if (isWin) ++level
+
+                        findNavController().navigate(
+                            R.id.action_resultsFragment_to_prelaunchFragment,
+                            bundleOf(
+                                MODE to Mode.SINGLE,
+                                Keys.CATEGORY_ID to requireArguments().getInt(Keys.CATEGORY_ID),
+                                Keys.LEVEL_NUMBER to level
+                            )
                         )
-                    )
+                    }
+                    lifecycleScope.launch {
+                        initRv(scores)
+                    }
+                }
+
+                Mode.ONLINE -> {
+                    gameStatusTitleTv.visibility = View.GONE
+                    resultsTv.visibility = View.GONE
+                    imageIv.visibility = View.GONE
+
+                    with(resultsViewModel) {
+
+                        lifecycleScope.launch {
+                            val room = requireArguments().getString(ROOM_CODE)
+                            room?.let {
+                                getResults(room)
+                            }
+                        }
+
+                        resultsFlow.observe(this@ResultsFragment) {
+                            it?.let {
+                                initRv(it)
+                            }
+                        }
+                    }
+
+
+                    nextBtn.setOnClickListener {
+                        findNavController().navigate(
+                            R.id.action_resultsFragment_to_roomFragment
+                        )
+                    }
                 }
             }
-            lifecycleScope.launch {
-                initRv(scores)
-            }
+
 
             exitBtn.setOnClickListener {
+                roomViewModel.clear()
                 findNavController().navigate(
                     R.id.action_resultsFragment_to_startFragment
                 )
@@ -101,20 +153,20 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
         }
     }
 
-    private fun initRv(scores: List<ScoreModel>) {
+    private fun initRv(scores: List<Score>) {
         binding.scoresRv.apply {
             adapter = ResultsAdapter(scores)
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
     }
 
-    private fun getScoresList(): List<ScoreModel> {
-        val list = mutableListOf<ScoreModel>()
+    private fun getScoresList(): List<Score> {
+        val list = mutableListOf<Score>()
         val players = requireArguments().getStringArrayList(PLAYERS_NAMES)
         val scores = requireArguments().getIntegerArrayList(PLAYERS_SCORES)
         if (players != null && scores != null) {
             for (i in players.indices) {
-                list.add(ScoreModel(players[i], scores[i]))
+                list.add(Score(players[i], scores[i]))
             }
         }
         return list

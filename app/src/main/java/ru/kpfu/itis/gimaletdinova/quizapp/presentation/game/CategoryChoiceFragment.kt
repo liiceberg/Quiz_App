@@ -1,22 +1,21 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.game
 
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.navigation.findNavController
-import by.kirich1409.viewbindingdelegate.viewBinding
-import dagger.hilt.android.AndroidEntryPoint
-import ru.kpfu.itis.gimaletdinova.quizapp.R
-import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.findNavController
+import by.kirich1409.viewbindingdelegate.viewBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
+import ru.kpfu.itis.gimaletdinova.quizapp.R
+import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
@@ -40,6 +39,7 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
                         View.VISIBLE
                     } else {
                         if (isQuestionsLoaded) {
+                            questionViewModel.onPause = false
                             findNavController()
                                 .navigate(R.id.action_categoryChoiceFragment_to_questionFragment)
                         }
@@ -50,14 +50,7 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
 
             lifecycleScope.launch {
                 questionViewModel.errorsChannel.consumeEach {
-                    AlertDialog.Builder(context)
-                        .setTitle(getString(R.string.unknown_error))
-                        .setMessage(getString(R.string.network_error_dialog_text))
-                        .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                            dialog.cancel()
-                            findNavController().popBackStack()
-                        }
-                        .show()
+                    Toast.makeText(context, getString(R.string.network_error_dialog_text), Toast.LENGTH_SHORT).show()
                 }
             }
 

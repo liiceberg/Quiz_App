@@ -9,6 +9,6 @@
         <item name="colorSecondaryVariant">@color/pumpkin</item>
         <item name="colorOnSecondary">@color/rich_black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
     </style>
 </resources>

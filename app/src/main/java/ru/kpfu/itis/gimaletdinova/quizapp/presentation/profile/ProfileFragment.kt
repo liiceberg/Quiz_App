@@ -3,13 +3,15 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.profile
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentProfileBinding
-import androidx.fragment.app.Fragment
 import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
 import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
@@ -24,11 +26,22 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private val profileViewModel: ProfileViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        lifecycleScope.launch {
+            profileViewModel.getUsername()
+        }
+
         with(binding) {
 
-            backBtn.setOnClickListener { view ->
-                view.findNavController()
-                    .navigate(R.id.action_profileFragment_to_startFragment)
+            backBtn.setOnClickListener {
+                findNavController().navigate(R.id.action_profileFragment_to_startFragment)
+            }
+
+            logoutBtn.setOnClickListener {
+                lifecycleScope.launch {
+                    profileViewModel.logout()
+                    findNavController().navigate(R.id.action_profileFragment_to_signInFragment)
+                }
             }
 
             usernameEditBtn.setOnClickListener {

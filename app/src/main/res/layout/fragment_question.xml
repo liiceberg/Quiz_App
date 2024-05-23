@@ -51,54 +51,50 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/question_number_tv"
-        tools:text="Question" />
+        tools:text="Question llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll" />
 
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
+        android:id="@+id/answers_ll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_gravity="center"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:isScrollContainer="true"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/question_tv">
 
-        <LinearLayout
-            android:id="@+id/answers_ll"
+        <com.google.android.material.button.MaterialButton
+            style="@style/DefaultButton"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="first answer lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll" />
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/DefaultButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                tools:text="first answer" />
+        <com.google.android.material.button.MaterialButton
+            style="@style/DefaultButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="second answer llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll" />
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/DefaultButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                tools:text="second answer" />
+        <com.google.android.material.button.MaterialButton
+            style="@style/DefaultButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="third answer llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll" />
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/DefaultButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                tools:text="third answer" />
-
-            <com.google.android.material.button.MaterialButton
-                style="@style/DefaultButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                tools:text="fourth answer" />
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+        <com.google.android.material.button.MaterialButton
+            style="@style/DefaultButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="fourth answer lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll" />
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
