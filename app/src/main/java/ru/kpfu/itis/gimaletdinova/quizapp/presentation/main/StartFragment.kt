@@ -2,13 +2,13 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.main
 
 import android.os.Bundle
 import android.view.View
-import androidx.navigation.findNavController
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import ru.kpfu.itis.gimaletdinova.quizapp.R
-import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentStartBinding
+
 @AndroidEntryPoint
 class StartFragment : Fragment(R.layout.fragment_start) {
 
@@ -28,8 +28,7 @@ class StartFragment : Fragment(R.layout.fragment_start) {
                 findNavController().navigate(R.id.action_startFragment_to_multiplayerOptionsFragment)
             }
             playOnlineBtn.setOnClickListener {
-                findNavController().navigate(R.id.action_startFragment_to_roomsListFragment)
-            }
+                findNavController().navigate(R.id.action_startFragment_to_roomsListFragmentContainer)            }
         }
     }
 }

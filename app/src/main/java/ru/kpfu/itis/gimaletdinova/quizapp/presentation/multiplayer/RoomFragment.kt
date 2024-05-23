@@ -1,7 +1,9 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -31,7 +33,7 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
 
     override fun onBackPressed() {
         roomViewModel.clear()
-        findNavController().navigate(R.id.action_roomFragment_to_roomsListFragment)
+        findNavController().navigate(R.id.action_roomFragment_to_roomsListFragmentContainer)
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -44,6 +46,9 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
             }
 
             with(binding) {
+                lifecycleScope.launch {
+                    getPlayers()
+                }
 
                 val scores = arguments?.getIntegerArrayList(PLAYERS_SCORES)
 
@@ -53,15 +58,19 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                 }
 
                 if (messages.isNotEmpty()) {
-                    infoTv.text = getMessages(messages)
+                    infoTv.text = buildToText(messages)
                 }
 
                 readyBtn.setOnClickListener {
                     sendMessage(MessageDto(userId, Code.READY))
                     readyBtn.isEnabled = false
                 }
+
+                teamIv.setOnClickListener {
+                    showPlayers()
+                }
                 messageFlow.observe(this@RoomFragment) {
-                    infoTv.text = getMessages(it)
+                    infoTv.text = buildToText(it)
                 }
 
                 waitFlow.observe(this@RoomFragment) {
@@ -102,7 +111,16 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
 
     }
 
-    private fun getMessages(list: List<String>): String {
+    private fun showPlayers() {
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.players_dialog)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        val dialogText = dialog.findViewById<View>(R.id.players_list_tv) as TextView
+        dialogText.text = roomViewModel.players?.let { buildToText(it) }
+        dialog.show()
+    }
+
+    private fun buildToText(list: List<String>): String {
         val builder: StringBuilder = java.lang.StringBuilder()
         for (str in list) {
             builder.append(str)

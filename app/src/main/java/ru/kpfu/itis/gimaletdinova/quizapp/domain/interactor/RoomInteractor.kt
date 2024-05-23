@@ -34,4 +34,10 @@ class RoomInteractor @Inject constructor(
         }
     }
 
+    suspend fun getPlayers(code: String) : List<String> {
+        return withContext(dispatcher) {
+            roomRepository.getPlayers(code)
+        }
+    }
+
 }

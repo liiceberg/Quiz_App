@@ -40,7 +40,7 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
                         difficulty = difficulty
                     )
                     if (code != null) {
-                        findNavController().navigate(R.id.action_createRoomFragment_to_roomsListFragment)
+                        findNavController().navigate(R.id.action_createRoomFragment_to_roomsListFragmentContainer)
                         val toastText = getString(R.string.room_created, code)
                         Toast.makeText(context, toastText, Toast.LENGTH_LONG)
                             .show()

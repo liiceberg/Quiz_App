@@ -95,7 +95,6 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
 
-    implementation("dev.gustavoavila:java-android-websocket-client:2.0.2")
     implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.4")
     implementation ("io.reactivex.rxjava2:rxandroid:2.1.1")
 }

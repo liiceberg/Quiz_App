@@ -11,6 +11,8 @@ object Keys {
 
     const val ROOM_CODE = "ROOM_CODE"
 
+    const val ALL_ROOMS = "ALL_ROOMS"
+
     const val DATA_STORE_NAME = "DATA_STORE_NAME"
     const val DATABASE_NAME = "QUIZ_DATABASE_NAME"
 

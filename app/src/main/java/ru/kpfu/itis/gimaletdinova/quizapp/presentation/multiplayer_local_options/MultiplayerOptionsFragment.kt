@@ -1,7 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options
 
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton

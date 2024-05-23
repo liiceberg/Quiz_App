@@ -2,6 +2,7 @@ package ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.UserRepository
 import javax.inject.Inject
 
@@ -30,6 +31,12 @@ class UserInteractor @Inject constructor(
     suspend fun setUsername(name: String) {
         return withContext(dispatcher) {
             userRepository.setUsername(name)
+        }
+    }
+
+    suspend fun getRooms(): List<Room> {
+        return withContext(dispatcher) {
+            userRepository.getRooms()
         }
     }
 }

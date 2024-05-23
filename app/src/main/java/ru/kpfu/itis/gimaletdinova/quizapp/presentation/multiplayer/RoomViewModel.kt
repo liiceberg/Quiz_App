@@ -20,6 +20,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.BuildConfig
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.MessageDto
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.RoomInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.USER_ID_KEY
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
@@ -32,7 +33,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RoomViewModel @Inject constructor(
     private val jwtTokenManager: JwtTokenManager,
-    private val prefs: DataStore<Preferences>
+    private val prefs: DataStore<Preferences>,
+    private val roomInteractor: RoomInteractor
 ) : ViewModel() {
 
     private var mStompClient: StompClient? = null
@@ -49,6 +51,9 @@ class RoomViewModel @Inject constructor(
     val resultsWaitFlow = MutableStateFlow(-1)
     private var _room: String? = null
     val room get() = _room
+
+    private var _players: List<String>? = null
+    val players get() = _players
 
 
     fun initStomp(room: String?) {
@@ -164,6 +169,14 @@ class RoomViewModel @Inject constructor(
         mStompClient = null
         initialized = false
         messages.clear()
+    }
+
+    suspend fun getPlayers() {
+        runCatching {
+            room?.let { roomInteractor.getPlayers(it) }
+        }.onSuccess {
+            _players = it
+        }
     }
 
     override fun onCleared() {

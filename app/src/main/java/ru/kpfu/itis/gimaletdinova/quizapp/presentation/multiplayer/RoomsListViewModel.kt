@@ -18,25 +18,26 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.GetCategoriesUseCase
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.RoomInteractor
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class RoomsListViewModel @Inject constructor(
     private val roomInteractor: RoomInteractor,
+    private val userInteractor: UserInteractor,
     private val categoriesUseCase: GetCategoriesUseCase,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val dispatcher: CoroutineDispatcher
-): ViewModel() {
-    
+) : ViewModel() {
+
     private val _roomFlow = MutableSharedFlow<List<Room>>()
     val roomFlow get() = _roomFlow
-    private var _currentRoomList : List<Room>? = null
+    private var _currentRoomList: List<Room>? = null
     val currentRoomList get() = _currentRoomList
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
-    suspend fun getCategoriesList() : CategoriesList? {
+    suspend fun getCategoriesList(): CategoriesList? {
         var categories: CategoriesList? = null
         viewModelScope.async {
             _loadingFlow.value = true
@@ -52,10 +53,14 @@ class RoomsListViewModel @Inject constructor(
         return categories
     }
 
-    fun getRoomList() {
+    fun getRoomList(allRooms: Boolean) {
         viewModelScope.launch {
             runCatching(exceptionHandlerDelegate) {
-                roomInteractor.getAll()
+                if (allRooms) {
+                    roomInteractor.getAll()
+                } else {
+                    userInteractor.getRooms()
+                }
             }.onSuccess {
                 roomFlow.emit(it)
                 _currentRoomList = it
@@ -82,22 +87,13 @@ class RoomsListViewModel @Inject constructor(
             }
         }
     }
+
     fun stopRepeatWork() {
         isActive = false
     }
+
     override fun onCleared() {
         isActive = false
         viewModelJob.cancel()
-    }
-    private inline fun <P> doCoroutineWork(
-        crossinline doOnAsyncBlock: suspend CoroutineScope.() -> P,
-        coroutineScope: CoroutineScope,
-        context: CoroutineContext
-    ) {
-        coroutineScope.launch {
-            withContext(context) {
-                doOnAsyncBlock.invoke(this)
-            }
-        }
     }
 }

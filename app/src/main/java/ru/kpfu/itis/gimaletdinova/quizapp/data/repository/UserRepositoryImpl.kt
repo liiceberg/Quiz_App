@@ -8,6 +8,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.BadRequestException
 import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.UserNotFoundException
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.LoginRequest
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.AuthService
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.TriviaService
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.UserRepository
@@ -48,6 +49,13 @@ class UserRepositoryImpl @Inject constructor(
         getUserId()?.let {
             triviaService.updateUsername(it, name)
         }
+    }
+
+    override suspend fun getRooms() : List<Room> {
+        getUserId()?.let {
+            return triviaService.getUserRooms(it)
+        }
+        throw UserNotFoundException("User's id not found")
     }
 
     private suspend fun getUserId(): Long? {

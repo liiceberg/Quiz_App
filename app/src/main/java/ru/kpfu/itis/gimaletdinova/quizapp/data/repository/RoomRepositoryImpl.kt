@@ -31,6 +31,10 @@ class RoomRepositoryImpl @Inject constructor(
         return triviaService.getResults(code)
     }
 
+    override suspend fun getPlayers(code: String): List<String> {
+        return triviaService.getPlayers(code)
+    }
+
     override suspend fun getGameContent(code: String): QuestionsList {
 
         val domainModel = questionsListMapper.mapResponseToQuestionsList(

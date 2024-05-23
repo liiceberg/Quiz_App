@@ -10,4 +10,5 @@ interface RoomRepository {
     suspend fun getAll() : List<Room>
     suspend fun getResults(code: String) : List<Score>
     suspend fun getGameContent(code: String) : QuestionsList
+    suspend fun getPlayers(code: String) : List<String>
 }

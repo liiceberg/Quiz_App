@@ -15,13 +15,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.UserRepository
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val userInteractor: UserInteractor,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val prefs: DataStore<Preferences>,
     private val dispatcher: CoroutineDispatcher
@@ -35,7 +35,7 @@ class SignInViewModel @Inject constructor(
         viewModelScope.async {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
-                val id = userRepository.login(email, password)
+                val id = userInteractor.login(email, password)
                 saveUser(id)
             }.onSuccess {
                 loggedIn = true

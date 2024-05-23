@@ -1,8 +1,8 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -54,15 +54,7 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
 
             lifecycleScope.launch {
                 errorsChannel.consumeEach {
-                    AlertDialog.Builder(context)
-                        .setTitle(getString(R.string.unknown_error))
-                        .setMessage(getString(R.string.network_error_dialog_text))
-                        .setCancelable(false)
-                        .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                            dialog.cancel()
-                            findNavController().popBackStack()
-                        }
-                        .show()
+                    Toast.makeText(context, getString(R.string.network_error_dialog_text), Toast.LENGTH_SHORT).show()
                 }
             }
         }

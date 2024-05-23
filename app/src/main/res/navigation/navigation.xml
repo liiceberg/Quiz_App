@@ -19,8 +19,8 @@
             android:id="@+id/action_startFragment_to_multiplayerOptionsFragment"
             app:destination="@id/multiplayerOptionsFragment" />
         <action
-            android:id="@+id/action_startFragment_to_roomsListFragment"
-            app:destination="@id/roomsListFragment" />
+            android:id="@+id/action_startFragment_to_roomsListFragmentContainer"
+            app:destination="@id/roomsListFragmentContainer" />
     </fragment>
     <fragment
         android:id="@+id/categoriesFragment"
@@ -175,15 +175,15 @@
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
-        android:id="@+id/roomsListFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomsListFragment"
-        android:label="RoomsListFragment"
-        tools:layout="@layout/fragment_rooms_list">
+        android:id="@+id/roomsListFragmentContainer"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomsListContainerFragment"
+        android:label="RoomsListFragmentContainer"
+        tools:layout="@layout/fragment_rooms_list_container">
         <action
-            android:id="@+id/action_roomsListFragment_to_createRoomFragment"
+            android:id="@+id/action_roomsListFragmentContainer_to_createRoomFragment"
             app:destination="@id/createRoomFragment" />
         <action
-            android:id="@+id/action_roomsListFragment_to_roomFragment"
+            android:id="@+id/action_roomsListFragmentContainer_to_roomFragment"
             app:destination="@id/roomFragment" />
     </fragment>
     <fragment
@@ -192,9 +192,9 @@
         android:label="CreateRoomFragment"
         tools:layout="@layout/fragment_create_room">
         <action
-            android:id="@+id/action_createRoomFragment_to_roomsListFragment"
-            app:destination="@id/roomsListFragment"
-            app:popUpTo="@id/roomsListFragment" />
+            android:id="@+id/action_createRoomFragment_to_roomsListFragmentContainer"
+            app:destination="@id/roomsListFragmentContainer"
+            app:popUpTo="@id/roomsListFragmentContainer" />
     </fragment>
     <fragment
         android:id="@+id/roomFragment"
@@ -204,12 +204,12 @@
         <action
             android:id="@+id/action_roomFragment_to_questionFragment"
             app:destination="@id/questionFragment"
-            app:popUpTo="@id/roomsListFragment"
+            app:popUpTo="@id/roomsListFragmentContainer"
             app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_roomFragment_to_roomsListFragment"
-            app:destination="@id/roomsListFragment"
-            app:popUpTo="@id/roomsListFragment"
+            android:id="@+id/action_roomFragment_to_roomsListFragmentContainer"
+            app:destination="@id/roomsListFragmentContainer"
+            app:popUpTo="@id/roomsListFragmentContainer"
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_roomFragment_to_resultsFragment"

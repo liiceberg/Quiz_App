@@ -39,9 +39,14 @@ interface TriviaService {
     @GET("api/room/game")
     suspend fun getGameContent(@Query("code") code: String) : TriviaResponse
 
+    @GET("api/room/players")
+    suspend fun getPlayers(@Query("code") code: String) : List<String>
+
     @GET("api/user/get/name")
     suspend fun getUsername(@Query("id") id: Long) : UsernameResponse
 
     @GET("api/user/update/name")
     suspend fun updateUsername(@Query("id") id: Long, @Query("name") name: String)
+    @GET("api/user/get/rooms")
+    suspend fun getUserRooms(@Query("id") id: Long) : List<Room>
 }
