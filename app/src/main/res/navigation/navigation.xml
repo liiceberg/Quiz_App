@@ -176,7 +176,7 @@
     </fragment>
     <fragment
         android:id="@+id/roomsListFragmentContainer"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomsListContainerFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.rooms_list.RoomsListContainerFragment"
         android:label="RoomsListFragmentContainer"
         tools:layout="@layout/fragment_rooms_list_container">
         <action
@@ -188,7 +188,7 @@
     </fragment>
     <fragment
         android:id="@+id/createRoomFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.CreateRoomFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.create_room.CreateRoomFragment"
         android:label="CreateRoomFragment"
         tools:layout="@layout/fragment_create_room">
         <action
@@ -198,7 +198,7 @@
     </fragment>
     <fragment
         android:id="@+id/roomFragment"
-        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room.RoomFragment"
         android:label="RoomFragment"
         tools:layout="@layout/fragment_room">
         <action

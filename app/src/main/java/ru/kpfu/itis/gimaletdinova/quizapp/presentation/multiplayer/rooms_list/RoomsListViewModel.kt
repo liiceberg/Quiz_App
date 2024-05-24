@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.rooms_list
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,6 +37,10 @@ class RoomsListViewModel @Inject constructor(
     val currentRoomList get() = _currentRoomList
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
+
+    private var viewModelJob = Job()
+    private val viewModelScope = CoroutineScope(Main + viewModelJob)
+    private var isActive = true
     suspend fun getCategoriesList(): CategoriesList? {
         var categories: CategoriesList? = null
         viewModelScope.async {
@@ -69,10 +73,6 @@ class RoomsListViewModel @Inject constructor(
             }
         }
     }
-
-    private var viewModelJob = Job()
-    private val viewModelScope = CoroutineScope(Main + viewModelJob)
-    private var isActive = true
 
     fun <P> doRepeatWork(delay: Long, doOnAsyncBlock: suspend CoroutineScope.() -> P) {
         isActive = true
