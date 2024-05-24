@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomViewModel
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room.RoomViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
@@ -66,6 +66,11 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                     lifecycleScope.launch {
                         initRv(scores)
                     }
+                    exitBtn.setOnClickListener {
+                        findNavController().navigate(
+                            R.id.action_resultsFragment_to_startFragment
+                        )
+                    }
                 }
 
                 Mode.SINGLE -> {
@@ -110,6 +115,11 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                     lifecycleScope.launch {
                         initRv(scores)
                     }
+                    exitBtn.setOnClickListener {
+                        findNavController().navigate(
+                            R.id.action_resultsFragment_to_startFragment
+                        )
+                    }
                 }
 
                 Mode.ONLINE -> {
@@ -139,15 +149,20 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                             R.id.action_resultsFragment_to_roomFragment
                         )
                     }
+
+                    exitBtn.setOnClickListener {
+                        roomViewModel.exit()
+                    }
+
+                    roomViewModel.exitFlow.observe(this@ResultsFragment) { exited ->
+                        if (exited) {
+                            roomViewModel.clear()
+                            findNavController().navigate(
+                                R.id.action_resultsFragment_to_startFragment
+                            )
+                        }
+                    }
                 }
-            }
-
-
-            exitBtn.setOnClickListener {
-                roomViewModel.clear()
-                findNavController().navigate(
-                    R.id.action_resultsFragment_to_startFragment
-                )
             }
 
         }

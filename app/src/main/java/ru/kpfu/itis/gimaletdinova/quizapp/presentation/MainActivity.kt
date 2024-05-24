@@ -2,24 +2,19 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation
 
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.datastore.DataStore
 import androidx.datastore.preferences.Preferences
 import androidx.datastore.preferences.edit
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomFragment
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.RoomViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.OnBackPressed
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.NIGHT_MODE_KEY
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.THEME_CHANGED_KEY

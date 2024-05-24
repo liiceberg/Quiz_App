@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.rooms_list
 
 import android.os.Bundle
 import android.view.View
@@ -76,7 +76,6 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
                 UPDATE_INTERVAL
             ) {
                 getRoomList(requireArguments().getBoolean(ALL_ROOMS))
-                println(roomsSearchView.isFocused)
             }
         }
     }

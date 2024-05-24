@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.create_room
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

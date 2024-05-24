@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.rooms_list
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

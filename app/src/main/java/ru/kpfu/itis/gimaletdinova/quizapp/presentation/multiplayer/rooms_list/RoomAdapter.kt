@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.rooms_list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

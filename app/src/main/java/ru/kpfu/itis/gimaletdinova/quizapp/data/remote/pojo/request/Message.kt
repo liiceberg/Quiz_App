@@ -1,6 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request
 
-data class MessageDto (
+data class Message (
     val sender: Long?,
     val code: Code,
     val message: String? = null,
@@ -9,5 +9,5 @@ data class MessageDto (
 )
 
 enum class Code {
-    JOIN, READY, EXIT, SCORE
+    JOIN, READY, EXIT, SCORE, ALIVE
 }

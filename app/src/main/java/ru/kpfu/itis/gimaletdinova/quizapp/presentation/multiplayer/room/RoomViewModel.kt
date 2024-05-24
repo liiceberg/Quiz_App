@@ -1,25 +1,30 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room
 
 import android.util.Log
 import androidx.datastore.DataStore
 import androidx.datastore.preferences.Preferences
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.BuildConfig
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.MessageDto
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.RoomInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.USER_ID_KEY
 import ua.naiksoftware.stomp.Stomp
@@ -34,7 +39,8 @@ import javax.inject.Inject
 class RoomViewModel @Inject constructor(
     private val jwtTokenManager: JwtTokenManager,
     private val prefs: DataStore<Preferences>,
-    private val roomInteractor: RoomInteractor
+    private val roomInteractor: RoomInteractor,
+    private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private var mStompClient: StompClient? = null
@@ -49,12 +55,17 @@ class RoomViewModel @Inject constructor(
     val messageFlow = MutableSharedFlow<List<String>>()
     val waitFlow = MutableStateFlow(-1)
     val resultsWaitFlow = MutableStateFlow(-1)
+    val joinFlow = MutableStateFlow(0)
+    val exitFlow = MutableStateFlow(false)
     private var _room: String? = null
     val room get() = _room
 
     private var _players: List<String>? = null
     val players get() = _players
 
+    private var viewModelJob = Job()
+    private val viewModelScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private var isActive = true
 
     fun initStomp(room: String?) {
         _room = room
@@ -75,7 +86,7 @@ class RoomViewModel @Inject constructor(
                     .subscribeOn(Schedulers.io(), false)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ topicMessage: StompMessage ->
-                        val message = gson.fromJson(topicMessage.payload, MessageDto::class.java)
+                        val message = gson.fromJson(topicMessage.payload, Message::class.java)
                         message.run {
                             this.message?.let {
                                 messages.add(it)
@@ -87,6 +98,7 @@ class RoomViewModel @Inject constructor(
                                 when (code) {
                                     Code.READY -> waitFlow.value = it
                                     Code.SCORE -> resultsWaitFlow.value = it
+                                    Code.JOIN -> joinFlow.value = it
                                     else -> {}
                                 }
                             }
@@ -122,9 +134,11 @@ class RoomViewModel @Inject constructor(
                 if (!mStompClient!!.isConnected) {
                     mStompClient!!.connect()
                     sendMessage(
-                        MessageDto(sender = _userId, code = Code.JOIN)
+                        Message(sender = _userId, code = Code.JOIN)
                     )
                 }
+
+                sendAliveMessage()
             } else {
                 Log.e("TAG", "mStompClient is null!")
             }
@@ -132,19 +146,20 @@ class RoomViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(message: MessageDto) {
+    fun sendMessage(message: Message) {
         if (_room != null) {
-            sendCompletable(mStompClient!!.send("/app/game/$_room", gson.toJson(message)))
+            sendCompletable(mStompClient!!.send("/app/game/$_room", gson.toJson(message)), message.code == Code.EXIT)
         }
     }
 
-    private fun sendCompletable(request: Completable) {
+    private fun sendCompletable(request: Completable, exit: Boolean) {
         compositeDisposable?.add(
             request.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     {
                         Log.i("TAG", "Stomp send")
+                        if (exit) exitFlow.value = true
                     },
                     {
                         Log.e("TAG", "Stomp error", it)
@@ -160,15 +175,8 @@ class RoomViewModel @Inject constructor(
         compositeDisposable = CompositeDisposable()
     }
 
-    fun clear() {
-        if (mStompClient != null) {
-            sendMessage(MessageDto(sender = _userId, code = Code.EXIT))
-        }
-        mStompClient?.disconnect()
-        compositeDisposable?.dispose()
-        mStompClient = null
-        initialized = false
-        messages.clear()
+    fun exit() {
+        sendMessage(Message(sender = _userId, code = Code.EXIT))
     }
 
     suspend fun getPlayers() {
@@ -179,8 +187,40 @@ class RoomViewModel @Inject constructor(
         }
     }
 
+    private fun sendAliveMessage() {
+        isActive = true
+        viewModelScope.launch {
+            while (this@RoomViewModel.isActive) {
+                withContext(dispatcher) {
+                    sendMessage(Message(_userId, Code.ALIVE))
+                }
+                if (this@RoomViewModel.isActive) {
+                    delay(ALIVE_MESSAGE_SEND_INTERVAL)
+                }
+            }
+        }
+    }
+
+    fun clear() {
+        isActive = false
+        viewModelJob.cancel()
+        mStompClient?.disconnect()
+        compositeDisposable?.dispose()
+        mStompClient = null
+        initialized = false
+        messages.clear()
+        exitFlow.value = false
+        resultsWaitFlow.value = -1
+        waitFlow.value = -1
+        joinFlow.value = 0
+    }
+
     override fun onCleared() {
         clear()
+    }
+
+    companion object {
+        private const val ALIVE_MESSAGE_SEND_INTERVAL = 10_000L
     }
 
 }

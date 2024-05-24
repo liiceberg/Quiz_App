@@ -44,6 +44,7 @@
     <string name="room_created">Room with code %s created</string>
     <string name="all_rooms">All</string>
     <string name="my_rooms">My</string>
+    <string name="players">Players:\n%s</string>
 
 
         <!--    EditText    -->

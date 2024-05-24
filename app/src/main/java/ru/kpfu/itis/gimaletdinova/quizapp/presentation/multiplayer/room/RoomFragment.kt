@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer
+package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room
 
 import android.app.Dialog
 import android.os.Bundle
@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.MessageDto
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentRoomBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.QuestionViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
@@ -32,9 +32,9 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
     private val questionViewModel: QuestionViewModel by activityViewModels()
 
     override fun onBackPressed() {
-        roomViewModel.clear()
-        findNavController().navigate(R.id.action_roomFragment_to_roomsListFragmentContainer)
+        roomViewModel.exit()
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         val room = arguments?.getString(ROOM_CODE)
@@ -54,7 +54,13 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
 
                 if (scores != null) {
                     readyBtn.visibility = View.GONE
-                    roomViewModel.sendMessage(MessageDto(sender = userId, code = Code.SCORE, score = scores[0]))
+                    roomViewModel.sendMessage(
+                        Message(
+                            sender = userId,
+                            code = Code.SCORE,
+                            score = scores[0]
+                        )
+                    )
                 }
 
                 if (messages.isNotEmpty()) {
@@ -62,7 +68,7 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                 }
 
                 readyBtn.setOnClickListener {
-                    sendMessage(MessageDto(userId, Code.READY))
+                    sendMessage(Message(userId, Code.READY))
                     readyBtn.isEnabled = false
                 }
 
@@ -87,12 +93,24 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                 resultsWaitFlow.observe(this@RoomFragment) {
                     if (it == 0) {
                         resultsWaitFlow.value = -1
-                        findNavController().navigate(R.id.action_roomFragment_to_resultsFragment,
+                        findNavController().navigate(
+                            R.id.action_roomFragment_to_resultsFragment,
                             bundleOf(
                                 MODE to Mode.ONLINE,
                                 ROOM_CODE to roomViewModel.room
                             )
                         )
+                    }
+                }
+
+                joinFlow.observe(this@RoomFragment) {
+                    readyBtn.isEnabled = it >= 0
+                }
+
+                exitFlow.observe(this@RoomFragment) { exited ->
+                    if (exited) {
+                        roomViewModel.clear()
+                        findNavController().navigate(R.id.action_roomFragment_to_roomsListFragmentContainer)
                     }
                 }
             }
@@ -116,15 +134,17 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
         dialog.setContentView(R.layout.players_dialog)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         val dialogText = dialog.findViewById<View>(R.id.players_list_tv) as TextView
-        dialogText.text = roomViewModel.players?.let { buildToText(it) }
+        dialogText.text = getString(R.string.players, roomViewModel.players?.let { buildToText(it) })
         dialog.show()
     }
 
     private fun buildToText(list: List<String>): String {
-        val builder: StringBuilder = java.lang.StringBuilder()
-        for (str in list) {
-            builder.append(str)
-            builder.append("\n")
+        val builder = StringBuilder()
+        for (i in list.indices) {
+            builder.append(list[i])
+            if (i != list.lastIndex) {
+                builder.append("\n")
+            }
         }
         return builder.toString()
     }
