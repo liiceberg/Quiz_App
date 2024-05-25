@@ -17,7 +17,9 @@ import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.ScoreInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.UserScores
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
 import ru.kpfu.itis.gimaletdinova.quizapp.util.setCurrentTheme
 import javax.inject.Inject
@@ -28,17 +30,22 @@ class ProfileViewModel @Inject constructor(
     private val dispatcher: CoroutineDispatcher,
     private val tokenManager: JwtTokenManager,
     private val userInteractor: UserInteractor,
-    private val exceptionHandlerDelegate: ExceptionHandlerDelegate
+    private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
+    private val scoreInteractor: ScoreInteractor
 ) : ViewModel() {
 
     val usernameFlow = MutableStateFlow("")
-
-    val totalQuestionsFlow = prefs.data.map { it[PrefsKeys.TOTAL_QUESTIONS_KEY] ?: 0 }
-
-    val userQuestionsFlow = prefs.data.map { it[PrefsKeys.USER_QUESTIONS_KEY] ?: 0 }
+    val scoresFlow = MutableStateFlow<UserScores?>(null)
     val themeFlow = prefs.data.map { it[PrefsKeys.NIGHT_MODE_KEY] ?: false }
 
-    suspend fun getUsername() {
+    fun getUserInfo() {
+        viewModelScope.launch {
+            getUsername()
+            getScores()
+        }
+    }
+
+    private suspend fun getUsername() {
         runCatching(exceptionHandlerDelegate) {
             userInteractor.getUsername()
         }.onSuccess {
@@ -46,6 +53,18 @@ class ProfileViewModel @Inject constructor(
                 usernameFlow.value = it
             } else {
                 usernameFlow.value = "user"
+            }
+        }
+    }
+
+    private suspend fun getScores() {
+        runCatching(exceptionHandlerDelegate) {
+            scoreInteractor.getScores()
+        }.onSuccess {
+            if (it != null) {
+                scoresFlow.value = it
+            } else {
+                scoresFlow.value = UserScores(0, 0)
             }
         }
     }

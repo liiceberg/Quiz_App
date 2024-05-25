@@ -8,10 +8,12 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManagerImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.LevelsRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.RoomRepositoryImpl
+import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.ScoresRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.TriviaRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.UserRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.LevelsRepository
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.RoomRepository
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.ScoresRepository
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.TriviaRepository
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.UserRepository
 import javax.inject.Singleton
@@ -38,4 +40,8 @@ interface DataModule {
     @Binds
     @Singleton
     fun bindRoomRepositoryToRoomRepositoryImpl(roomRepository: RoomRepositoryImpl) : RoomRepository
+
+    @Binds
+    @Singleton
+    fun bindScoresRepositoryToScoresRepositoryImpl(scoresRepository: ScoresRepositoryImpl) : ScoresRepository
 }

@@ -6,13 +6,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
@@ -63,9 +61,9 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                             )
                         )
                     }
-                    lifecycleScope.launch {
-                        initRv(scores)
-                    }
+
+                    initRv(scores)
+
                     exitBtn.setOnClickListener {
                         findNavController().navigate(
                             R.id.action_resultsFragment_to_startFragment
@@ -112,9 +110,9 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                             )
                         )
                     }
-                    lifecycleScope.launch {
-                        initRv(scores)
-                    }
+
+                    initRv(scores)
+
                     exitBtn.setOnClickListener {
                         findNavController().navigate(
                             R.id.action_resultsFragment_to_startFragment
@@ -129,11 +127,9 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
                     with(resultsViewModel) {
 
-                        lifecycleScope.launch {
-                            val room = requireArguments().getString(ROOM_CODE)
-                            room?.let {
-                                getResults(room)
-                            }
+                        val room = requireArguments().getString(ROOM_CODE)
+                        room?.let {
+                            getResults(room)
                         }
 
                         resultsFlow.observe(this@ResultsFragment) {

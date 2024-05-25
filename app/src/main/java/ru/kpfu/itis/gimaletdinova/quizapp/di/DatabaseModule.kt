@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ru.kpfu.itis.gimaletdinova.quizapp.data.local.QuizDatabase
 import ru.kpfu.itis.gimaletdinova.quizapp.data.local.dao.QuestionsDao
+import ru.kpfu.itis.gimaletdinova.quizapp.data.local.dao.ScoresDao
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys
 import javax.inject.Singleton
 
@@ -27,4 +28,7 @@ class DatabaseModule {
 
     @Provides
     fun provideQuestionsDao(db: QuizDatabase) : QuestionsDao = db.questionsDao
+
+    @Provides
+    fun provideScoresDao(db: QuizDatabase) : ScoresDao = db.scoreDao
 }

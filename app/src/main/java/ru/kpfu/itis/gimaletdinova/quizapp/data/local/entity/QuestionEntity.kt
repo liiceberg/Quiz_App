@@ -21,7 +21,7 @@ data class QuestionEntity(
     val number: Int,
     val question: String,
     val answers: List<String>,
-    val correctAnswerPosition: Int,
-    val userAnswerPosition: Int,
+    @ColumnInfo(name = "correct_answer_position") val correctAnswerPosition: Int,
+    @ColumnInfo(name = "user_answer_position") val userAnswerPosition: Int,
     @ColumnInfo(name = "level_id") val levelId: Int?
 )

@@ -27,9 +27,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        lifecycleScope.launch {
-            profileViewModel.getUsername()
-        }
+        profileViewModel.getUserInfo()
 
         with(binding) {
 
@@ -68,12 +66,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                     usernameTv.text = username
                 }
 
-                userQuestionsFlow.observe(this@ProfileFragment) { number ->
-                    userQuestionsTv.text = getString(R.string.user_questions_number, number)
-                }
-
-                totalQuestionsFlow.observe(this@ProfileFragment) { number ->
-                    totalQuestionsTv.text = getString(R.string.total_questions_number, number)
+                scoresFlow.observe(this@ProfileFragment) {
+                    it?.let {
+                        userQuestionsTv.text =
+                            getString(R.string.user_questions_number, it.correctNumber)
+                        totalQuestionsTv.text =
+                            getString(R.string.total_questions_number, it.totalNumber)
+                    }
                 }
 
                 themeFlow.observe(this@ProfileFragment) { isNightMode ->
