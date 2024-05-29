@@ -21,21 +21,27 @@ class CreateRoomViewModel @Inject constructor(
     private val categoriesUseCase: GetCategoriesUseCase,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val roomInteractor: RoomInteractor
-): ViewModel() {
+) : ViewModel() {
     private val _categoriesFlow = MutableStateFlow<CategoriesList?>(null)
     val categoriesFlow get() = _categoriesFlow
 
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
     val errorsChannel = Channel<Throwable>()
-    suspend fun create(playersNumber: Int, categoryId: Int?, difficulty: LevelDifficulty?) : String? {
-        var code : String? = null
+    suspend fun create(
+        playersNumber: Int,
+        categoryId: Int?,
+        difficulty: LevelDifficulty?
+    ): String? {
+        var code: String? = null
         viewModelScope.async {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
                 roomInteractor.createRoom(playersNumber, categoryId, difficulty)
             }.onSuccess {
                 code = it
+            }.onFailure {
+                errorsChannel.send(it)
             }
         }.await()
         _loadingFlow.value = false
@@ -54,5 +60,9 @@ class CreateRoomViewModel @Inject constructor(
             }
             _loadingFlow.value = false
         }
+    }
+
+    override fun onCleared() {
+        errorsChannel.close()
     }
 }

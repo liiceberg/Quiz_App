@@ -64,17 +64,17 @@
     <string name="password_digit_char_error">Password must contain digit</string>
     <string name="passwords_not_equals_error">Passwords not equals</string>
     <string name="account_created">Account was successfully created</string>
-    <string name="login_error">Email or password entered incorrectly</string>
-    <string name="email_already_exist">This email already registered</string>
 
 
         <!--  Exceptions  -->
     <string name="too_many_requests">The number of request attempts exceeded</string>
-    <string name="page_not_found">Trivia not found</string>
-    <string name="bad_request">Bad request</string>
+    <string name="page_not_found">Can\'t find anything</string>
+    <string name="bad_request">Request is incorrect</string>
+    <string name="unauthorized">Reauthorization is required</string>
     <string name="server_exception">Server is not response</string>
     <string name="empty_questions_list_response">Questions not found</string>
     <string name="empty_categories_list_response">Categories not found</string>
+    <string name="connection_exception">Сan\'t connect to the server</string>
     <string name="unknown_error">Unknown error occurred</string>
 
 </resources>

@@ -4,7 +4,6 @@ import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -81,7 +80,6 @@ class QuestionViewModel @Inject constructor(
         } else {
             QUESTIONS_NUMBER
         }
-
         viewModelScope.launch {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
@@ -110,6 +108,7 @@ class QuestionViewModel @Inject constructor(
             errorsChannel.send(ex)
         }
         _loadingFlow.value = false
+
     }
 
     fun saveLevel(categoryId: Int, levelNumber: Int) {
@@ -142,19 +141,34 @@ class QuestionViewModel @Inject constructor(
         }.start()
     }
 
-    suspend fun setPlayers(names: List<String>?) {
-        if (names == null) {
-            val username = viewModelScope.async {
-                userInteractor.getUsername() ?: "user"
-            }.await()
-            players.add(username)
-        } else {
-            players.addAll(names)
+    fun setPlayers() {
+        setPlayers(null)
+    }
+
+    fun setPlayers(names: List<String>?) {
+        viewModelScope.launch {
+            if (names == null) {
+                async {
+                    var username = "user"
+                    runCatching {
+                        userInteractor.getUsername()
+                    }.onSuccess {
+                        it?.let {
+                            username = it
+                        }
+                    }.onFailure {
+                        errorsChannel.send(it)
+                    }
+                    players.add(username)
+                }.await()
+            } else {
+                players.addAll(names)
+            }
+            for (player in players) {
+                scores[player] = 0
+            }
+            playersIterator = players.iterator()
         }
-        for (player in players) {
-            scores[player] = 0
-        }
-        playersIterator = players.iterator()
     }
 
     fun getPlayer(): String {
@@ -206,11 +220,11 @@ class QuestionViewModel @Inject constructor(
         players.clear()
         onPause = false
         counter = 0
+        playersIterator = null
     }
 
     override fun onCleared() {
         errorsChannel.close()
-        super.onCleared()
     }
 
 }

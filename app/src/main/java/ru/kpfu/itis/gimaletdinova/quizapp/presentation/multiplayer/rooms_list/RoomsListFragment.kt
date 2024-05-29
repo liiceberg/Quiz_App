@@ -3,6 +3,7 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.rooms_list
 import android.os.Bundle
 import android.view.View
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
@@ -29,11 +31,10 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
     private val binding: FragmentRoomsListBinding by viewBinding(FragmentRoomsListBinding::bind)
     private val roomsListViewModel: RoomsListViewModel by viewModels()
     private var roomAdapter: RoomAdapter? = null
-    private val UPDATE_INTERVAL = 1000L
     private lateinit var roomsSearchView: SearchView
 
     override fun onStart() {
-        repeatCheckingRoomsForUpdates()
+        roomsListViewModel.repeatCheckingRoomsForUpdates(requireArguments().getBoolean(ALL_ROOMS))
         roomsSearchView = requireParentFragment().requireView().findViewById(R.id.room_sv)
         super.onStart()
     }
@@ -65,19 +66,12 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
             roomFlow.observe(this@RoomsListFragment) {
                 roomAdapter?.setItems(it)
             }
-        }
 
-    }
-
-    private fun repeatCheckingRoomsForUpdates() {
-
-        roomsListViewModel.run {
-            doRepeatWork(
-                UPDATE_INTERVAL
-            ) {
-                getRoomList(requireArguments().getBoolean(ALL_ROOMS))
+            errorsChannel.receiveAsFlow().observe(this@RoomsListFragment) {
+                Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
             }
         }
+
     }
 
     private fun setOnRoomsSearchListener() {
@@ -104,7 +98,7 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
                 if (focused) {
                     stopRepeatWork()
                 } else {
-                    repeatCheckingRoomsForUpdates()
+                    repeatCheckingRoomsForUpdates(requireArguments().getBoolean(ALL_ROOMS))
                 }
             }
         }
@@ -134,12 +128,11 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
             val verticalMarginValue = 8.getValueInPx(resources.displayMetrics)
             addItemDecoration(SimpleVerticalMarginDecoration(verticalMarginValue))
         }
-        roomsListViewModel.getRoomList(requireArguments().getBoolean(ALL_ROOMS))
     }
 
     private fun onItemClicked(room: Room) {
         findNavController().navigate(
-            R.id.action_roomsListFragmentContainer_to_roomFragment,
+            R.id.action_roomsListContainerFragment_to_roomFragment,
             bundleOf(
                 Keys.ROOM_CODE to room.code
             )

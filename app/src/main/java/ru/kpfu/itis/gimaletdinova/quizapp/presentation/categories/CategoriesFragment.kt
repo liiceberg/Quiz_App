@@ -6,14 +6,12 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoriesBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.model.Category
@@ -52,10 +50,8 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
                 }
             }
 
-            lifecycleScope.launch {
-                errorsChannel.consumeEach {
-                    Toast.makeText(context, getString(R.string.network_error_dialog_text), Toast.LENGTH_SHORT).show()
-                }
+            errorsChannel.receiveAsFlow().observe(this@CategoriesFragment) {
+                Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
             }
         }
     }

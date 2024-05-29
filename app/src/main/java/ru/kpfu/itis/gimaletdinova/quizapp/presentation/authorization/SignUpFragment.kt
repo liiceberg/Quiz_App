@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentSignUpBinding
@@ -33,20 +34,24 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
 
                             findNavController().navigate(R.id.action_signUpFragment_to_signInFragment)
 
-                        } else {
-                            emailEt.error = getString(R.string.email_already_exist)
                         }
                     }
                 }
             }
 
-            viewModel.loadingFlow.observe(this@SignUpFragment) { isLoad ->
-                progressBar.apply {
-                    visibility = if (isLoad) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
+            with(viewModel) {
+                loadingFlow.observe(this@SignUpFragment) { isLoad ->
+                    progressBar.apply {
+                        visibility = if (isLoad) {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
+                        }
                     }
+                    signUpBtn.isEnabled = isLoad.not()
+                }
+                errorsChannel.receiveAsFlow().observe(this@SignUpFragment) {
+                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -57,31 +62,34 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
             val email = emailEt.text.toString().trim()
             if (email.isEmpty() ||
                 email.matches(Regex("\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*\\.\\w{2,4}")).not()) {
-                emailEt.error = getString(R.string.email_error)
+                emailTil.error = getString(R.string.email_error)
                 return false
             }
+            emailTil.error = null
             val password = passwordEt.text.toString().trim()
             if (password.matches(Regex("\\w{8,}")).not()) {
-                passwordEt.error = getString(R.string.password_length_error)
+                passwordTil.error = getString(R.string.password_length_error)
                 return false
             }
             if (password.matches(Regex(".*[A-Z].*")).not()) {
-                passwordEt.error = getString(R.string.password_upper_case_char_error)
+                passwordTil.error = getString(R.string.password_upper_case_char_error)
                 return false
             }
             if (password.matches(Regex(".*[a-z].*")).not()) {
-                passwordEt.error = getString(R.string.password_lower_case_char_error)
+                passwordTil.error = getString(R.string.password_lower_case_char_error)
                 return false
             }
             if (password.matches(Regex(".*\\d.*")).not()) {
-                passwordEt.error = getString(R.string.password_digit_char_error)
+                passwordTil.error = getString(R.string.password_digit_char_error)
                 return false
             }
+            passwordTil.error = null
             val repeatPassword = repeatPasswordEt.text.toString().trim()
             if(password != repeatPassword) {
-                repeatPasswordEt.error = getString(R.string.passwords_not_equals_error)
+                repeatPasswordTil.error = getString(R.string.passwords_not_equals_error)
                 return false
             }
+            repeatPasswordTil.error = null
             return true
         }
     }

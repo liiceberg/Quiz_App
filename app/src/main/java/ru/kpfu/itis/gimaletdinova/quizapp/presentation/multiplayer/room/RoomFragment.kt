@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -11,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
@@ -38,23 +40,21 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         val room = arguments?.getString(ROOM_CODE)
+        with(binding) {
 
-        with(roomViewModel) {
+            with(roomViewModel) {
 
-            if (!initialized) {
-                initStomp(room)
-            }
-
-            with(binding) {
-                lifecycleScope.launch {
-                    getPlayers()
+                if (!initialized) {
+                    initStomp(room)
                 }
+
+                getPlayers()
 
                 val scores = arguments?.getIntegerArrayList(PLAYERS_SCORES)
 
                 if (scores != null) {
                     readyBtn.visibility = View.GONE
-                    roomViewModel.sendMessage(
+                    sendMessage(
                         Message(
                             sender = userId,
                             code = Code.SCORE,
@@ -82,11 +82,14 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                 waitFlow.observe(this@RoomFragment) {
                     if (it == 0) {
                         waitFlow.value = -1
-                        lifecycleScope.launch {
-                            questionViewModel.clear()
-                            questionViewModel.setMode(Mode.ONLINE)
-                            questionViewModel.getQuestions(roomViewModel.room!!)
-                            findNavController().navigate(R.id.action_roomFragment_to_questionFragment)
+                        with(questionViewModel) {
+                            lifecycleScope.launch {
+                                clear()
+                                setMode(Mode.ONLINE)
+                                getQuestions(roomViewModel.room!!)
+                                setPlayers()
+                                findNavController().navigate(R.id.action_roomFragment_to_questionFragment)
+                            }
                         }
                     }
                 }
@@ -109,9 +112,13 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
 
                 exitFlow.observe(this@RoomFragment) { exited ->
                     if (exited) {
-                        roomViewModel.clear()
-                        findNavController().navigate(R.id.action_roomFragment_to_roomsListFragmentContainer)
+                        clear()
+                        findNavController().navigate(R.id.action_roomFragment_to_roomsListContainerFragment)
                     }
+                }
+
+                errorsChannel.receiveAsFlow().observe(this@RoomFragment) {
+                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                 }
             }
 
@@ -134,7 +141,8 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
         dialog.setContentView(R.layout.players_dialog)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         val dialogText = dialog.findViewById<View>(R.id.players_list_tv) as TextView
-        dialogText.text = getString(R.string.players, roomViewModel.players?.let { buildToText(it) })
+        dialogText.text =
+            getString(R.string.players, roomViewModel.players?.let { buildToText(it) })
         dialog.show()
     }
 

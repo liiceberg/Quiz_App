@@ -10,8 +10,8 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.ACCESS_JWT_KEY
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.REFRESH_JWT_KEY
 import javax.inject.Inject
 
-class JwtTokenManagerImpl @Inject constructor(private val dataStore: DataStore<Preferences>) :
-    JwtTokenManager {
+class JwtManagerImpl @Inject constructor(private val dataStore: DataStore<Preferences>) :
+    JwtManager {
 
     override suspend fun saveAccessJwt(token: String) {
         dataStore.edit { preferences ->

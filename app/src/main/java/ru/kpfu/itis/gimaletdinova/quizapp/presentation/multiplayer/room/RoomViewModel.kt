@@ -4,25 +4,25 @@ import android.util.Log
 import androidx.datastore.DataStore
 import androidx.datastore.preferences.Preferences
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.BuildConfig
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManager
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.RoomInteractor
@@ -37,10 +37,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RoomViewModel @Inject constructor(
-    private val jwtTokenManager: JwtTokenManager,
+    private val jwtManager: JwtManager,
     private val prefs: DataStore<Preferences>,
-    private val roomInteractor: RoomInteractor,
-    private val dispatcher: CoroutineDispatcher
+    private val roomInteractor: RoomInteractor
 ) : ViewModel() {
 
     private var mStompClient: StompClient? = null
@@ -62,22 +61,24 @@ class RoomViewModel @Inject constructor(
 
     private var _players: List<String>? = null
     val players get() = _players
+    val errorsChannel = Channel<Throwable>()
 
     private var viewModelJob = Job()
-    private val viewModelScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private val viewModelScopeWithJob = CoroutineScope(Dispatchers.Main + viewModelJob)
     private var isActive = true
 
     fun initStomp(room: String?) {
         _room = room
         viewModelScope.launch {
             _userId = prefs.data.map { it[USER_ID_KEY] }.first()
-            val token = jwtTokenManager.getAccessJwt()
+            val token = jwtManager.getAccessJwt()
             val headerMap = Collections.singletonMap("Authorization", "Bearer $token")
             mStompClient = Stomp.over(
                 Stomp.ConnectionProvider.OKHTTP,
                 BuildConfig.BASE_URL + "game-websocket/websocket",
                 headerMap
             )
+            println(mStompClient)
 
             resetSubscriptions()
 
@@ -148,7 +149,10 @@ class RoomViewModel @Inject constructor(
 
     fun sendMessage(message: Message) {
         if (_room != null) {
-            sendCompletable(mStompClient!!.send("/app/game/$_room", gson.toJson(message)), message.code == Code.EXIT)
+            sendCompletable(
+                mStompClient!!.send("/app/game/$_room", gson.toJson(message)),
+                message.code == Code.EXIT
+            )
         }
     }
 
@@ -163,6 +167,9 @@ class RoomViewModel @Inject constructor(
                     },
                     {
                         Log.e("TAG", "Stomp error", it)
+                        viewModelScope.launch {
+                            errorsChannel.send(it)
+                        }
                     }
                 )
         )
@@ -179,21 +186,23 @@ class RoomViewModel @Inject constructor(
         sendMessage(Message(sender = _userId, code = Code.EXIT))
     }
 
-    suspend fun getPlayers() {
-        runCatching {
-            room?.let { roomInteractor.getPlayers(it) }
-        }.onSuccess {
-            _players = it
+    fun getPlayers() {
+        viewModelScope.launch {
+            runCatching {
+                room?.let { roomInteractor.getPlayers(it) }
+            }.onSuccess {
+                _players = it
+            }.onFailure {
+                errorsChannel.send(it)
+            }
         }
     }
 
     private fun sendAliveMessage() {
         isActive = true
-        viewModelScope.launch {
+        viewModelScopeWithJob.launch {
             while (this@RoomViewModel.isActive) {
-                withContext(dispatcher) {
-                    sendMessage(Message(_userId, Code.ALIVE))
-                }
+                sendMessage(Message(_userId, Code.ALIVE))
                 if (this@RoomViewModel.isActive) {
                     delay(ALIVE_MESSAGE_SEND_INTERVAL)
                 }
@@ -204,6 +213,7 @@ class RoomViewModel @Inject constructor(
     fun clear() {
         isActive = false
         viewModelJob.cancel()
+        viewModelJob = Job()
         mStompClient?.disconnect()
         compositeDisposable?.dispose()
         mStompClient = null

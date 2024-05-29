@@ -28,6 +28,7 @@
         app:layout_constraintTop_toBottomOf="@id/title_tv">
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/email_til"
             style="@style/DefaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,6 +44,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/password_til"
             style="@style/DefaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -60,6 +62,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/repeat_password_til"
             style="@style/DefaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

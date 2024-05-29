@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentSignInBinding
@@ -34,8 +34,6 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
                     if (validate()) {
                         if (viewModel.login(emailEt.text.toString(), passwordEt.text.toString())) {
                             findNavController().navigate(R.id.action_signInFragment_to_startFragment)
-                        } else {
-                            errorTv.visibility = View.VISIBLE
                         }
                     }
                 }
@@ -51,9 +49,10 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
                             View.GONE
                         }
                     }
+                    signInBtn.isEnabled = isLoad.not()
                 }
-                errorsChannel.consumeAsFlow().observe(this@SignInFragment) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+                errorsChannel.receiveAsFlow().observe(this@SignInFragment) {
+                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -65,14 +64,16 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
             if (email.isEmpty() ||
                 email.matches(Regex("\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*\\.\\w{2,4}")).not()
             ) {
-                emailEt.error = getString(R.string.email_error)
+                emailTil.error = getString(R.string.email_error)
                 return false
             }
+            emailTil.error = null
             val password = passwordEt.text.toString().trim()
             if (password.matches(Regex("\\w{8,}")).not()) {
-                passwordEt.error = getString(R.string.password_length_error)
+                passwordTil.error = getString(R.string.password_length_error)
                 return false
             }
+            passwordTil.error = null
             return true
         }
     }

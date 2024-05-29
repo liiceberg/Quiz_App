@@ -2,6 +2,7 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.results
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
@@ -157,6 +159,10 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                                 R.id.action_resultsFragment_to_startFragment
                             )
                         }
+                    }
+
+                    resultsViewModel.errorsChannel.receiveAsFlow().observe(this@ResultsFragment) {
+                        Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
                     }
                 }
             }

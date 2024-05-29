@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManagerImpl
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManager
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManagerImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.LevelsRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.RoomRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.ScoresRepositoryImpl
@@ -31,7 +31,7 @@ interface DataModule {
 
     @Binds
     @Singleton
-    fun bindJwtTokenManagerToJwtTokenManagerImpl(jwtTokenManagerImpl: JwtTokenManagerImpl) : JwtTokenManager
+    fun bindJwtTokenManagerToJwtTokenManagerImpl(jwtTokenManagerImpl: JwtManagerImpl) : JwtManager
 
     @Binds
     @Singleton

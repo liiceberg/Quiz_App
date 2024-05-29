@@ -18,15 +18,23 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentQuestionBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
+import ru.kpfu.itis.gimaletdinova.quizapp.util.OnBackPressed
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
-class QuestionFragment : Fragment(R.layout.fragment_question) {
+class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
+    override fun onBackPressed() {
+        if (questionViewModel.mode == Mode.ONLINE) {
+            navigateToResults()
+        } else {
+            activity?.onBackPressed()
+        }
+    }
 
     private val binding: FragmentQuestionBinding by viewBinding(
         FragmentQuestionBinding::bind
@@ -35,33 +43,35 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
     private val questionViewModel: QuestionViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (questionViewModel.onPause.not()) {
-            questionViewModel.updateTimer()
-        } else {
-            questionViewModel.onPause = false
-        }
-
         binding.run {
 
-            if (questionViewModel.mode != Mode.MULTIPLAYER) {
-                usernameTv.visibility = View.GONE
-            }
+            with(questionViewModel) {
 
-            for (i in 0 until answersLl.childCount) {
-                (answersLl.getChildAt(i) as? Button)?.setOnClickListener {
-                    for (item in answersLl.children) {
-                        item.isEnabled = false
-                    }
-                    lifecycleScope.launch {
-                        verifyAnswer(i)
+                if (onPause.not()) {
+                    updateTimer()
+                } else {
+                    onPause = false
+                }
+
+                if (mode != Mode.MULTIPLAYER) {
+                    usernameTv.visibility = View.GONE
+                }
+
+                for (i in 0 until answersLl.childCount) {
+                    (answersLl.getChildAt(i) as? Button)?.setOnClickListener {
+                        for (item in answersLl.children) {
+                            item.isEnabled = false
+                        }
+                        lifecycleScope.launch {
+                            verifyAnswer(i)
+                        }
                     }
                 }
-            }
 
-            with(questionViewModel) {
+
                 questionsFlow.observe(this@QuestionFragment) { q ->
                     q?.let {
-                        usernameTv.text = questionViewModel.getPlayer()
+                        usernameTv.text = getPlayer()
                         questionNumberTv.text =
                             getString(R.string.question_number, q.number, questionsListSize)
                         questionTv.text = q.question
@@ -159,28 +169,30 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
     }
 
     private fun navigateToResults() {
+        with(questionViewModel) {
 
-        val playersNames = mutableListOf<String>()
-        val playersScores = mutableListOf<Int>()
-        questionViewModel.scores.toList().sortedByDescending { it.second }.map {
-            playersNames.add(it.first)
-            playersScores.add(it.second)
-        }
-        val action = when (questionViewModel.mode) {
-            Mode.SINGLE -> R.id.action_questionFragment_to_resultsFragment
-            Mode.MULTIPLAYER -> R.id.action_questionFragment_to_resultsFragment_multiplayer
-            Mode.ONLINE -> R.id.action_questionFragment_to_roomFragment
-        }
-        findNavController().navigate(
-            action,
-            bundleOf(
-                MODE to questionViewModel.mode,
-                PLAYERS_NAMES to playersNames,
-                PLAYERS_SCORES to playersScores,
-                CATEGORY_ID to arguments?.getInt(CATEGORY_ID),
-                LEVEL_NUMBER to arguments?.getInt(LEVEL_NUMBER),
+            val playersNames = mutableListOf<String>()
+            val playersScores = mutableListOf<Int>()
+            scores.toList().sortedByDescending { it.second }.map {
+                playersNames.add(it.first)
+                playersScores.add(it.second)
+            }
+            val action = when (mode) {
+                Mode.SINGLE -> R.id.action_questionFragment_to_resultsFragment
+                Mode.MULTIPLAYER -> R.id.action_questionFragment_to_resultsFragment_multiplayer
+                Mode.ONLINE -> R.id.action_questionFragment_to_roomFragment
+            }
+            findNavController().navigate(
+                action,
+                bundleOf(
+                    MODE to mode,
+                    PLAYERS_NAMES to playersNames,
+                    PLAYERS_SCORES to playersScores,
+                    CATEGORY_ID to arguments?.getInt(CATEGORY_ID),
+                    LEVEL_NUMBER to arguments?.getInt(LEVEL_NUMBER),
+                )
             )
-        )
+        }
     }
 
     override fun onDestroyView() {

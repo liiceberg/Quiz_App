@@ -1,6 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.data.remote
 
-interface JwtTokenManager {
+interface JwtManager {
     suspend fun saveAccessJwt(token: String)
     suspend fun saveRefreshJwt(token: String)
     suspend fun getAccessJwt(): String?

@@ -3,11 +3,11 @@ package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.interceptor
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManager
 import javax.inject.Inject
 
 class AccessTokenInterceptor @Inject constructor(
-    private val tokenManager: JwtTokenManager,
+    private val tokenManager: JwtManager,
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val token = runBlocking {

@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         val navHost = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment?
         when(navHost?.navController?.currentDestination?.id) {
-            R.id.roomFragment-> {
+            R.id.roomFragment , R.id.questionFragment -> {
                 (navHost.childFragmentManager.fragments[0] as? OnBackPressed)?.onBackPressed()
             }
             else -> {

@@ -9,13 +9,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManager
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.ScoreInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
@@ -28,7 +29,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     private val prefs: DataStore<Preferences>,
     private val dispatcher: CoroutineDispatcher,
-    private val tokenManager: JwtTokenManager,
+    private val tokenManager: JwtManager,
     private val userInteractor: UserInteractor,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val scoreInteractor: ScoreInteractor
@@ -37,6 +38,7 @@ class ProfileViewModel @Inject constructor(
     val usernameFlow = MutableStateFlow("")
     val scoresFlow = MutableStateFlow<UserScores?>(null)
     val themeFlow = prefs.data.map { it[PrefsKeys.NIGHT_MODE_KEY] ?: false }
+    val errorsChannel = Channel<Throwable>()
 
     fun getUserInfo() {
         viewModelScope.launch {
@@ -54,6 +56,8 @@ class ProfileViewModel @Inject constructor(
             } else {
                 usernameFlow.value = "user"
             }
+        }.onFailure {
+            errorsChannel.send(it)
         }
     }
 
@@ -66,6 +70,8 @@ class ProfileViewModel @Inject constructor(
             } else {
                 scoresFlow.value = UserScores(0, 0)
             }
+        }.onFailure {
+            errorsChannel.send(it)
         }
     }
 
@@ -75,6 +81,8 @@ class ProfileViewModel @Inject constructor(
                 userInteractor.setUsername(name)
             }.onSuccess {
                 usernameFlow.value = name
+            }.onFailure {
+                errorsChannel.send(it)
             }
         }
     }
@@ -98,5 +106,9 @@ class ProfileViewModel @Inject constructor(
                 it.remove(PrefsKeys.USER_ID_KEY)
             }
         }
+    }
+
+    override fun onCleared() {
+        errorsChannel.close()
     }
 }

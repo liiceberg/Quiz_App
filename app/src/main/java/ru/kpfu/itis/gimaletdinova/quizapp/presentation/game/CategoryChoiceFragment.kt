@@ -8,12 +8,10 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
@@ -31,60 +29,61 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
         var isQuestionsLoaded = false
 
         with(binding) {
-            usernameTv.text = questionViewModel.getPlayerToCategoryChoice()
+            with(questionViewModel) {
 
-            questionViewModel.loadingFlow.observe(this@CategoryChoiceFragment) { isLoad ->
-                binding.progressBar.apply {
-                    visibility = if (isLoad) {
-                        View.VISIBLE
-                    } else {
-                        if (isQuestionsLoaded) {
-                            questionViewModel.onPause = false
-                            findNavController()
-                                .navigate(R.id.action_categoryChoiceFragment_to_questionFragment)
-                        }
-                        View.GONE
-                    }
-                }
-            }
+                usernameTv.text = getPlayerToCategoryChoice()
 
-            lifecycleScope.launch {
-                questionViewModel.errorsChannel.consumeEach {
-                    Toast.makeText(context, getString(R.string.network_error_dialog_text), Toast.LENGTH_SHORT).show()
-                }
-            }
-
-
-            categoryChoiceSpinner.apply {
-
-                val list = mutableListOf<String>()
-                list.add("Select the category")
-                questionViewModel.categoriesList?.let {
-                    list.addAll(it.categoriesList.map { model -> model.displayName })
-                }
-
-                adapter = ArrayAdapter(requireContext(), R.layout.spinner_category_item, list)
-
-                onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            parent: AdapterView<*>?,
-                            view: View?,
-                            position: Int,
-                            id: Long
-                        ) {
-                            if (position != 0) {
-                                questionViewModel.categoriesList?.let {
-                                    val catId = it.categoriesList[position - 1].id
-                                    questionViewModel.getQuestions(catId)
-                                    isQuestionsLoaded = true
-                                }
-
+                loadingFlow.observe(this@CategoryChoiceFragment) { isLoad ->
+                    progressBar.apply {
+                        visibility = if (isLoad) {
+                            View.VISIBLE
+                        } else {
+                            if (isQuestionsLoaded) {
+                                onPause = false
+                                findNavController()
+                                    .navigate(R.id.action_categoryChoiceFragment_to_questionFragment)
                             }
+                            View.GONE
                         }
-
-                        override fun onNothingSelected(parent: AdapterView<*>?) {}
                     }
+                }
+
+                errorsChannel.receiveAsFlow().observe(this@CategoryChoiceFragment) {
+                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                }
+
+
+                categoryChoiceSpinner.apply {
+
+                    val list = mutableListOf<String>()
+                    list.add("Select the category")
+                    categoriesList?.let {
+                        list.addAll(it.categoriesList.map { model -> model.displayName })
+                    }
+
+                    adapter = ArrayAdapter(requireContext(), R.layout.spinner_category_item, list)
+
+                    onItemSelectedListener =
+                        object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(
+                                parent: AdapterView<*>?,
+                                view: View?,
+                                position: Int,
+                                id: Long
+                            ) {
+                                if (position != 0) {
+                                    categoriesList?.let {
+                                        val catId = it.categoriesList[position - 1].id
+                                        getQuestions(catId)
+                                        isQuestionsLoaded = true
+                                    }
+
+                                }
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>?) {}
+                        }
+                }
             }
         }
 

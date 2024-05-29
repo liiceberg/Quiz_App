@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
@@ -26,54 +27,60 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
     private val createRoomViewModel: CreateRoomViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        createRoomViewModel.getCategoriesList()
 
         with(binding) {
-            var difficulty: LevelDifficulty? = null
-            var category: Int? = null
-
-            createBtn.setOnClickListener {
-                lifecycleScope.launch {
-                    val code = createRoomViewModel.create(
-                        playersNumber = playersNumberTv.text.toString().toInt(),
-                        categoryId = category,
-                        difficulty = difficulty
-                    )
-                    if (code != null) {
-                        findNavController().navigate(R.id.action_createRoomFragment_to_roomsListFragmentContainer)
-                        val toastText = getString(R.string.room_created, code)
-                        Toast.makeText(context, toastText, Toast.LENGTH_LONG)
-                            .show()
-                    }
-                }
-            }
-
-            playersNumberTv.text = numberSb.progress.toString()
-
-            numberSb.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-                    playersNumberTv.text = progress.toString()
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-
-            })
-
-            difficultyGroup.setOnCheckedChangeListener { _, checkedId ->
-                when (checkedId) {
-                    R.id.dif_easy_rb -> difficulty = EASY
-                    R.id.dif_medium_rb -> difficulty = MEDIUM
-                    R.id.dif_hard_rb -> difficulty = HARD
-                }
-            }
 
             with(createRoomViewModel) {
+
+                getCategoriesList()
+
+                var difficulty: LevelDifficulty? = null
+                var category: Int? = null
+
+                createBtn.setOnClickListener {
+                    lifecycleScope.launch {
+                        val code = create(
+                            playersNumber = playersNumberTv.text.toString().toInt(),
+                            categoryId = category,
+                            difficulty = difficulty
+                        )
+                        if (code != null) {
+                            findNavController().navigate(R.id.action_createRoomFragment_to_roomsListContainerFragment)
+                            Toast.makeText(
+                                context,
+                                getString(R.string.room_created, code),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+
+                playersNumberTv.text = numberSb.progress.toString()
+
+                numberSb.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(
+                        seekBar: SeekBar?,
+                        progress: Int,
+                        fromUser: Boolean
+                    ) {
+                        playersNumberTv.text = progress.toString()
+                    }
+
+                    override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+                    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+
+                })
+
+                difficultyGroup.setOnCheckedChangeListener { _, checkedId ->
+                    when (checkedId) {
+                        R.id.dif_easy_rb -> difficulty = EASY
+                        R.id.dif_medium_rb -> difficulty = MEDIUM
+                        R.id.dif_hard_rb -> difficulty = HARD
+                    }
+                }
+
+
 
                 loadingFlow.observe(this@CreateRoomFragment) { isLoad ->
                     binding.progressBar.apply {
@@ -117,9 +124,11 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
                     }
                 }
 
+                errorsChannel.receiveAsFlow().observe(this@CreateRoomFragment) {
+                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                }
+
             }
-
-
         }
     }
 }

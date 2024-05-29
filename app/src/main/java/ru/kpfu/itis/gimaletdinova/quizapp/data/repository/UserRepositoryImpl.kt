@@ -4,9 +4,9 @@ import androidx.datastore.DataStore
 import androidx.datastore.preferences.Preferences
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.BadRequestException
+import retrofit2.HttpException
 import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.UserNotFoundException
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtTokenManager
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManager
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.LoginRequest
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.AuthService
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val authService: AuthService,
-    private val jwtTokenManager: JwtTokenManager,
+    private val jwtManager: JwtManager,
     private val triviaService: TriviaService,
     private val dataStore: DataStore<Preferences>
 ): UserRepository {
@@ -25,13 +25,12 @@ class UserRepositoryImpl @Inject constructor(
         val response = authService.login(LoginRequest(email, password))
         if (response.isSuccessful) {
             response.body()?.let {
-                jwtTokenManager.saveAccessJwt(it.accessToken)
-                jwtTokenManager.saveRefreshJwt(it.refreshToken)
+                jwtManager.saveAccessJwt(it.accessToken)
+                jwtManager.saveRefreshJwt(it.refreshToken)
                 return it.userId
             }
         }
-
-        throw BadRequestException("The login has not been completed")
+        throw HttpException(response)
     }
 
     override suspend fun register(email: String, password: String) {

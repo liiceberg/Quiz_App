@@ -6,12 +6,10 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentPrelaunchBinding
@@ -31,59 +29,56 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
 
     private val questionViewModel: QuestionViewModel by activityViewModels()
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        questionViewModel.clear()
-        val mode = requireArguments().getSerializable(MODE) as Mode
-        questionViewModel.setMode(mode)
+        with(questionViewModel) {
+            clear()
+            val mode = requireArguments().getSerializable(MODE) as Mode
+            setMode(mode)
+            setPlayers(arguments?.getStringArrayList(PLAYERS_NAMES))
 
-        lifecycleScope.launch {
-            questionViewModel.setPlayers(arguments?.getStringArrayList(PLAYERS_NAMES))
-        }
+            if (this.mode == Mode.MULTIPLAYER) {
+                getCategoriesList()
+            } else {
+                val categoryId = requireArguments().getInt(CATEGORY_ID)
+                val level = requireArguments().getInt(LEVEL_NUMBER)
+                getQuestions(categoryId, LevelDifficulty.get(level))
+            }
 
-        if (questionViewModel.mode == Mode.MULTIPLAYER) {
-            questionViewModel.getCategoriesList()
-        } else {
-            val categoryId = requireArguments().getInt(CATEGORY_ID)
-            val level = requireArguments().getInt(LEVEL_NUMBER)
 
-            questionViewModel.getQuestions(categoryId, LevelDifficulty.get(level))
-        }
+            with(binding) {
+                errorsChannel.receiveAsFlow().observe(this@PrelaunchFragment) {
+                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                    playBtn.isEnabled = false
+                }
 
-        with(binding) {
-
-            questionViewModel.loadingFlow.observe(this@PrelaunchFragment) { isLoad ->
-                binding.progressBar.apply {
-                    visibility = if (isLoad) {
-                        View.VISIBLE
-                    } else {
-                        playBtn.isEnabled = true
-                        View.GONE
+                loadingFlow.observe(this@PrelaunchFragment) { isLoad ->
+                    progressBar.apply {
+                        visibility = if (isLoad) {
+                            playBtn.isEnabled = false
+                            View.VISIBLE
+                        } else {
+                            playBtn.isEnabled = true
+                            View.GONE
+                        }
                     }
                 }
-            }
 
-            lifecycleScope.launch {
-                questionViewModel.errorsChannel.consumeEach {
-                    Toast.makeText(context, getString(R.string.network_error_dialog_text), Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            playBtn.setOnClickListener {
-                if (questionViewModel.mode == Mode.MULTIPLAYER) {
-                    findNavController().navigate(
-                        R.id.action_prelaunchFragment_to_categoryChoiceFragment
-                    )
-                } else {
-                    findNavController().navigate(
-                        R.id.action_prelaunchFragment_to_questionFragment,
-                        bundleOf(
-                            CATEGORY_ID to requireArguments().getInt(CATEGORY_ID),
-                            LEVEL_NUMBER to requireArguments().getInt(LEVEL_NUMBER),
+                playBtn.setOnClickListener {
+                    if (questionViewModel.mode == Mode.MULTIPLAYER) {
+                        findNavController().navigate(
+                            R.id.action_prelaunchFragment_to_categoryChoiceFragment
                         )
-                    )
+                    } else {
+                        findNavController().navigate(
+                            R.id.action_prelaunchFragment_to_questionFragment,
+                            bundleOf(
+                                CATEGORY_ID to requireArguments().getInt(CATEGORY_ID),
+                                LEVEL_NUMBER to requireArguments().getInt(LEVEL_NUMBER),
+                            )
+                        )
+                    }
+                    requireArguments().clear()
                 }
-                requireArguments().clear()
             }
         }
     }

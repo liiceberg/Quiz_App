@@ -58,6 +58,5 @@ class SignInViewModel @Inject constructor(
     }
     override fun onCleared() {
         errorsChannel.close()
-        super.onCleared()
     }
 }

@@ -18,7 +18,7 @@ class RoomsListContainerFragment : Fragment(R.layout.fragment_rooms_list_contain
 
         with(binding) {
             createBtn.setOnClickListener {
-                findNavController().navigate(R.id.action_roomsListFragmentContainer_to_createRoomFragment)
+                findNavController().navigate(R.id.action_roomsListContainerFragment_to_createRoomFragment)
             }
         }
     }

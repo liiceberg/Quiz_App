@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
@@ -18,6 +19,7 @@ class SignUpViewModel @Inject constructor(
 ) : ViewModel() {
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
+    val errorsChannel = Channel<Throwable>()
     suspend fun save(email: String, password: String) : Boolean {
         var registered = false
         viewModelScope.async {
@@ -26,9 +28,14 @@ class SignUpViewModel @Inject constructor(
                 userInteractor.register(email, password)
             }.onSuccess {
                 registered = true
+            }.onFailure {
+                errorsChannel.send(it)
             }
         }.await()
         _loadingFlow.value = false
         return registered
+    }
+    override fun onCleared() {
+        errorsChannel.close()
     }
 }

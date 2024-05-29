@@ -10,7 +10,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.RefreshTokenServic
 import javax.inject.Inject
 
 class AuthAuthenticator @Inject constructor(
-    private val tokenManager: JwtTokenManager,
+    private val tokenManager: JwtManager,
     private val refreshTokenService: RefreshTokenService
 ) : Authenticator {
 
