@@ -14,6 +14,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -63,7 +64,7 @@ class RoomViewModel @Inject constructor(
     val players get() = _players
     val errorsChannel = Channel<Throwable>()
 
-    private var viewModelJob = Job()
+    private var viewModelJob = SupervisorJob()
     private val viewModelScopeWithJob = CoroutineScope(Dispatchers.Main + viewModelJob)
     private var isActive = true
 
@@ -213,7 +214,7 @@ class RoomViewModel @Inject constructor(
     fun clear() {
         isActive = false
         viewModelJob.cancel()
-        viewModelJob = Job()
+        viewModelJob = SupervisorJob()
         mStompClient?.disconnect()
         compositeDisposable?.dispose()
         mStompClient = null

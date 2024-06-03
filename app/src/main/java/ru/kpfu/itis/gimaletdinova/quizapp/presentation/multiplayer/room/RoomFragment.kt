@@ -107,7 +107,10 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                 }
 
                 joinFlow.observe(this@RoomFragment) {
-                    readyBtn.isEnabled = it >= 0
+                    if (it < 0) {
+                        readyBtn.isEnabled = false
+                        roomViewModel.clear()
+                    }
                 }
 
                 exitFlow.observe(this@RoomFragment) { exited ->
