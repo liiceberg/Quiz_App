@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/profile_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="end"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/baseline_account_circle_24"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        android:src="@drawable/baseline_account_circle_24" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/play_btn"
@@ -22,11 +20,9 @@
         android:layout_width="match_parent"
         android:layout_height="128dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="164dp"
+        android:layout_marginTop="124dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/play_bth_text"
-        app:layout_constraintBottom_toTopOf="@id/play_with_friends_btn"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="@string/play_bth_text" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/play_with_friends_btn"
@@ -36,8 +32,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/play_with_friends_bth_text"
-        app:layout_constraintTop_toBottomOf="@id/play_btn" />
+        android:text="@string/play_with_friends_bth_text" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/play_online_btn"
@@ -48,7 +43,6 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="@string/play_online_text"
-        app:backgroundTint="?attr/colorPrimaryVariant"
-        app:layout_constraintTop_toBottomOf="@id/play_with_friends_btn" />
+        app:backgroundTint="?attr/colorPrimaryVariant" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
