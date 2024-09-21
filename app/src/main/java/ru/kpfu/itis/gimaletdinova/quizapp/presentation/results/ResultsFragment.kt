@@ -3,11 +3,11 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.results
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -20,14 +20,8 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room.RoomView
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.ROOM_CODE
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import java.util.stream.Collectors
 
 @AndroidEntryPoint
 class ResultsFragment : Fragment(R.layout.fragment_results) {
@@ -38,10 +32,11 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
     private val resultsViewModel: ResultsViewModel by viewModels()
     private val roomViewModel: RoomViewModel by activityViewModels()
+    private val args by navArgs<ResultsFragmentArgs>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val mode = requireArguments().getSerializable(MODE) as Mode
+        val mode = args.mode
 
         with(binding) {
             when (mode) {
@@ -54,12 +49,9 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
                     nextBtn.setOnClickListener {
                         findNavController().navigate(
-                            R.id.action_resultsFragment_to_prelaunchFragment_multiplayer,
-                            bundleOf(
-                                MODE to Mode.MULTIPLAYER,
-                                PLAYERS_NAMES to scores.stream()
-                                    .map { model -> model.username }
-                                    .collect(Collectors.toList())
+                            ResultsFragmentDirections.actionResultsFragmentToPrelaunchFragmentMultiplayer(
+                                mode = Mode.MULTIPLAYER,
+                                playersNames = scores.map { model -> model.username }.toTypedArray()
                             )
                         )
                     }
@@ -94,7 +86,7 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                         Constants.QUESTIONS_NUMBER
                     )
 
-                    var level = requireArguments().getInt(Keys.LEVEL_NUMBER)
+                    var level = args.levelNumber
 
                     if (level == LEVELS_NUMBER) {
                         nextBtn.isEnabled = false
@@ -104,11 +96,10 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                         if (isWin) ++level
 
                         findNavController().navigate(
-                            R.id.action_resultsFragment_to_prelaunchFragment,
-                            bundleOf(
-                                MODE to Mode.SINGLE,
-                                Keys.CATEGORY_ID to requireArguments().getInt(Keys.CATEGORY_ID),
-                                Keys.LEVEL_NUMBER to level
+                            ResultsFragmentDirections.actionResultsFragmentToPrelaunchFragment(
+                                Mode.SINGLE,
+                                args.categoryId,
+                                level
                             )
                         )
                     }
@@ -129,7 +120,7 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
                     with(resultsViewModel) {
 
-                        val room = requireArguments().getString(ROOM_CODE)
+                        val room = args.roomCode
                         room?.let {
                             getResults(room)
                         }
@@ -179,8 +170,8 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
     private fun getScoresList(): List<Score> {
         val list = mutableListOf<Score>()
-        val players = requireArguments().getStringArrayList(PLAYERS_NAMES)
-        val scores = requireArguments().getIntegerArrayList(PLAYERS_SCORES)
+        val players = args.playersNames
+        val scores = args.playersScores
         if (players != null && scores != null) {
             for (i in players.indices) {
                 list.add(Score(players[i], scores[i]))

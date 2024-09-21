@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -19,9 +19,6 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentRoomBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.QuestionViewModel
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.ROOM_CODE
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.OnBackPressed
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
@@ -29,9 +26,11 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
 class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
+
     private val binding: FragmentRoomBinding by viewBinding(FragmentRoomBinding::bind)
     private val roomViewModel: RoomViewModel by activityViewModels()
     private val questionViewModel: QuestionViewModel by activityViewModels()
+    private val args by navArgs<RoomFragmentArgs>()
 
     override fun onBackPressed() {
         roomViewModel.exit()
@@ -39,7 +38,7 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val room = arguments?.getString(ROOM_CODE)
+        val room = args.roomCode
         with(binding) {
 
             with(roomViewModel) {
@@ -50,7 +49,7 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
 
                 getPlayers()
 
-                val scores = arguments?.getIntegerArrayList(PLAYERS_SCORES)
+                val scores = args.playersScores
 
                 if (scores != null) {
                     readyBtn.visibility = View.GONE
@@ -86,7 +85,7 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                             lifecycleScope.launch {
                                 clear()
                                 setMode(Mode.ONLINE)
-                                getQuestions(roomViewModel.room!!)
+                                getQuestions(roomViewModel.room)
                                 setPlayers()
                                 findNavController().navigate(R.id.action_roomFragment_to_questionFragment)
                             }
@@ -97,10 +96,9 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                     if (it == 0) {
                         resultsWaitFlow.value = -1
                         findNavController().navigate(
-                            R.id.action_roomFragment_to_resultsFragment,
-                            bundleOf(
-                                MODE to Mode.ONLINE,
-                                ROOM_CODE to roomViewModel.room
+                            RoomFragmentDirections.actionRoomFragmentToResultsFragment(
+                                mode = Mode.ONLINE,
+                                roomCode = roomViewModel.room
                             )
                         )
                     }

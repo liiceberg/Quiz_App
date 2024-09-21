@@ -22,7 +22,9 @@ class StartFragment : Fragment(R.layout.fragment_start) {
                 findNavController().navigate(R.id.action_startFragment_to_profileFragment)
             }
             playBtn.setOnClickListener {
-                findNavController().navigate(R.id.action_startFragment_to_categoriesFragment)
+                findNavController().navigate(
+                    StartFragmentDirections.actionStartFragmentToCategoriesFragment()
+                )
             }
             playWithFriendsBtn.setOnClickListener {
                 findNavController().navigate(R.id.action_startFragment_to_multiplayerOptionsFragment)

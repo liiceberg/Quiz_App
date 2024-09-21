@@ -3,7 +3,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -15,8 +14,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoriesBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.model.Category
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
@@ -66,10 +63,9 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
 
     private fun onItemClicked(category: Category) {
         findNavController().navigate(
-            R.id.action_categoriesFragment_to_levelsFragment,
-            bundleOf(
-                CATEGORY_NAME to category.name,
-                CATEGORY_ID to category.id
+            CategoriesFragmentDirections.actionCategoriesFragmentToLevelsFragment(
+                category.id,
+                category.name
             )
         )
     }

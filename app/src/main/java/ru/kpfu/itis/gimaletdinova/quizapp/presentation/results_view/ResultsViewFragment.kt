@@ -9,11 +9,11 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsViewBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ru.kpfu.itis.gimaletdinova.quizapp.data.local.entity.QuestionEntity
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
@@ -24,11 +24,13 @@ class ResultsViewFragment : Fragment(R.layout.fragment_results_view) {
     )
     private val resultsViewViewModel: ResultsViewViewModel by viewModels()
 
+    private val args by navArgs<ResultsViewFragmentArgs>()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(resultsViewViewModel) {
-            val level = requireArguments().getInt(Keys.LEVEL_NUMBER)
-            val catId = requireArguments().getInt(Keys.CATEGORY_ID)
-            val catName = requireArguments().getString(Keys.CATEGORY_NAME)
+            val level = args.levelNumber
+            val catId = args.categoryId
+            val catName = args.categoryName
 
             with(binding) {
                 categoryTv.text = catName

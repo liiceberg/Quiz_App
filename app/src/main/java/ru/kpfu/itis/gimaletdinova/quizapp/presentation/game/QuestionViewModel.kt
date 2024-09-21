@@ -145,7 +145,7 @@ class QuestionViewModel @Inject constructor(
         setPlayers(null)
     }
 
-    fun setPlayers(names: List<String>?) {
+    fun setPlayers(names: Array<String>?) {
         viewModelScope.launch {
             if (names == null) {
                 async {

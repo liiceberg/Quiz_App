@@ -13,7 +13,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -58,7 +57,7 @@ class RoomViewModel @Inject constructor(
     val joinFlow = MutableStateFlow(0)
     val exitFlow = MutableStateFlow(false)
     private var _room: String? = null
-    val room get() = _room
+    val room get() = _room ?: ""
 
     private var _players: List<String>? = null
     val players get() = _players
@@ -190,7 +189,7 @@ class RoomViewModel @Inject constructor(
     fun getPlayers() {
         viewModelScope.launch {
             runCatching {
-                room?.let { roomInteractor.getPlayers(it) }
+                roomInteractor.getPlayers(room)
             }.onSuccess {
                 _players = it
             }.onFailure {

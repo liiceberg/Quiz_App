@@ -2,10 +2,10 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -17,10 +17,6 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.Simple
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Level
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.EASY_LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MEDIUM_LEVELS_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_NAME
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
@@ -35,13 +31,14 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
 
     private var levelsAdapter: LevelsAdapter? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    private val args by navArgs<LevelsFragmentArgs>()
 
-        binding.categoryTv.text = requireArguments().getString(CATEGORY_NAME)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.categoryTv.text = args.categoryName
         initRecyclerView()
 
         with(levelsViewModel) {
-            val catId = requireArguments().getInt(CATEGORY_ID)
+            val catId = args.categoryId
             getLevels(catId)
 
             loadingFlow.observe(this@LevelsFragment) { isLoad ->
@@ -92,20 +89,19 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
     private fun onItemClicked(level: Level) {
         if (level.number <= levelsViewModel.levelsNumber) {
             findNavController().navigate(
-                R.id.action_levelsFragment_to_resultsViewFragment,
-                bundleOf(
-                    LEVEL_NUMBER to level.number,
-                    CATEGORY_ID to requireArguments().getInt(CATEGORY_ID),
-                    CATEGORY_NAME to requireArguments().getString(CATEGORY_NAME)
+                LevelsFragmentDirections.actionLevelsFragmentToResultsViewFragment(
+                    args.categoryId,
+                    args.categoryName,
+                    level.number
                 )
             )
         } else {
             findNavController().navigate(
-                R.id.action_levelsFragment_to_prelaunchFragment,
-                bundleOf(
-                    LEVEL_NUMBER to level.number,
-                    CATEGORY_ID to arguments?.getInt(CATEGORY_ID),
-                    MODE to Mode.SINGLE
+                LevelsFragmentDirections.actionLevelsFragmentToPrelaunchFragment(
+                    categoryId = args.categoryId,
+                    levelNumber = level.number,
+                    mode = Mode.SINGLE,
+                    playersNames = null
                 )
             )
         }

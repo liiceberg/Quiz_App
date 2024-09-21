@@ -19,8 +19,6 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentRoomsListBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.ALL_ROOMS
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 import java.util.stream.Collectors
@@ -132,9 +130,8 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
 
     private fun onItemClicked(room: Room) {
         findNavController().navigate(
-            R.id.action_roomsListContainerFragment_to_roomFragment,
-            bundleOf(
-                Keys.ROOM_CODE to room.code
+            RoomsListContainerFragmentDirections.actionRoomsListContainerFragmentToRoomFragment(
+                room.code
             )
         )
     }
@@ -145,6 +142,7 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
     }
 
     companion object {
+        private const val ALL_ROOMS = "ALL_ROOMS"
         fun newInstance(getAllRooms: Boolean) = RoomsListFragment().apply {
             arguments = bundleOf(ALL_ROOMS to getAllRooms)
         }
