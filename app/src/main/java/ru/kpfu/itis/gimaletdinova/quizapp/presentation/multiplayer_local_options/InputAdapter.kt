@@ -6,15 +6,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemInputBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options.model.InputModel
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Validator
 
 class InputAdapter(
     diffCallback: DiffUtil.ItemCallback<InputModel>,
-    private val onTextChanged: ((InputModel) -> Unit)
+    private val onTextChanged: ((InputModel) -> Unit),
+    private val validate: (String) -> Validator.ValidationResult
 ): ListAdapter<InputModel, InputHolder>(diffCallback) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InputHolder {
         return InputHolder(
             ItemInputBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-            onTextChanged
+            onTextChanged,
+            validate
         )
     }
     override fun onBindViewHolder(holder: InputHolder, position: Int) {

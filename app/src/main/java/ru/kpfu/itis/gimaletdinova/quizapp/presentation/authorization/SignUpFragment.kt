@@ -59,33 +59,26 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
 
     private fun validate(): Boolean {
         with(binding) {
-            val email = emailEt.text.toString().trim()
-            if (email.isEmpty() ||
-                email.matches(Regex("\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*\\.\\w{2,4}")).not()) {
-                emailTil.error = getString(R.string.email_error)
+
+            val emailValidation = viewModel.validateEmail(
+                emailEt.text.toString().trim()
+            )
+            emailTil.error = emailValidation.error
+            if (emailValidation.isValid.not()) {
                 return false
             }
-            emailTil.error = null
+
             val password = passwordEt.text.toString().trim()
-            if (password.matches(Regex("\\w{8,}")).not()) {
-                passwordTil.error = getString(R.string.password_length_error)
+            val passwordValidator = viewModel.validatePassword(
+                password
+            )
+            passwordTil.error = passwordValidator.error
+            if (passwordValidator.isValid.not()) {
                 return false
             }
-            if (password.matches(Regex(".*[A-Z].*")).not()) {
-                passwordTil.error = getString(R.string.password_upper_case_char_error)
-                return false
-            }
-            if (password.matches(Regex(".*[a-z].*")).not()) {
-                passwordTil.error = getString(R.string.password_lower_case_char_error)
-                return false
-            }
-            if (password.matches(Regex(".*\\d.*")).not()) {
-                passwordTil.error = getString(R.string.password_digit_char_error)
-                return false
-            }
-            passwordTil.error = null
+
             val repeatPassword = repeatPasswordEt.text.toString().trim()
-            if(password != repeatPassword) {
+            if (password != repeatPassword) {
                 repeatPasswordTil.error = getString(R.string.passwords_not_equals_error)
                 return false
             }

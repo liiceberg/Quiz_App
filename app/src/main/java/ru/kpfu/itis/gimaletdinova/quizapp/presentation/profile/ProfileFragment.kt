@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentProfileBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
 import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
@@ -92,16 +91,14 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private fun validateUserInput(): Boolean {
         with(binding) {
-            val name = usernameEt.text.toString()
-            if (ValidationUtil.validateName(name)) {
+            val validationResult = profileViewModel.validateUsername(
+                usernameEt.text.toString()
+            )
+            if (validationResult.isValid) {
                 usernameEtLayout.error = null
                 return true
             } else {
-                if (name.trim().isEmpty()) {
-                    usernameEtLayout.error = getString(R.string.empty_username_error)
-                } else if (name.matches(Regex("[A-Za-z]+")).not()) {
-                    usernameEtLayout.error = getString(R.string.incorrect_username_error)
-                }
+                usernameEtLayout.error = validationResult.error
                 return false
             }
         }

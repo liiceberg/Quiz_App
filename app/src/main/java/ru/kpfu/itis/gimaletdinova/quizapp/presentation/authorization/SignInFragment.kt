@@ -60,21 +60,11 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
 
     private fun validate(): Boolean {
         with(binding) {
-            val email = emailEt.text.toString().trim()
-            if (email.isEmpty() ||
-                email.matches(Regex("\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*\\.\\w{2,4}")).not()
-            ) {
-                emailTil.error = getString(R.string.email_error)
-                return false
-            }
-            emailTil.error = null
-            val password = passwordEt.text.toString().trim()
-            if (password.matches(Regex("\\w{8,}")).not()) {
-                passwordTil.error = getString(R.string.password_length_error)
-                return false
-            }
-            passwordTil.error = null
-            return true
+            val validationResult = viewModel.validateEmail(
+                emailEt.text.toString().trim()
+            )
+            emailTil.error = validationResult.error
+            return validationResult.isValid
         }
     }
 

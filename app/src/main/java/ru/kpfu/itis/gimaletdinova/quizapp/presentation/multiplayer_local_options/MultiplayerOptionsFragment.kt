@@ -7,6 +7,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +21,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MAX_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Validator
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 
@@ -29,6 +31,7 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
     private val binding: FragmentMultiplayerOptionsBinding by viewBinding(
         FragmentMultiplayerOptionsBinding::bind
     )
+    private val multiplayerOptionsViewModel: MultiplayerOptionsViewModel by viewModels()
     private var inputAdapter: InputAdapter? = null
 
 
@@ -70,7 +73,8 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
     private fun initRecyclerView() {
         inputAdapter = InputAdapter(
             diffCallback = InputDiffUtilItemCallback(),
-            ::onTextChanged
+            ::onTextChanged,
+            ::validate
         )
         inputAdapter?.setItems(createInputList())
 
@@ -86,6 +90,10 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
 
     private fun onTextChanged(newInputModel: InputModel) {
         inputAdapter?.updateItem(newInputModel)
+    }
+
+    private fun validate(name: String) : Validator.ValidationResult {
+        return multiplayerOptionsViewModel.validateUsername(name)
     }
 
 

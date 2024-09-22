@@ -10,16 +10,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Validator
 import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val userInteractor: UserInteractor,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
+    private val validator: Validator
 ) : ViewModel() {
+
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
     val errorsChannel = Channel<Throwable>()
+
     suspend fun save(email: String, password: String) : Boolean {
         var registered = false
         viewModelScope.async {
@@ -35,6 +39,15 @@ class SignUpViewModel @Inject constructor(
         _loadingFlow.value = false
         return registered
     }
+
+    fun validateEmail(email: String) : Validator.ValidationResult {
+        return validator.validateEmail(email)
+    }
+
+    fun validatePassword(password: String) : Validator.ValidationResult {
+        return validator.validatePassword(password)
+    }
+
     override fun onCleared() {
         errorsChannel.close()
     }

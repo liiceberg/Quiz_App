@@ -17,6 +17,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Validator
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,12 +25,14 @@ class SignInViewModel @Inject constructor(
     private val userInteractor: UserInteractor,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val prefs: DataStore<Preferences>,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
+    private val validator: Validator
 ) : ViewModel() {
 
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
     val errorsChannel = Channel<Throwable>()
+
     suspend fun login(email: String, password: String) : Boolean {
         var loggedIn = false
         viewModelScope.async {
@@ -45,6 +48,10 @@ class SignInViewModel @Inject constructor(
         }.await()
         _loadingFlow.value = false
         return loggedIn
+    }
+
+    fun validateEmail(email: String) : Validator.ValidationResult {
+        return validator.validateEmail(email)
     }
 
     private fun saveUser(id: Long) {

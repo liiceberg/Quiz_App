@@ -22,6 +22,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.ScoreInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.UserScores
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Validator
 import ru.kpfu.itis.gimaletdinova.quizapp.util.setCurrentTheme
 import javax.inject.Inject
 
@@ -32,7 +33,8 @@ class ProfileViewModel @Inject constructor(
     private val tokenManager: JwtManager,
     private val userInteractor: UserInteractor,
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
-    private val scoreInteractor: ScoreInteractor
+    private val scoreInteractor: ScoreInteractor,
+    private val validator: Validator
 ) : ViewModel() {
 
     val usernameFlow = MutableStateFlow("")
@@ -85,6 +87,10 @@ class ProfileViewModel @Inject constructor(
                 errorsChannel.send(it)
             }
         }
+    }
+
+    fun validateUsername(username: String) : Validator.ValidationResult {
+        return validator.validateName(username)
     }
 
     fun changeTheme() {

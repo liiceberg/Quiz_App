@@ -40,6 +40,7 @@ class RoomsListViewModel @Inject constructor(
     private var viewModelJob = Job()
     private val viewModelScope = CoroutineScope(Main + viewModelJob)
     private var isActive = true
+
     suspend fun getCategoriesList(): CategoriesList? {
         var categories: CategoriesList? = null
         viewModelScope.async {
