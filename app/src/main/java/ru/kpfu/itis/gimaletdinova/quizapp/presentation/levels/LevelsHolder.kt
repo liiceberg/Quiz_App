@@ -29,6 +29,7 @@ class LevelsHolder(
     fun bindItem(item: Level) {
         this.item = item
         with(binding) {
+
             valueBtn.text = item.number.toString()
 
             val backgroundColor = if (item.isBlocked) {
@@ -42,6 +43,7 @@ class LevelsHolder(
             valueBtn.setBackgroundColor(
                 root.context.getThemeColor(backgroundColor)
             )
+
             if (item.isBlocked) {
                 valueBtn.isEnabled = false
             }

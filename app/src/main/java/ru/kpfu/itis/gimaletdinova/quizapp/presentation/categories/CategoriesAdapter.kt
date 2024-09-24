@@ -11,6 +11,7 @@ class CategoriesAdapter(
     diffCallback: DiffUtil.ItemCallback<Category>,
     private val onItemClicked: ((Category) -> Unit)
 ): ListAdapter<Category, CategoriesHolder>(diffCallback) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoriesHolder =
         CategoriesHolder(
             ItemCategoryBinding.inflate(LayoutInflater.from(parent.context), parent, false),

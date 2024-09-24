@@ -12,13 +12,19 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentRoomsListContainer
 
 class RoomsListContainerFragment : Fragment(R.layout.fragment_rooms_list_container) {
 
-    private val binding: FragmentRoomsListContainerBinding by viewBinding(FragmentRoomsListContainerBinding::bind)
+    private val binding: FragmentRoomsListContainerBinding by viewBinding(
+        FragmentRoomsListContainerBinding::bind
+    )
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         initTabs()
 
         with(binding) {
             createBtn.setOnClickListener {
-                findNavController().navigate(R.id.action_roomsListContainerFragment_to_createRoomFragment)
+                findNavController().navigate(
+                    RoomsListContainerFragmentDirections.actionRoomsListContainerFragmentToCreateRoomFragment()
+                )
             }
         }
     }

@@ -44,9 +44,6 @@
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile">
         <action
-            android:id="@+id/action_profileFragment_to_startFragment"
-            app:destination="@id/startFragment" />
-        <action
             android:id="@+id/action_profileFragment_to_signInFragment"
             app:destination="@id/signInFragment"
             app:launchSingleTop="true"
@@ -118,9 +115,11 @@
         tools:layout="@layout/fragment_question">
         <argument
             android:name="categoryId"
+            android:defaultValue="-1"
             app:argType="integer" />
         <argument
             android:name="levelNumber"
+            android:defaultValue="-1"
             app:argType="integer" />
         <action
             android:id="@+id/action_questionFragment_to_categoryChoiceFragment"
@@ -243,7 +242,7 @@
             app:argType="integer" />
         <argument
             android:name="roomCode"
-            android:defaultValue="null"
+            android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <action
@@ -355,8 +354,9 @@
         tools:layout="@layout/fragment_room">
         <argument
             android:name="roomCode"
-            android:defaultValue="null"
-            app:argType="string" />
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
         <argument
             android:name="playersScores"
             android:defaultValue="@null"

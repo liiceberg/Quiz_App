@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Quiz App</string>
+    <string name="default_username">User</string>
 
         <!--  Buttons  -->
     <string name="username_edit_bth_text">Edit</string>
@@ -45,6 +46,7 @@
     <string name="all_rooms">All</string>
     <string name="my_rooms">My</string>
     <string name="players">Players:\n%s</string>
+    <string name="unselected_category">No category selected</string>
 
 
         <!--    EditText    -->

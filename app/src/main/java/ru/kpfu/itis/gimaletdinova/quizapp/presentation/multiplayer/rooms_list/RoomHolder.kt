@@ -12,7 +12,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 class RoomHolder(
     private val binding: ItemRoomBinding,
     private val onItemClicked: ((Room) -> Unit),
-    private val categories: CategoriesList?
+    private val categories: CategoriesList
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var item: Room? = null
@@ -28,16 +28,14 @@ class RoomHolder(
     fun bindItem(item: Room) {
         this.item = item
         with(binding) {
-            var category: String? = null
-            if (item.category != null) {
-                getCategoryById(item.category)?.let {
-                    category = it
-                }
+
+            item.category?.let {
+                categoryTv.text = getCategoryById(item.category)
             }
-            categoryTv.text = category
 
             codeTv.text = item.code
-            val color = when(item.difficulty) {
+
+            val color = when (item.difficulty) {
                 EASY -> com.google.android.material.R.attr.colorPrimaryVariant
                 MEDIUM -> com.google.android.material.R.attr.colorPrimary
                 HARD -> com.google.android.material.R.attr.colorSecondaryVariant
@@ -47,14 +45,11 @@ class RoomHolder(
         }
     }
 
-    private fun getCategoryById(id: Int): String? {
-        if (categories != null) {
-            return categories.categoriesList.stream()
-                .filter { c -> c.id == id }
-                .findFirst()
-                .get()
-                .displayName
-        }
-        return null
+    private fun getCategoryById(id: Int): String {
+        return categories.categoriesList.stream()
+            .filter { c -> c.id == id }
+            .findFirst()
+            .get()
+            .displayName
     }
 }

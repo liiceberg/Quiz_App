@@ -17,6 +17,7 @@ class LevelsAdapter(
     diffCallback: DiffUtil.ItemCallback<Item>,
     private val onItemClicked: ((Level) -> Unit)
 ) : ListAdapter<Item, RecyclerView.ViewHolder>(diffCallback) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             R.layout.item_level -> LevelsHolder(
@@ -27,6 +28,7 @@ class LevelsAdapter(
             R.layout.item_level_difficulty -> DifficultyHolder(
                 ItemLevelDifficultyBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             )
+
             else -> throw ViewTypeNotFoundException()
         }
     }
@@ -45,6 +47,7 @@ class LevelsAdapter(
             else -> -1
         }
     }
+
     fun setItems(items: List<Item>) {
         submitList(items)
     }

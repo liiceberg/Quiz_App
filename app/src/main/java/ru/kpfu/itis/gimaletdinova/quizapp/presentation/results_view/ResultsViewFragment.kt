@@ -23,7 +23,6 @@ class ResultsViewFragment : Fragment(R.layout.fragment_results_view) {
         FragmentResultsViewBinding::bind
     )
     private val resultsViewViewModel: ResultsViewViewModel by viewModels()
-
     private val args by navArgs<ResultsViewFragmentArgs>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,8 +58,15 @@ class ResultsViewFragment : Fragment(R.layout.fragment_results_view) {
         binding.answersRv.apply {
             adapter = ResultsViewAdapter(list)
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-            val verticalMarginValue = 8.getValueInPx(resources.displayMetrics)
-            addItemDecoration(SimpleVerticalMarginDecoration(verticalMarginValue))
+
+            val verticalMargin = SimpleVerticalMarginDecoration(
+                VERTICAL_MARGIN_VALUE.getValueInPx(resources.displayMetrics)
+            )
+            addItemDecoration(verticalMargin)
         }
+    }
+
+    companion object {
+        private const val VERTICAL_MARGIN_VALUE = 8
     }
 }

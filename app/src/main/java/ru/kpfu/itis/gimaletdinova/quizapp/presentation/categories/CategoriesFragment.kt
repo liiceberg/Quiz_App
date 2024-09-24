@@ -2,7 +2,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -15,6 +14,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoriesBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.categories.model.Category
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
 
 @AndroidEntryPoint
 class CategoriesFragment : Fragment(R.layout.fragment_categories) {
@@ -25,9 +25,10 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
     private val categoriesViewModel: CategoriesViewModel by viewModels()
     private var categoriesAdapter: CategoriesAdapter? = null
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         initRecyclerView()
+
         with(categoriesViewModel) {
             getCategories()
 
@@ -48,7 +49,7 @@ class CategoriesFragment : Fragment(R.layout.fragment_categories) {
             }
 
             errorsChannel.receiveAsFlow().observe(this@CategoriesFragment) {
-                Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                activity?.showErrorMessage(it.message)
             }
         }
     }

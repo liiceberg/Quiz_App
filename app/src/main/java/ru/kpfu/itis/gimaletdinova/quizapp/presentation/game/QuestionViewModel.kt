@@ -1,15 +1,17 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.game
 
+import android.content.Context
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
@@ -22,9 +24,9 @@ import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionModel
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.PLAYERS_QUESTIONS_NUMBER_PROPORTION
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.QUESTIONS_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.QUESTION_TIME
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.PLAYERS_QUESTIONS_NUMBER_PROPORTION
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.QUESTIONS_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.QUESTION_TIME
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import javax.inject.Inject
 
@@ -35,7 +37,8 @@ class QuestionViewModel @Inject constructor(
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val userInteractor: UserInteractor,
     private val levelInteractor: LevelInteractor,
-    private val roomInteractor: RoomInteractor
+    private val roomInteractor: RoomInteractor,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private var _mode = Mode.SINGLE
@@ -54,9 +57,8 @@ class QuestionViewModel @Inject constructor(
 
     private var timer: CountDownTimer? = null
 
-    private val _timeFlow = MutableStateFlow(100)
-    val timeFlow: StateFlow<Int>
-        get() = _timeFlow
+    private val _timeFlow = MutableStateFlow(INIT_TIMER_VALUE)
+    val timeFlow: StateFlow<Int> get() = _timeFlow
 
     private var _categoriesList: CategoriesList? = null
     val categoriesList get() = _categoriesList
@@ -130,15 +132,8 @@ class QuestionViewModel @Inject constructor(
         _questionsFlow.value = questionsList?.questions?.get(counter)
         counter++
 
-        _timeFlow.value = 100
-        timer = object : CountDownTimer(QUESTION_TIME, 100) {
-
-            override fun onTick(millisUntilFinished: Long) {
-                _timeFlow.value = (millisUntilFinished * 100).div(QUESTION_TIME).toInt()
-            }
-
-            override fun onFinish() {}
-        }.start()
+        _timeFlow.value = INIT_TIMER_VALUE
+        timer = AnswerTimer().start()
     }
 
     fun setPlayers() {
@@ -148,25 +143,22 @@ class QuestionViewModel @Inject constructor(
     fun setPlayers(names: Array<String>?) {
         viewModelScope.launch {
             if (names == null) {
-                async {
-                    var username = "user"
-                    runCatching {
-                        userInteractor.getUsername()
-                    }.onSuccess {
-                        it?.let {
-                            username = it
-                        }
-                    }.onFailure {
-                        errorsChannel.send(it)
+                var username = context.getString(R.string.default_username)
+                runCatching {
+                    userInteractor.getUsername()
+                }.onSuccess {
+                    it?.let {
+                        username = it
                     }
-                    players.add(username)
-                }.await()
+                }.onFailure {
+                    errorsChannel.send(it)
+                }
+                players.add(username)
             } else {
                 players.addAll(names)
             }
-            for (player in players) {
-                scores[player] = 0
-            }
+
+            players.forEach { scores[it] = 0 }
             playersIterator = players.iterator()
         }
     }
@@ -198,8 +190,7 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun saveScores(player: String) {
-        val score = scores[player] ?: 0
-        scores[player] = score + 1
+        scores[player] = scores.getValue(player) + 1
     }
 
     fun saveUserAnswer(position: Int) {
@@ -225,6 +216,20 @@ class QuestionViewModel @Inject constructor(
 
     override fun onCleared() {
         errorsChannel.close()
+    }
+
+    inner class AnswerTimer: CountDownTimer(QUESTION_TIME, COUNT_DOWN_INTERVAL) {
+
+        override fun onTick(millisUntilFinished: Long) {
+            _timeFlow.value = (millisUntilFinished * INIT_TIMER_VALUE).div(QUESTION_TIME).toInt()
+        }
+
+        override fun onFinish() {}
+    }
+
+    companion object {
+        private const val COUNT_DOWN_INTERVAL = 100L
+        private const val INIT_TIMER_VALUE = 100
     }
 
 }

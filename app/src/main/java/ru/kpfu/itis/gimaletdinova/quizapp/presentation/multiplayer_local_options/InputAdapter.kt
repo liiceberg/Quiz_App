@@ -13,6 +13,7 @@ class InputAdapter(
     private val onTextChanged: ((InputModel) -> Unit),
     private val validate: (String) -> Validator.ValidationResult
 ): ListAdapter<InputModel, InputHolder>(diffCallback) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InputHolder {
         return InputHolder(
             ItemInputBinding.inflate(LayoutInflater.from(parent.context), parent, false),

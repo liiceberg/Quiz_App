@@ -8,7 +8,6 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemInputBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options.model.InputModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Validator
 import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
-import javax.inject.Inject
 
 class InputHolder(
     private val binding: ItemInputBinding,
@@ -35,7 +34,7 @@ class InputHolder(
                 setOnEditorActionListener { _, actionId, _ ->
                     when (actionId) {
                         EditorInfo.IME_ACTION_DONE -> {
-                            hideKeyboard(context, rootView)
+                            rootView.hideKeyboard()
                             clearFocus()
                         }
                     }

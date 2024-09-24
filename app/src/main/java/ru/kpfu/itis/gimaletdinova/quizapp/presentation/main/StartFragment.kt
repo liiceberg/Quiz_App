@@ -19,7 +19,9 @@ class StartFragment : Fragment(R.layout.fragment_start) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
             profileBtn.setOnClickListener {
-                findNavController().navigate(R.id.action_startFragment_to_profileFragment)
+                findNavController().navigate(
+                    StartFragmentDirections.actionStartFragmentToProfileFragment()
+                )
             }
             playBtn.setOnClickListener {
                 findNavController().navigate(
@@ -27,10 +29,15 @@ class StartFragment : Fragment(R.layout.fragment_start) {
                 )
             }
             playWithFriendsBtn.setOnClickListener {
-                findNavController().navigate(R.id.action_startFragment_to_multiplayerOptionsFragment)
+                findNavController().navigate(
+                    StartFragmentDirections.actionStartFragmentToMultiplayerOptionsFragment()
+                )
             }
             playOnlineBtn.setOnClickListener {
-                findNavController().navigate(R.id.action_startFragment_to_roomsListFragmentContainer)            }
+                findNavController().navigate(
+                    StartFragmentDirections.actionStartFragmentToRoomsListFragmentContainer()
+                )
+            }
         }
     }
 }

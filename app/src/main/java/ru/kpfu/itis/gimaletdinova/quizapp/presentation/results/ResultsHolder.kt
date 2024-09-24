@@ -5,8 +5,10 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemScoreBinding
 
 class ResultsHolder(private val binding: ItemScoreBinding) : RecyclerView.ViewHolder(binding.root) {
+
     fun bindItem(item: Score) {
-        binding.userTv.text = item.username ?: "user"
+        binding.userTv.text = item.username
         binding.scoreTv.text = item.value.toString()
     }
+
 }

@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +21,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.QuestionViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.OnBackPressed
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
 
 
 @AndroidEntryPoint
@@ -38,26 +38,23 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val room = args.roomCode
         with(binding) {
 
             with(roomViewModel) {
 
                 if (!initialized) {
-                    initStomp(room)
+                    initStomp(args.roomCode)
                 }
 
                 getPlayers()
 
-                val scores = args.playersScores
-
-                if (scores != null) {
+                args.playersScores?.let {
                     readyBtn.visibility = View.GONE
                     sendMessage(
                         Message(
                             sender = userId,
                             code = Code.SCORE,
-                            score = scores[0]
+                            score = it[0]
                         )
                     )
                 }
@@ -74,6 +71,7 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                 teamIv.setOnClickListener {
                     showPlayers()
                 }
+
                 messageFlow.observe(this@RoomFragment) {
                     infoTv.text = buildToText(it)
                 }
@@ -87,7 +85,9 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                                 setMode(Mode.ONLINE)
                                 getQuestions(roomViewModel.room)
                                 setPlayers()
-                                findNavController().navigate(R.id.action_roomFragment_to_questionFragment)
+                                findNavController().navigate(
+                                    RoomFragmentDirections.actionRoomFragmentToQuestionFragment()
+                                )
                             }
                         }
                     }
@@ -114,12 +114,14 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                 exitFlow.observe(this@RoomFragment) { exited ->
                     if (exited) {
                         clear()
-                        findNavController().navigate(R.id.action_roomFragment_to_roomsListContainerFragment)
+                        findNavController().navigate(
+                            RoomFragmentDirections.actionRoomFragmentToRoomsListContainerFragment()
+                        )
                     }
                 }
 
                 errorsChannel.receiveAsFlow().observe(this@RoomFragment) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                    activity?.showErrorMessage(it.message)
                 }
             }
 

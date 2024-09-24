@@ -1,6 +1,7 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.game
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.core.view.children
@@ -15,7 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentQuestionBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.OnBackPressed
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
@@ -30,6 +31,8 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
 
     private val questionViewModel: QuestionViewModel by activityViewModels()
     private val args by navArgs<QuestionFragmentArgs>()
+    private val categoryId by lazy { args.categoryId }
+    private val levelNumber by lazy { args.levelNumber }
 
     override fun onBackPressed() {
         if (questionViewModel.mode == Mode.ONLINE) {
@@ -87,7 +90,7 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
                                 (this as? Button)?.text = q.answers[i]
                             }
                         }
-                        println(q.correctAnswerPosition)
+                        Log.d("CORRECT ANSWER", q.correctAnswerPosition.toString())
                     }
 
                 }
@@ -121,7 +124,9 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
                 if (isGameOver()) {
                     finishGame()
                 } else {
-                    findNavController().navigate(R.id.action_questionFragment_to_categoryChoiceFragment)
+                    findNavController().navigate(
+                        QuestionFragmentDirections.actionQuestionFragmentToCategoryChoiceFragment()
+                    )
                 }
             }
         }
@@ -157,8 +162,8 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
         with(questionViewModel) {
             if (mode == Mode.SINGLE && scores.values.first() >= MIN_CORRECT_ANSWERS_NUMBER_TO_WIN) {
                 saveLevel(
-                    categoryId = args.categoryId,
-                    levelNumber = args.levelNumber
+                    categoryId = categoryId,
+                    levelNumber = levelNumber
                 )
             }
         }
@@ -181,8 +186,8 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
                     mode,
                     playersNames = playersNames.toTypedArray(),
                     playersScores = playersScores.toIntArray(),
-                    categoryId = args.categoryId,
-                    levelNumber = args.levelNumber
+                    categoryId = categoryId,
+                    levelNumber = levelNumber
                 )
                 Mode.MULTIPLAYER -> QuestionFragmentDirections.actionQuestionFragmentToResultsFragmentMultiplayer(
                     mode,

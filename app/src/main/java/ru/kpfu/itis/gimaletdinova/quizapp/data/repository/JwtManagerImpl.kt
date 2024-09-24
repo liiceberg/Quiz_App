@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.data.remote
+package ru.kpfu.itis.gimaletdinova.quizapp.data.repository
 
 import androidx.datastore.DataStore
 import androidx.datastore.preferences.Preferences
@@ -6,6 +6,7 @@ import androidx.datastore.preferences.edit
 import androidx.datastore.preferences.remove
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.JwtManager
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.ACCESS_JWT_KEY
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.REFRESH_JWT_KEY
 import javax.inject.Inject

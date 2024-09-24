@@ -5,7 +5,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,30 +30,35 @@ class RoomsListViewModel @Inject constructor(
 
     private val _roomFlow = MutableSharedFlow<List<Room>>()
     val roomFlow get() = _roomFlow
+
     private var _currentRoomList: List<Room>? = null
     val currentRoomList get() = _currentRoomList
+
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
+
+    private val _categoriesFlow = MutableStateFlow<CategoriesList?>(null)
+    val categoriesFlow get() = _categoriesFlow.asStateFlow()
+
     val errorsChannel = Channel<Throwable>()
 
     private var viewModelJob = Job()
     private val viewModelScope = CoroutineScope(Main + viewModelJob)
     private var isActive = true
 
-    suspend fun getCategoriesList(): CategoriesList? {
-        var categories: CategoriesList? = null
-        viewModelScope.async {
+    fun getCategoriesList() {
+        viewModelScope.launch {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
                 categoriesUseCase.invoke()
             }.onSuccess {
-                categories = it
+                _categoriesFlow.value = it
             }.onFailure { ex ->
                 errorsChannel.send(ex)
+                _categoriesFlow.value = CategoriesList.empty()
             }
             _loadingFlow.value = false
-        }.await()
-        return categories
+        }
     }
 
     fun repeatCheckingRoomsForUpdates(allRooms: Boolean) {

@@ -7,6 +7,9 @@ import okhttp3.Response
 import okhttp3.Route
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.RefreshJwtRequest
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.RefreshTokenService
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.JwtManager
+import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.HEADER_AUTHORIZATION
+import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.TOKEN_TYPE
 import javax.inject.Inject
 
 class AuthAuthenticator @Inject constructor(
@@ -50,8 +53,5 @@ class AuthAuthenticator @Inject constructor(
             }
         }
     }
-    companion object {
-        const val HEADER_AUTHORIZATION = "Authorization"
-        const val TOKEN_TYPE = "Bearer"
-    }
+
 }

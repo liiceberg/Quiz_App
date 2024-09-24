@@ -26,7 +26,9 @@ class CategoriesViewModel @Inject constructor(
 
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
+
     val errorsChannel = Channel<Throwable>()
+
     fun getCategories() {
         viewModelScope.launch {
             _loadingFlow.value = true

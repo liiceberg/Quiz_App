@@ -15,31 +15,30 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentLevelsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Level
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.EASY_LEVELS_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MEDIUM_LEVELS_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.EASY_LEVELS_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.MEDIUM_LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
 class LevelsFragment : Fragment(R.layout.fragment_levels) {
+
     private val binding: FragmentLevelsBinding by viewBinding(
         FragmentLevelsBinding::bind
     )
-
     private val levelsViewModel: LevelsViewModel by viewModels()
+    private val args by navArgs<LevelsFragmentArgs>()
 
     private var levelsAdapter: LevelsAdapter? = null
-
-    private val args by navArgs<LevelsFragmentArgs>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.categoryTv.text = args.categoryName
         initRecyclerView()
 
         with(levelsViewModel) {
-            val catId = args.categoryId
-            getLevels(catId)
+
+            getLevels(args.categoryId)
 
             loadingFlow.observe(this@LevelsFragment) { isLoad ->
                 binding.progressBar.apply {
@@ -64,14 +63,20 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
         binding.levelsRv.apply {
             levelsAdapter = LevelsAdapter(LevelsDiffUtilItemCallback(), ::onItemClicked)
             adapter = levelsAdapter
-            val manager = GridLayoutManager(requireContext(), 5, RecyclerView.VERTICAL, false)
+
+            val manager = GridLayoutManager(
+                requireContext(),
+                SPAN_COUNT,
+                RecyclerView.VERTICAL,
+                false
+            )
             manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return if (position == 0 ||
                         position == EASY_LEVELS_NUMBER + 1 ||
                         position == EASY_LEVELS_NUMBER + MEDIUM_LEVELS_NUMBER + 2
                     ) {
-                        5
+                        SPAN_COUNT
                     } else {
                         1
                     }
@@ -79,10 +84,14 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
             }
             layoutManager = manager
 
-            val verticalMarginValue = 2.getValueInPx(resources.displayMetrics)
-            val horizontalMarginValue = 8.getValueInPx(resources.displayMetrics)
-            addItemDecoration(SimpleHorizontalMarginDecoration(horizontalMarginValue))
-            addItemDecoration(SimpleVerticalMarginDecoration(verticalMarginValue))
+            val verticalMarginDecoration = SimpleVerticalMarginDecoration(
+                VERTICAL_MARGIN_VALUE.getValueInPx(resources.displayMetrics)
+            )
+            val horizontalMarginDecoration = SimpleHorizontalMarginDecoration(
+                HORIZONTAL_MARGIN_VALUE.getValueInPx(resources.displayMetrics)
+            )
+            addItemDecoration(verticalMarginDecoration)
+            addItemDecoration(horizontalMarginDecoration)
         }
     }
 
@@ -105,6 +114,12 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
                 )
             )
         }
+    }
+
+    companion object {
+        private const val SPAN_COUNT = 5
+        private const val VERTICAL_MARGIN_VALUE = 2
+        private const val HORIZONTAL_MARGIN_VALUE = 8
     }
 
 }

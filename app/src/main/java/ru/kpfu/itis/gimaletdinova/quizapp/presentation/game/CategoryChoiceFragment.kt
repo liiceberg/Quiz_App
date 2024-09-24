@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
 
 @AndroidEntryPoint
 class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
@@ -40,8 +40,9 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
                         } else {
                             if (isQuestionsLoaded) {
                                 onPause = false
-                                findNavController()
-                                    .navigate(R.id.action_categoryChoiceFragment_to_questionFragment)
+                                findNavController().navigate(
+                                    CategoryChoiceFragmentDirections.actionCategoryChoiceFragmentToQuestionFragment()
+                                )
                             }
                             View.GONE
                         }
@@ -49,7 +50,7 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
                 }
 
                 errorsChannel.receiveAsFlow().observe(this@CategoryChoiceFragment) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                    activity?.showErrorMessage(it.message)
                 }
 
 

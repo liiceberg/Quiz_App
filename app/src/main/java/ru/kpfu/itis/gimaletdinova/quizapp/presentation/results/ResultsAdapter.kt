@@ -8,6 +8,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemScoreBinding
 
 class ResultsAdapter(private val items: List<Score>) :
     RecyclerView.Adapter<ResultsHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultsHolder {
         return ResultsHolder(
             ItemScoreBinding.inflate(LayoutInflater.from(parent.context), parent, false)

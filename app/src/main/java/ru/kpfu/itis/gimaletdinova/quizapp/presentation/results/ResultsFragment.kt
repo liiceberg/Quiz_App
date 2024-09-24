@@ -2,7 +2,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.results
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -17,11 +16,12 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room.RoomViewModel
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.LEVELS_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.LEVELS_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
 
 @AndroidEntryPoint
 class ResultsFragment : Fragment(R.layout.fragment_results) {
@@ -29,17 +29,14 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
     private val binding: FragmentResultsBinding by viewBinding(
         FragmentResultsBinding::bind
     )
-
     private val resultsViewModel: ResultsViewModel by viewModels()
     private val roomViewModel: RoomViewModel by activityViewModels()
     private val args by navArgs<ResultsFragmentArgs>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val mode = args.mode
-
         with(binding) {
-            when (mode) {
+            when (args.mode) {
                 Mode.MULTIPLAYER -> {
                     gameStatusTitleTv.visibility = View.GONE
                     resultsTv.visibility = View.GONE
@@ -60,7 +57,7 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
                     exitBtn.setOnClickListener {
                         findNavController().navigate(
-                            R.id.action_resultsFragment_to_startFragment
+                            ResultsFragmentDirections.actionResultsFragmentToStartFragment()
                         )
                     }
                 }
@@ -83,7 +80,7 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
                     resultsViewModel.saveScores(
                         scores[0].value,
-                        Constants.QUESTIONS_NUMBER
+                        GameConfigConstants.QUESTIONS_NUMBER
                     )
 
                     var level = args.levelNumber
@@ -94,12 +91,11 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                     nextBtn.setOnClickListener {
 
                         if (isWin) ++level
-
                         findNavController().navigate(
                             ResultsFragmentDirections.actionResultsFragmentToPrelaunchFragment(
-                                Mode.SINGLE,
-                                args.categoryId,
-                                level
+                                mode = Mode.SINGLE,
+                                categoryId = args.categoryId,
+                                levelNumber = level
                             )
                         )
                     }
@@ -108,7 +104,7 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
                     exitBtn.setOnClickListener {
                         findNavController().navigate(
-                            R.id.action_resultsFragment_to_startFragment
+                            ResultsFragmentDirections.actionResultsFragmentToStartFragment()
                         )
                     }
                 }
@@ -120,9 +116,8 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
                     with(resultsViewModel) {
 
-                        val room = args.roomCode
-                        room?.let {
-                            getResults(room)
+                        args.roomCode?.let {
+                            getResults(it)
                         }
 
                         resultsFlow.observe(this@ResultsFragment) {
@@ -135,7 +130,7 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
 
                     nextBtn.setOnClickListener {
                         findNavController().navigate(
-                            R.id.action_resultsFragment_to_roomFragment
+                            ResultsFragmentDirections.actionResultsFragmentToRoomFragment()
                         )
                     }
 
@@ -147,13 +142,13 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                         if (exited) {
                             roomViewModel.clear()
                             findNavController().navigate(
-                                R.id.action_resultsFragment_to_startFragment
+                                ResultsFragmentDirections.actionResultsFragmentToStartFragment()
                             )
                         }
                     }
 
                     resultsViewModel.errorsChannel.receiveAsFlow().observe(this@ResultsFragment) {
-                        Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                        activity?.showErrorMessage(it.message)
                     }
                 }
             }

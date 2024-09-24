@@ -9,7 +9,9 @@ import javax.inject.Inject
 class MultiplayerOptionsViewModel @Inject constructor(
     private val validator: Validator
 ) : ViewModel() {
+
     fun validateUsername(name: String) : Validator.ValidationResult {
         return validator.validateName(name)
     }
+
 }

@@ -20,8 +20,8 @@ class ScoresRepositoryImpl @Inject constructor(
         getUserId()?.let { userId ->
             val score = scoresDao.getScore(userId)
             if (score != null) {
-                score.userScoresNumber = score.userScoresNumber + userNumber
-                score.totalScoresNumber = score.totalScoresNumber + totalNumber
+                score.userScoresNumber += userNumber
+                score.totalScoresNumber += totalNumber
                 scoresDao.saveScore(score)
             } else {
                 scoresDao.saveScore(

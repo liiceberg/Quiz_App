@@ -2,7 +2,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.game
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -15,6 +14,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentPrelaunchBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
 
 @AndroidEntryPoint
 class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
@@ -28,24 +28,29 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
     private val args by navArgs<PrelaunchFragmentArgs>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         with(questionViewModel) {
             clear()
-            val mode = args.mode
-            setMode(mode)
+            setMode(args.mode)
             setPlayers(args.playersNames)
 
-            if (this.mode == Mode.MULTIPLAYER) {
-                getCategoriesList()
-            } else {
-                val categoryId = args.categoryId
-                val level = args.levelNumber
-                getQuestions(categoryId, LevelDifficulty.get(level))
+            when (this.mode) {
+                Mode.MULTIPLAYER -> {
+                    getCategoriesList()
+                }
+                Mode.SINGLE -> {
+                    val categoryId = args.categoryId
+                    val level = args.levelNumber
+                    getQuestions(categoryId, LevelDifficulty.get(level))
+                }
+                else -> {}
             }
 
 
             with(binding) {
+
                 errorsChannel.receiveAsFlow().observe(this@PrelaunchFragment) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                    activity?.showErrorMessage(it.message)
                     playBtn.isEnabled = false
                 }
 
@@ -62,19 +67,19 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
                 }
 
                 playBtn.setOnClickListener {
-                    if (questionViewModel.mode == Mode.MULTIPLAYER) {
-                        findNavController().navigate(
-                            R.id.action_prelaunchFragment_to_categoryChoiceFragment
-                        )
-                    } else {
-                        findNavController().navigate(
+                    val action = when (questionViewModel.mode) {
+                        Mode.SINGLE -> {
                             PrelaunchFragmentDirections.actionPrelaunchFragmentToQuestionFragment(
                                 args.categoryId,
                                 args.levelNumber
                             )
-                        )
+                        }
+
+                        else -> {
+                            PrelaunchFragmentDirections.actionPrelaunchFragmentToCategoryChoiceFragment()
+                        }
                     }
-                    requireArguments().clear()
+                    findNavController().navigate(action)
                 }
             }
         }

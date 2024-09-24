@@ -5,41 +5,34 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentSignUpBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
 
 @AndroidEntryPoint
 class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
 
     private val binding: FragmentSignUpBinding by viewBinding(FragmentSignUpBinding::bind)
-    private val viewModel: SignUpViewModel by viewModels()
+    private val signUpViewModel: SignUpViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
 
             signUpBtn.setOnClickListener {
-                lifecycleScope.launch {
-                    if (validate()) {
-                        if (viewModel.save(emailEt.text.toString(), passwordEt.text.toString())) {
-
-                            Toast.makeText(context, R.string.account_created, Toast.LENGTH_SHORT)
-                                .show()
-
-                            findNavController().navigate(R.id.action_signUpFragment_to_signInFragment)
-
-                        }
-                    }
+                if (validate()) {
+                    signUpViewModel.save(
+                        emailEt.text.toString(),
+                        passwordEt.text.toString()
+                    )
                 }
             }
 
-            with(viewModel) {
+            with(signUpViewModel) {
                 loadingFlow.observe(this@SignUpFragment) { isLoad ->
                     progressBar.apply {
                         visibility = if (isLoad) {
@@ -50,8 +43,22 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                     }
                     signUpBtn.isEnabled = isLoad.not()
                 }
+                signedInFlow.observe(this@SignUpFragment) { isSignedIn ->
+                    if (isSignedIn) {
+
+                        Toast.makeText(
+                            context,
+                            R.string.account_created,
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        findNavController().navigate(
+                            SignUpFragmentDirections.actionSignUpFragmentToSignInFragment()
+                        )
+                    }
+                }
                 errorsChannel.receiveAsFlow().observe(this@SignUpFragment) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                    activity?.showErrorMessage(it.message)
                 }
             }
         }
@@ -60,7 +67,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
     private fun validate(): Boolean {
         with(binding) {
 
-            val emailValidation = viewModel.validateEmail(
+            val emailValidation = signUpViewModel.validateEmail(
                 emailEt.text.toString().trim()
             )
             emailTil.error = emailValidation.error
@@ -69,7 +76,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
             }
 
             val password = passwordEt.text.toString().trim()
-            val passwordValidator = viewModel.validatePassword(
+            val passwordValidator = signUpViewModel.validatePassword(
                 password
             )
             passwordTil.error = passwordValidator.error

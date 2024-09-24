@@ -18,8 +18,8 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentMultiplayerOptions
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options.model.InputModel
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MAX_PLAYERS_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_PLAYERS_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.MAX_PLAYERS_NUMBER
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.MIN_PLAYERS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Validator
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
@@ -34,7 +34,6 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
     private val multiplayerOptionsViewModel: MultiplayerOptionsViewModel by viewModels()
     private var inputAdapter: InputAdapter? = null
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
             playersNumberTv.text = MIN_PLAYERS_NUMBER.toString()
@@ -42,8 +41,8 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
             initRecyclerView()
 
             startBtn.setOnClickListener {
-                if (isPlayersCorrect()) {
 
+                if (isPlayersCorrect()) {
                     val players = inputAdapter?.currentList?.map { model -> model.text }
                         ?.toTypedArray() ?: arrayOf()
 
@@ -54,9 +53,11 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
                         )
                     )
                 } else {
-                    inputAdapter?.currentList?.count { it.text == "" }
+                    inputAdapter?.currentList?.count { it.text.trim().isEmpty() }
                         ?.let { emptyFieldsNumber ->
-                            if (emptyFieldsNumber > 0) showWarning()
+                            if (emptyFieldsNumber > 0) {
+                                showWarning()
+                            }
                         }
                 }
             }
@@ -64,6 +65,7 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
             plusBtn.setOnClickListener {
                 increasePlayersNumber()
             }
+
             minusBtn.setOnClickListener {
                 decreasePlayersNumber()
             }
@@ -81,9 +83,10 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
         binding.inputRv.apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             adapter = inputAdapter
-            val marginValue = 8.getValueInPx(resources.displayMetrics)
-            addItemDecoration(SimpleHorizontalMarginDecoration(marginValue))
-            addItemDecoration(SimpleVerticalMarginDecoration(marginValue))
+
+            val marginValueInPx = MARGIN_VALUE.getValueInPx(resources.displayMetrics)
+            addItemDecoration(SimpleHorizontalMarginDecoration(marginValueInPx))
+            addItemDecoration(SimpleVerticalMarginDecoration(marginValueInPx))
         }
 
     }
@@ -92,17 +95,17 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
         inputAdapter?.updateItem(newInputModel)
     }
 
-    private fun validate(name: String) : Validator.ValidationResult {
+    private fun validate(name: String): Validator.ValidationResult {
         return multiplayerOptionsViewModel.validateUsername(name)
     }
-
 
     private fun increasePlayersNumber() {
         with(binding) {
             val playersNumber = getPlayersNumber()
             if (playersNumber < MAX_PLAYERS_NUMBER) {
-                playersNumberTv.text = (playersNumber + 1).toString()
-                if (playersNumber + 1 == MAX_PLAYERS_NUMBER) {
+                val currentPlayersNumber = playersNumber + 1
+                playersNumberTv.text = currentPlayersNumber.toString()
+                if (currentPlayersNumber == MAX_PLAYERS_NUMBER) {
                     deactivateView(plusBtn)
                 }
                 if (playersNumber == MIN_PLAYERS_NUMBER) {
@@ -166,7 +169,7 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
     }
 
 
-    private fun getPlayersNumber(): Int = binding.playersNumberTv.text.toString().toInt()
+    private fun getPlayersNumber(): Int = inputAdapter?.itemCount ?: MIN_PLAYERS_NUMBER
 
     private fun createInputList(): List<InputModel> {
         val list = mutableListOf<InputModel>()
@@ -178,6 +181,10 @@ class MultiplayerOptionsFragment : Fragment(R.layout.fragment_multiplayer_option
 
     private fun showWarning() {
         Toast.makeText(context, R.string.options_dialog_text, Toast.LENGTH_LONG).show()
+    }
+
+    companion object {
+        private const val MARGIN_VALUE = 8
     }
 
 }

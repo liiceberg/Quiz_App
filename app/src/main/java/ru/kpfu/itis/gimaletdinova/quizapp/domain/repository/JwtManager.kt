@@ -1,4 +1,4 @@
-package ru.kpfu.itis.gimaletdinova.quizapp.data.remote
+package ru.kpfu.itis.gimaletdinova.quizapp.domain.repository
 
 interface JwtManager {
     suspend fun saveAccessJwt(token: String)

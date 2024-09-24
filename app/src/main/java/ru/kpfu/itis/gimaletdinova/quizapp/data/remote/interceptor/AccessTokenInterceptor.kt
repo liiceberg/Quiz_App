@@ -3,7 +3,9 @@ package ru.kpfu.itis.gimaletdinova.quizapp.data.remote.interceptor
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManager
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.JwtManager
+import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.HEADER_AUTHORIZATION
+import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.TOKEN_TYPE
 import javax.inject.Inject
 
 class AccessTokenInterceptor @Inject constructor(
@@ -17,9 +19,5 @@ class AccessTokenInterceptor @Inject constructor(
         request.addHeader(HEADER_AUTHORIZATION, "$TOKEN_TYPE $token")
         return chain.proceed(request.build())
     }
-
-    companion object {
-        const val HEADER_AUTHORIZATION = "Authorization"
-        const val TOKEN_TYPE = "Bearer"
-    }
+    
 }
