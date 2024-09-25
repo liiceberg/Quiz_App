@@ -47,7 +47,7 @@ class ProfileViewModel @Inject constructor(
 
     val errorsChannel = Channel<Throwable>()
 
-    private fun initProfile() {
+    fun initProfile() {
         viewModelScope.launch {
             getUsername()
             getScores()

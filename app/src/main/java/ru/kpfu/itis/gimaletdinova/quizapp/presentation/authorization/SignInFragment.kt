@@ -2,7 +2,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.authorization
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -10,11 +9,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentSignInBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+
 
 @AndroidEntryPoint
-class SignInFragment : Fragment(R.layout.fragment_sign_in) {
+class SignInFragment : BaseFragment(R.layout.fragment_sign_in) {
 
     private val binding: FragmentSignInBinding by viewBinding(FragmentSignInBinding::bind)
     private val signInViewModel: SignInViewModel by viewModels()
@@ -39,7 +38,7 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
             }
 
             with(signInViewModel) {
-                loadingFlow.observe(this@SignInFragment) { isLoad ->
+                loadingFlow.observe { isLoad ->
                     progressBar.apply {
                         visibility = if (isLoad) {
                             View.VISIBLE
@@ -49,15 +48,15 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
                     }
                     signInBtn.isEnabled = isLoad.not()
                 }
-                loggedInFlow.observe(this@SignInFragment) { isLoggedIn ->
+                loggedInFlow.observe { isLoggedIn ->
                     if (isLoggedIn) {
                         findNavController().navigate(
                             SignInFragmentDirections.actionSignInFragmentToStartFragment()
                         )
                     }
                 }
-                errorsChannel.receiveAsFlow().observe(this@SignInFragment) {
-                    activity?.showErrorMessage(it.message)
+                errorsChannel.receiveAsFlow().observe {
+                    showError(it.message)
                 }
             }
         }

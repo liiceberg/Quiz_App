@@ -2,7 +2,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.results
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -15,16 +14,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room.RoomViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants
 import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
+
 
 @AndroidEntryPoint
-class ResultsFragment : Fragment(R.layout.fragment_results) {
+class ResultsFragment : BaseFragment(R.layout.fragment_results) {
 
     private val binding: FragmentResultsBinding by viewBinding(
         FragmentResultsBinding::bind
@@ -120,7 +119,7 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                             getResults(it)
                         }
 
-                        resultsFlow.observe(this@ResultsFragment) {
+                        resultsFlow.observe {
                             it?.let {
                                 initRv(it)
                             }
@@ -138,7 +137,7 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                         roomViewModel.exit()
                     }
 
-                    roomViewModel.exitFlow.observe(this@ResultsFragment) { exited ->
+                    roomViewModel.exitFlow.observe { exited ->
                         if (exited) {
                             roomViewModel.clear()
                             findNavController().navigate(
@@ -147,8 +146,8 @@ class ResultsFragment : Fragment(R.layout.fragment_results) {
                         }
                     }
 
-                    resultsViewModel.errorsChannel.receiveAsFlow().observe(this@ResultsFragment) {
-                        activity?.showErrorMessage(it.message)
+                    resultsViewModel.errorsChannel.receiveAsFlow().observe {
+                        showError(it.message)
                     }
                 }
             }

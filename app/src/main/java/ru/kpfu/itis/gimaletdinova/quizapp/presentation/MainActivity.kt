@@ -7,7 +7,6 @@ import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import ru.kpfu.itis.gimaletdinova.quizapp.R
-import ru.kpfu.itis.gimaletdinova.quizapp.util.OnBackPressed
 
 
 @AndroidEntryPoint
@@ -35,20 +34,6 @@ class MainActivity : AppCompatActivity() {
             val graph = navInflater.inflate(R.navigation.navigation)
             graph.setStartDestination(appViewModel.getStartDestination())
             navController.graph = graph
-        }
-    }
-
-    override fun onBackPressed() {
-        val navHost =
-            supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment?
-        when (navHost?.navController?.currentDestination?.id) {
-            R.id.roomFragment, R.id.questionFragment -> {
-                (navHost.childFragmentManager.fragments[0] as? OnBackPressed)?.onBackPressed()
-            }
-
-            else -> {
-                super.onBackPressed()
-            }
         }
     }
 

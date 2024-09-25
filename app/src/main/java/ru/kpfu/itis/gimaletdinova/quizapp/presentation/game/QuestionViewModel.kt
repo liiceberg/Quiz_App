@@ -63,6 +63,9 @@ class QuestionViewModel @Inject constructor(
     private var _categoriesList: CategoriesList? = null
     val categoriesList get() = _categoriesList
 
+    private val _gameEnabledFlow = MutableStateFlow(false)
+    val gameEnabledFlow get() = _gameEnabledFlow.asStateFlow()
+
     private val players = mutableListOf<String>()
     private var categoryChoiceCounter = 0
     private var playersIterator: MutableIterator<String>? = null
@@ -93,6 +96,7 @@ class QuestionViewModel @Inject constructor(
                 )
             }.onSuccess {
                 questionsList = it
+                _gameEnabledFlow.value = true
             }.onFailure { ex ->
                 errorsChannel.send(ex)
             }
@@ -182,6 +186,7 @@ class QuestionViewModel @Inject constructor(
                 categoriesUseCase.invoke()
             }.onSuccess {
                 _categoriesList = it
+                _gameEnabledFlow.value = true
             }.onFailure { ex ->
                 errorsChannel.send(ex)
             }
@@ -212,6 +217,7 @@ class QuestionViewModel @Inject constructor(
         onPause = false
         counter = 0
         playersIterator = null
+        _gameEnabledFlow.value = false
     }
 
     override fun onCleared() {

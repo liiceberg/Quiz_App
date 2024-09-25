@@ -2,7 +2,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.game
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -12,12 +11,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentPrelaunchBinding
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
+
 
 @AndroidEntryPoint
-class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
+class PrelaunchFragment : BaseFragment(R.layout.fragment_prelaunch) {
 
     private val binding: FragmentPrelaunchBinding by viewBinding(
         FragmentPrelaunchBinding::bind
@@ -38,32 +37,35 @@ class PrelaunchFragment : Fragment(R.layout.fragment_prelaunch) {
                 Mode.MULTIPLAYER -> {
                     getCategoriesList()
                 }
+
                 Mode.SINGLE -> {
                     val categoryId = args.categoryId
                     val level = args.levelNumber
                     getQuestions(categoryId, LevelDifficulty.get(level))
                 }
+
                 else -> {}
             }
 
 
             with(binding) {
 
-                errorsChannel.receiveAsFlow().observe(this@PrelaunchFragment) {
-                    activity?.showErrorMessage(it.message)
-                    playBtn.isEnabled = false
+                errorsChannel.receiveAsFlow().observe {
+                    showError(it.message)
                 }
 
-                loadingFlow.observe(this@PrelaunchFragment) { isLoad ->
+                loadingFlow.observe { isLoad ->
                     progressBar.apply {
                         visibility = if (isLoad) {
-                            playBtn.isEnabled = false
                             View.VISIBLE
                         } else {
-                            playBtn.isEnabled = true
                             View.GONE
                         }
                     }
+                }
+
+                gameEnabledFlow.observe { enabled ->
+                    if (enabled) playBtn.isEnabled = true
                 }
 
                 playBtn.setOnClickListener {

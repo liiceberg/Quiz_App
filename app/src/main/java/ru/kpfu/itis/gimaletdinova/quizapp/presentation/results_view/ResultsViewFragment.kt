@@ -2,23 +2,22 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.results_view
 
 import android.os.Bundle
 import android.view.View
-import by.kirich1409.viewbindingdelegate.viewBinding
-import dagger.hilt.android.AndroidEntryPoint
-import ru.kpfu.itis.gimaletdinova.quizapp.R
-import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsViewBinding
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
+import dagger.hilt.android.AndroidEntryPoint
+import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.local.entity.QuestionEntity
+import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsViewBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
-class ResultsViewFragment : Fragment(R.layout.fragment_results_view) {
+class ResultsViewFragment : BaseFragment(R.layout.fragment_results_view) {
     private val binding: FragmentResultsViewBinding by viewBinding(
         FragmentResultsViewBinding::bind
     )
@@ -41,7 +40,7 @@ class ResultsViewFragment : Fragment(R.layout.fragment_results_view) {
 
             getQuestions(level, catId)
 
-            loadingFlow.observe(this@ResultsViewFragment) { isLoad ->
+            loadingFlow.observe { isLoad ->
                 binding.progressBar.apply {
                     visibility = if (isLoad) {
                         View.VISIBLE

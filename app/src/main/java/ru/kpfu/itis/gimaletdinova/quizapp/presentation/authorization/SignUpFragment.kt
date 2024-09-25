@@ -3,7 +3,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.authorization
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -11,11 +10,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentSignUpBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+
 
 @AndroidEntryPoint
-class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
+class SignUpFragment : BaseFragment(R.layout.fragment_sign_up) {
 
     private val binding: FragmentSignUpBinding by viewBinding(FragmentSignUpBinding::bind)
     private val signUpViewModel: SignUpViewModel by viewModels()
@@ -33,7 +32,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
             }
 
             with(signUpViewModel) {
-                loadingFlow.observe(this@SignUpFragment) { isLoad ->
+                loadingFlow.observe { isLoad ->
                     progressBar.apply {
                         visibility = if (isLoad) {
                             View.VISIBLE
@@ -43,7 +42,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                     }
                     signUpBtn.isEnabled = isLoad.not()
                 }
-                signedInFlow.observe(this@SignUpFragment) { isSignedIn ->
+                signedInFlow.observe { isSignedIn ->
                     if (isSignedIn) {
 
                         Toast.makeText(
@@ -57,8 +56,8 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                         )
                     }
                 }
-                errorsChannel.receiveAsFlow().observe(this@SignUpFragment) {
-                    activity?.showErrorMessage(it.message)
+                errorsChannel.receiveAsFlow().observe {
+                    showError(it.message)
                 }
             }
         }

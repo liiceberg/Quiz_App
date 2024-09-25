@@ -14,10 +14,21 @@
         android:layout_marginBottom="16dp"
         tools:listitem="@layout/item_room" />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/no_rooms_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/no_rooms"
+        android:visibility="gone" />
+
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
 </FrameLayout>

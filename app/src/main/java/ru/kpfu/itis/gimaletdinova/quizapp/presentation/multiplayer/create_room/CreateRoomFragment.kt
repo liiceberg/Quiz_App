@@ -6,7 +6,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SeekBar
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -18,11 +17,11 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty.EASY
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty.HARD
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty.MEDIUM
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCreateRoomBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+
 
 @AndroidEntryPoint
-class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
+class CreateRoomFragment : BaseFragment(R.layout.fragment_create_room) {
 
     private val binding: FragmentCreateRoomBinding by viewBinding(FragmentCreateRoomBinding::bind)
     private val createRoomViewModel: CreateRoomViewModel by viewModels()
@@ -73,7 +72,7 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
 
 
 
-                loadingFlow.observe(this@CreateRoomFragment) { isLoad ->
+                loadingFlow.observe { isLoad ->
                     binding.progressBar.apply {
                         visibility = if (isLoad) {
                             View.VISIBLE
@@ -82,7 +81,7 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
                         }
                     }
                 }
-                categoriesFlow.observe(this@CreateRoomFragment) {
+                categoriesFlow.observe {
                     it?.let {
                         categoriesSpinner.apply {
 
@@ -115,7 +114,7 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
                     }
                 }
 
-                createRoomFlow.observe(this@CreateRoomFragment) { code ->
+                createRoomFlow.observe { code ->
                     if (code != null) {
                         findNavController().navigate(
                             CreateRoomFragmentDirections.actionCreateRoomFragmentToRoomsListContainerFragment()
@@ -128,8 +127,8 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
                     }
                 }
 
-                errorsChannel.receiveAsFlow().observe(this@CreateRoomFragment) {
-                    activity?.showErrorMessage(it.message)
+                errorsChannel.receiveAsFlow().observe {
+                    showError(it.message)
                 }
 
             }

@@ -4,26 +4,27 @@ import android.os.Bundle
 import android.view.View
 import android.widget.SearchView
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentRoomsListBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
-import java.util.stream.Collectors
+
 
 @AndroidEntryPoint
-class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
+class RoomsListFragment : BaseFragment(R.layout.fragment_rooms_list) {
 
     private val binding: FragmentRoomsListBinding by viewBinding(FragmentRoomsListBinding::bind)
     private val roomsListViewModel: RoomsListViewModel by viewModels()
@@ -43,12 +44,11 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         with(roomsListViewModel) {
 
             getCategoriesList()
 
-            loadingFlow.observe(this@RoomsListFragment) { isLoad ->
+            loadingFlow.observe { isLoad ->
                 binding.progressBar.apply {
                     visibility = if (isLoad) {
                         View.VISIBLE
@@ -58,16 +58,21 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
                 }
             }
 
-            categoriesFlow.observe(this@RoomsListFragment) { categories ->
+            categoriesFlow.observe { categories ->
                 categories?.let { initRv(categories) }
             }
 
-            roomFlow.observe(this@RoomsListFragment) {
-                roomAdapter?.setItems(it)
+            roomFlow.observe { roomsList ->
+                if (roomsList.isEmpty()) {
+                    binding.noRoomsTv.visibility = View.VISIBLE
+                } else {
+                    binding.noRoomsTv.visibility = View.GONE
+                    roomAdapter?.setItems(roomsList)
+                }
             }
 
-            errorsChannel.receiveAsFlow().observe(this@RoomsListFragment) {
-                activity?.showErrorMessage(it.message)
+            errorsChannel.receiveAsFlow().observe {
+                showError(it.message)
             }
         }
 
@@ -99,14 +104,13 @@ class RoomsListFragment : Fragment(R.layout.fragment_rooms_list) {
     }
 
     private fun filterRoomList(text: String) {
-        val query = text.trim().lowercase()
-        roomsListViewModel.currentRoomList
-            ?.stream()
-            ?.filter { it.code.lowercase().startsWith(query) }
-            ?.collect(Collectors.toList())
-            ?.let {
-                roomAdapter?.setItems(it)
-            }
+        lifecycleScope.launch {
+            val query = text.trim().lowercase()
+            roomsListViewModel.roomFlow.lastOrNull()
+                ?.filter { it.code.lowercase().startsWith(query) }
+                ?.toList()
+                ?.let { roomAdapter?.setItems(it) }
+        }
     }
 
     private fun initRv(categoriesList: CategoriesList) {

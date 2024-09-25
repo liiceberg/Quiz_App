@@ -2,7 +2,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -14,15 +13,15 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentLevelsBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleHorizontalMarginDecoration
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.adapter.decoration.SimpleVerticalMarginDecoration
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.model.Level
 import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.EASY_LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.MEDIUM_LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getValueInPx
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
-class LevelsFragment : Fragment(R.layout.fragment_levels) {
+class LevelsFragment : BaseFragment(R.layout.fragment_levels) {
 
     private val binding: FragmentLevelsBinding by viewBinding(
         FragmentLevelsBinding::bind
@@ -40,7 +39,7 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
 
             getLevels(args.categoryId)
 
-            loadingFlow.observe(this@LevelsFragment) { isLoad ->
+            loadingFlow.observe { isLoad ->
                 binding.progressBar.apply {
                     visibility = if (isLoad) {
                         View.VISIBLE
@@ -50,7 +49,7 @@ class LevelsFragment : Fragment(R.layout.fragment_levels) {
                 }
             }
 
-            levelsFlow.observe(this@LevelsFragment) {
+            levelsFlow.observe {
                 it?.let {
                     levelsAdapter?.setItems(it)
                 }

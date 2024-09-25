@@ -3,7 +3,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.profile
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -11,12 +10,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentProfileBinding
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
+
 
 @AndroidEntryPoint
-class ProfileFragment : Fragment(R.layout.fragment_profile) {
+class ProfileFragment : BaseFragment(R.layout.fragment_profile) {
 
     private val binding: FragmentProfileBinding by viewBinding(
         FragmentProfileBinding::bind
@@ -59,11 +58,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             }
 
             with(profileViewModel) {
-                usernameFlow.observe(this@ProfileFragment) { username ->
+                usernameFlow.observe { username ->
                     usernameTv.text = username
                 }
 
-                scoresFlow.observe(this@ProfileFragment) {
+                scoresFlow.observe {
                     it?.let {
                         userQuestionsTv.text =
                             getString(R.string.user_questions_number, it.correctNumber)
@@ -72,13 +71,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                     }
                 }
 
-                themeFlow.observe(this@ProfileFragment) { isNightMode ->
+                themeFlow.observe { isNightMode ->
                     val img =
                         if (isNightMode) R.drawable.moon_svgrepo_com else R.drawable.sun_svgrepo_com
                     themeBtn.setImageResource(img)
                 }
 
-                loggedOutFlow.observe(this@ProfileFragment) { isLoggedOut ->
+                loggedOutFlow.observe { isLoggedOut ->
                     if (isLoggedOut) {
                         findNavController().navigate(
                             ProfileFragmentDirections.actionProfileFragmentToSignInFragment()
@@ -86,8 +85,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                     }
                 }
 
-                errorsChannel.receiveAsFlow().observe(this@ProfileFragment) {
-                    activity?.showErrorMessage(it.message)
+                errorsChannel.receiveAsFlow().observe {
+                    showError(it.message)
                 }
             }
         }

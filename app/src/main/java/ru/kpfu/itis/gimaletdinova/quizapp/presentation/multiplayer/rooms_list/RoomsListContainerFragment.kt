@@ -2,15 +2,15 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.rooms_list
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.tabs.TabLayout
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentRoomsListContainerBinding
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 
-class RoomsListContainerFragment : Fragment(R.layout.fragment_rooms_list_container) {
+class RoomsListContainerFragment : BaseFragment(R.layout.fragment_rooms_list_container) {
 
     private val binding: FragmentRoomsListContainerBinding by viewBinding(
         FragmentRoomsListContainerBinding::bind

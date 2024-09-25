@@ -31,9 +31,6 @@ class RoomsListViewModel @Inject constructor(
     private val _roomFlow = MutableSharedFlow<List<Room>>()
     val roomFlow get() = _roomFlow
 
-    private var _currentRoomList: List<Room>? = null
-    val currentRoomList get() = _currentRoomList
-
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
 
@@ -67,7 +64,7 @@ class RoomsListViewModel @Inject constructor(
             while (this@RoomsListViewModel.isActive) {
                 getRoomList(allRooms)
                 if (this@RoomsListViewModel.isActive) {
-                    delay(100L)
+                    delay(REPEAT_CHECKING_INTERVAL)
                 }
             }
         }
@@ -81,10 +78,11 @@ class RoomsListViewModel @Inject constructor(
                 userInteractor.getRooms()
             }
         }.onSuccess {
-            roomFlow.emit(it)
-            _currentRoomList = it
+            _roomFlow.emit(it)
         }.onFailure { ex ->
+            stopRepeatWork()
             errorsChannel.send(ex)
+            _roomFlow.emit(emptyList())
         }
     }
 
@@ -93,8 +91,12 @@ class RoomsListViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        isActive = false
+        stopRepeatWork()
         viewModelJob.cancel()
         errorsChannel.close()
+    }
+
+    companion object {
+        private const val REPEAT_CHECKING_INTERVAL = 100L
     }
 }

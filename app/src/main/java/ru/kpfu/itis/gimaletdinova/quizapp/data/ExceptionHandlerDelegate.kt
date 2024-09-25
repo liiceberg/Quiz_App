@@ -21,7 +21,6 @@ class ExceptionHandlerDelegate @Inject constructor(
 ) {
     private val gson = Gson()
     fun handleException(ex: Throwable): Throwable {
-        println(ex.javaClass)
         return when (ex) {
             is HttpException -> {
                 var message: String? = null
@@ -43,7 +42,6 @@ class ExceptionHandlerDelegate @Inject constructor(
                     else -> ex
                 }
             }
-
             is SocketTimeoutException, is ConnectException -> ConnectionException(ctx.getString(R.string.connection_exception))
             else -> ex
         }

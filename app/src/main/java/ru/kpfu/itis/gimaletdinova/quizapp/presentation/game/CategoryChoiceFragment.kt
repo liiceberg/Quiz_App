@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -13,11 +12,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
-import ru.kpfu.itis.gimaletdinova.quizapp.util.showErrorMessage
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+
 
 @AndroidEntryPoint
-class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
+class CategoryChoiceFragment : BaseFragment(R.layout.fragment_category_choice) {
 
     private val binding: FragmentCategoryChoiceBinding by viewBinding(
         FragmentCategoryChoiceBinding::bind
@@ -33,7 +32,7 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
 
                 usernameTv.text = getPlayerToCategoryChoice()
 
-                loadingFlow.observe(this@CategoryChoiceFragment) { isLoad ->
+                loadingFlow.observe { isLoad ->
                     progressBar.apply {
                         visibility = if (isLoad) {
                             View.VISIBLE
@@ -49,8 +48,8 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
                     }
                 }
 
-                errorsChannel.receiveAsFlow().observe(this@CategoryChoiceFragment) {
-                    activity?.showErrorMessage(it.message)
+                errorsChannel.receiveAsFlow().observe {
+                    showError(it.message)
                 }
 
 

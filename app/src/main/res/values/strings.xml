@@ -47,6 +47,10 @@
     <string name="my_rooms">My</string>
     <string name="players">Players:\n%s</string>
     <string name="unselected_category">No category selected</string>
+    <string name="no_categories">The quiz topics will be displayed here</string>
+    <string name="no_rooms">The available rooms will be displayed here</string>
+    <string name="dialog_error_title">Oops.. Some error occurred</string>
+    <string name="try_again">Try again</string>
 
 
         <!--    EditText    -->

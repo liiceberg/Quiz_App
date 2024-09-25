@@ -46,10 +46,6 @@ class RoomHolder(
     }
 
     private fun getCategoryById(id: Int): String {
-        return categories.categoriesList.stream()
-            .filter { c -> c.id == id }
-            .findFirst()
-            .get()
-            .displayName
+        return categories.categoriesList.first { c -> c.id == id }.displayName
     }
 }
