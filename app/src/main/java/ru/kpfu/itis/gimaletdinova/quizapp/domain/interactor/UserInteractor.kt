@@ -28,7 +28,7 @@ class UserInteractor @Inject constructor(
         }
     }
 
-    suspend fun getUserId(): Long? {
+    suspend fun getUserId(): Long {
         return withContext(dispatcher) {
             userRepository.getUserId()
         }

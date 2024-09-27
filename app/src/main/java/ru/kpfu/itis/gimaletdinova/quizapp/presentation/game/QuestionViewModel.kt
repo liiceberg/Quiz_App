@@ -148,7 +148,7 @@ class QuestionViewModel @Inject constructor(
         viewModelScope.launch {
             if (names == null) {
                 var username = context.getString(R.string.default_username)
-                runCatching {
+                runCatching(exceptionHandlerDelegate) {
                     userInteractor.getUsername()
                 }.onSuccess {
                     it?.let {

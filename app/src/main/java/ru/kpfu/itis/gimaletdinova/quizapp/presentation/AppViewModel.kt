@@ -22,10 +22,11 @@ class AppViewModel @Inject constructor(
     }
 
     suspend fun getStartDestination(): Int {
-        return if (userInteractor.getUserId() == null) {
-            R.id.signInFragment
-        } else {
+        return try {
+            userInteractor.getUserId()
             R.id.startFragment
+        } catch (ex: Exception) {
+            R.id.signInFragment
         }
     }
 

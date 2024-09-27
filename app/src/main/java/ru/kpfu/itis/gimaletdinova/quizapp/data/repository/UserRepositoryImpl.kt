@@ -6,13 +6,15 @@ import androidx.datastore.preferences.edit
 import androidx.datastore.preferences.remove
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import retrofit2.HttpException
-import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.UserNotFoundException
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.JwtManager
+import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.AppException
+import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.AppException.SuchEmailAlreadyRegistered
+import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.HttpException.*
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.makeSafeApiCall
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.LoginRequest
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.AuthService
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.service.TriviaService
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.JwtManager
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.UserRepository
 import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys
 import javax.inject.Inject
@@ -25,24 +27,31 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
 
     override suspend fun login(email: String, password: String): Long {
-        val response = authService.login(LoginRequest(email, password))
-        if (response.isSuccessful) {
-            response.body()?.let { body ->
-                jwtManager.saveAccessJwt(body.accessToken)
-                jwtManager.saveRefreshJwt(body.refreshToken)
-                val id = body.userId
-                dataStore.edit {
-                    it[PrefsKeys.USER_ID_KEY] = id
-                }
-                return id
+        try {
+            val loginResponse = makeSafeApiCall {
+                authService.login(LoginRequest(email, password))
             }
-
+            jwtManager.saveAccessJwt(loginResponse.accessToken)
+            jwtManager.saveRefreshJwt(loginResponse.refreshToken)
+            dataStore.edit {
+                it[PrefsKeys.USER_ID_KEY] = loginResponse.userId
+            }
+            return loginResponse.userId
+        } catch (ex: UnauthorizedException) {
+            throw AppException.InvalidPassword("Invalid password")
+        } catch (ex: NotFoundException) {
+            throw AppException.EmailNotFound("Email not found")
         }
-        throw HttpException(response)
     }
 
     override suspend fun register(email: String, password: String) {
-        authService.register(LoginRequest(email, password))
+        try {
+            makeSafeApiCall {
+                authService.register(LoginRequest(email, password))
+            }
+        } catch (ex: ConflictException) {
+            throw SuchEmailAlreadyRegistered("This email already registered")
+        }
     }
 
     override suspend fun logout() {
@@ -53,28 +62,26 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUsername(): String {
-        getUserId()?.let {
-            return triviaService.getUsername(it).name
-        }
-        throw UserNotFoundException("User's id not found")
+        return makeSafeApiCall {
+            triviaService.getUsername(getUserId())
+        }.name
     }
 
     override suspend fun setUsername(name: String) {
-        getUserId()?.let { id ->
-            triviaService.updateUsername(id, name)
+        makeSafeApiCall {
+            triviaService.updateUsername(getUserId(), name)
         }
     }
 
     override suspend fun getRooms(): List<Room> {
-        getUserId()?.let {
-            return triviaService.getUserRooms(it)
+        return makeSafeApiCall {
+            triviaService.getUserRooms(getUserId())
         }
-        throw UserNotFoundException("User's id not found")
     }
 
-    override suspend fun getUserId(): Long? {
+    override suspend fun getUserId(): Long {
         return dataStore.data.map {
             it[PrefsKeys.USER_ID_KEY]
-        }.first()
+        }.first() ?: throw AppException.UserNotFoundException("User not found")
     }
 }

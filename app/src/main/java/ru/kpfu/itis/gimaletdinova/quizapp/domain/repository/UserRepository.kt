@@ -6,7 +6,7 @@ interface UserRepository {
     suspend fun login(email: String, password: String) : Long
     suspend fun register(email: String, password: String)
     suspend fun getUsername(): String?
-    suspend fun getUserId() : Long?
+    suspend fun getUserId() : Long
     suspend fun setUsername(name: String)
     suspend fun getRooms() : List<Room>
     suspend fun logout()

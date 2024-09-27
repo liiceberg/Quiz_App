@@ -9,6 +9,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
+import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.AppException
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentSignUpBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 
@@ -56,8 +57,11 @@ class SignUpFragment : BaseFragment(R.layout.fragment_sign_up) {
                         )
                     }
                 }
-                errorsChannel.receiveAsFlow().observe {
-                    showError(it.message)
+                errorsChannel.receiveAsFlow().observe { error ->
+                    when(error) {
+                        is AppException.SuchEmailAlreadyRegistered -> emailTil.error = error.message
+                        else -> showError(error.message)
+                    }
                 }
             }
         }

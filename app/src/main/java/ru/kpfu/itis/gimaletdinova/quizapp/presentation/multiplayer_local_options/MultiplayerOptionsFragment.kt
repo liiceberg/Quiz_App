@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -52,13 +51,6 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
                             players
                         )
                     )
-                } else {
-                    inputAdapter?.currentList?.count { it.text.trim().isEmpty() }
-                        ?.let { emptyFieldsNumber ->
-                            if (emptyFieldsNumber > 0) {
-                                showWarning()
-                            }
-                        }
                 }
             }
 
@@ -162,12 +154,17 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
     private fun isPlayersCorrect(): Boolean {
         inputAdapter?.currentList?.let { list ->
             for (item in list) {
-                if (item.isCorrect.not()) return false
+                if (item.isCorrect.not()) {
+                    return false
+                }
+                else if (item.text.isBlank()) {
+                    inputAdapter?.updateItem(item.copy(isCorrect = false))
+                    return false
+                }
             }
         }
         return true
     }
-
 
     private fun getPlayersNumber(): Int = inputAdapter?.itemCount ?: MIN_PLAYERS_NUMBER
 
@@ -177,10 +174,6 @@ class MultiplayerOptionsFragment : BaseFragment(R.layout.fragment_multiplayer_op
             list.add(InputModel(position = pos))
         }
         return list
-    }
-
-    private fun showWarning() {
-        Toast.makeText(context, R.string.options_dialog_text, Toast.LENGTH_LONG).show()
     }
 
     companion object {

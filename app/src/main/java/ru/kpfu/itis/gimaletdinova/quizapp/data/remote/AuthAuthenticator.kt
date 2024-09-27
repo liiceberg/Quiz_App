@@ -25,24 +25,25 @@ class AuthAuthenticator @Inject constructor(
             val updatedToken = runBlocking {
                 tokenManager.getAccessJwt()
             }
+
             val token = if (currentToken != updatedToken) updatedToken else {
-                val newSessionResponse = runBlocking {
-                    refreshTokenService.refreshToken(
-                        RefreshJwtRequest(tokenManager.getRefreshJwt())
-                    )
-                }
-                if (newSessionResponse.isSuccessful && newSessionResponse.body() != null) {
-                    newSessionResponse.body()?.let { body ->
-                        runBlocking {
-                            tokenManager.saveAccessJwt(body.accessToken)
-                            tokenManager.saveRefreshJwt(body.refreshToken)
+                try {
+                    runBlocking {
+                        val authResponse = makeSafeApiCall {
+                            refreshTokenService.refreshToken(
+                                RefreshJwtRequest(tokenManager.getRefreshJwt())
+                            )
                         }
-                        body.accessToken
+
+                        tokenManager.saveAccessJwt(authResponse.accessToken)
+                        tokenManager.saveRefreshJwt(authResponse.refreshToken)
+                        authResponse.accessToken
                     }
-                } else {
+                } catch (ex: Exception) {
                     null
                 }
             }
+
             return if (token != null) {
                 response.request
                     .newBuilder()

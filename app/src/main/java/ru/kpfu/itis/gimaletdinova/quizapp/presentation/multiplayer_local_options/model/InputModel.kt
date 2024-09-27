@@ -2,6 +2,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_option
 
 data class InputModel(
     var text: String = "",
-    var isCorrect: Boolean = false,
-    val position: Int
+    var isCorrect: Boolean = true,
+    val position: Int,
 )

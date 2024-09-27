@@ -18,8 +18,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.BuildConfig
+import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message
+import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.RoomInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.JwtManager
@@ -41,6 +43,7 @@ class RoomViewModel @Inject constructor(
     private val jwtManager: JwtManager,
     private val userInteractor: UserInteractor,
     private val roomInteractor: RoomInteractor,
+    private val exceptionHandlerDelegate: ExceptionHandlerDelegate
 ) : ViewModel() {
 
     private var mStompClient: StompClient? = null
@@ -190,7 +193,7 @@ class RoomViewModel @Inject constructor(
 
     fun getPlayers() {
         viewModelScope.launch {
-            runCatching {
+            runCatching(exceptionHandlerDelegate) {
                 roomInteractor.getPlayers(room)
             }.onSuccess {
                 _players = it

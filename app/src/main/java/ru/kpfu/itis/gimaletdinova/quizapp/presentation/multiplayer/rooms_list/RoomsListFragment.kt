@@ -5,15 +5,12 @@ import android.view.View
 import android.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Room
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentRoomsListBinding
@@ -32,7 +29,6 @@ class RoomsListFragment : BaseFragment(R.layout.fragment_rooms_list) {
     private lateinit var roomsSearchView: SearchView
 
     override fun onStart() {
-        roomsListViewModel.repeatCheckingRoomsForUpdates(requireArguments().getBoolean(ALL_ROOMS))
         roomsSearchView = requireParentFragment().requireView().findViewById(R.id.room_sv)
         super.onStart()
     }
@@ -48,6 +44,7 @@ class RoomsListFragment : BaseFragment(R.layout.fragment_rooms_list) {
 
             getCategoriesList()
 
+
             loadingFlow.observe { isLoad ->
                 binding.progressBar.apply {
                     visibility = if (isLoad) {
@@ -59,7 +56,10 @@ class RoomsListFragment : BaseFragment(R.layout.fragment_rooms_list) {
             }
 
             categoriesFlow.observe { categories ->
-                categories?.let { initRv(categories) }
+                categories?.let {
+                    initRv(categories)
+                    repeatCheckingRoomsForUpdates(requireArguments().getBoolean(ALL_ROOMS))
+                }
             }
 
             roomFlow.observe { roomsList ->
@@ -104,13 +104,11 @@ class RoomsListFragment : BaseFragment(R.layout.fragment_rooms_list) {
     }
 
     private fun filterRoomList(text: String) {
-        lifecycleScope.launch {
-            val query = text.trim().lowercase()
-            roomsListViewModel.roomFlow.lastOrNull()
-                ?.filter { it.code.lowercase().startsWith(query) }
-                ?.toList()
-                ?.let { roomAdapter?.setItems(it) }
-        }
+        val query = text.trim().lowercase()
+        roomsListViewModel.roomFlow.value
+            .filter { it.code.lowercase().startsWith(query) }
+            .toList()
+            .let { roomAdapter?.setItems(it) }
     }
 
     private fun initRv(categoriesList: CategoriesList) {
@@ -128,6 +126,7 @@ class RoomsListFragment : BaseFragment(R.layout.fragment_rooms_list) {
                 VERTICAL_MARGIN_VALUE.getValueInPx(resources.displayMetrics)
             )
             addItemDecoration(verticalMarginDecoration)
+
         }
     }
 

@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -28,7 +27,7 @@ class RoomsListViewModel @Inject constructor(
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate
 ) : ViewModel() {
 
-    private val _roomFlow = MutableSharedFlow<List<Room>>()
+    private val _roomFlow = MutableStateFlow<List<Room>>(emptyList())
     val roomFlow get() = _roomFlow
 
     private val _loadingFlow = MutableStateFlow(false)
@@ -50,8 +49,7 @@ class RoomsListViewModel @Inject constructor(
                 categoriesUseCase.invoke()
             }.onSuccess {
                 _categoriesFlow.value = it
-            }.onFailure { ex ->
-                errorsChannel.send(ex)
+            }.onFailure {
                 _categoriesFlow.value = CategoriesList.empty()
             }
             _loadingFlow.value = false
@@ -78,11 +76,11 @@ class RoomsListViewModel @Inject constructor(
                 userInteractor.getRooms()
             }
         }.onSuccess {
-            _roomFlow.emit(it)
+            _roomFlow.value = it
         }.onFailure { ex ->
             stopRepeatWork()
             errorsChannel.send(ex)
-            _roomFlow.emit(emptyList())
+            _roomFlow.value = emptyList()
         }
     }
 
@@ -97,6 +95,6 @@ class RoomsListViewModel @Inject constructor(
     }
 
     companion object {
-        private const val REPEAT_CHECKING_INTERVAL = 100L
+        private const val REPEAT_CHECKING_INTERVAL = 1000L
     }
 }

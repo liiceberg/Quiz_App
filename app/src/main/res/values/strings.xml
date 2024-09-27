@@ -73,14 +73,8 @@
 
 
         <!--  Exceptions  -->
-    <string name="too_many_requests">The number of request attempts exceeded</string>
-    <string name="page_not_found">Can\'t find anything</string>
-    <string name="bad_request">Request is incorrect</string>
-    <string name="unauthorized">Reauthorization is required</string>
-    <string name="server_exception">Server is not response</string>
-    <string name="empty_questions_list_response">Questions not found</string>
-    <string name="empty_categories_list_response">Categories not found</string>
-    <string name="connection_exception">Сan\'t connect to the server</string>
-    <string name="unknown_error">Unknown error occurred</string>
+    <string name="data_loading_error">The data could not be uploaded. Please, check your internet connection and try again.</string>
+    <string name="unauthorized_error">Your session is outdated. Please, reauthorize.</string>
+    <string name="unknown_error">An unexpected error occurred. Please, try again later.</string>
 
 </resources>

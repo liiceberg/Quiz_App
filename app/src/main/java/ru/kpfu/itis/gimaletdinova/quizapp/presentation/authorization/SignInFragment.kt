@@ -8,6 +8,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
+import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.AppException
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentSignInBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 
@@ -55,8 +56,12 @@ class SignInFragment : BaseFragment(R.layout.fragment_sign_in) {
                         )
                     }
                 }
-                errorsChannel.receiveAsFlow().observe {
-                    showError(it.message)
+                errorsChannel.receiveAsFlow().observe { error ->
+                    when(error) {
+                        is AppException.EmailNotFound -> emailTil.error = error.message
+                        is AppException.InvalidPassword -> passwordTil.error = error.message
+                        else -> showError(error.message)
+                    }
                 }
             }
         }

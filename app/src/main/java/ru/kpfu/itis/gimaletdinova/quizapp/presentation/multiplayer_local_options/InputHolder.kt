@@ -49,6 +49,10 @@ class InputHolder(
         with(binding) {
             usernameEtLayout.hint =
                 root.context.getString(R.string.player_input_hint, item.position)
+
+            if (item.isCorrect.not()) {
+                usernameEt.error = validate(item.text).error
+            }
         }
     }
 

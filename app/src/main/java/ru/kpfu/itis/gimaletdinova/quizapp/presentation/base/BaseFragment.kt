@@ -16,20 +16,25 @@ abstract class BaseFragment(@LayoutRes layout: Int) : Fragment(layout) {
         return observe(fragment = this@BaseFragment, block)
     }
 
-    fun showError(message: String?, replayAction: () -> Unit = {}) {
+    fun showError(message: String?, replayAction: (() -> Unit)? = null) {
         with(requireActivity()) {
             val dialogView = this.layoutInflater.inflate(R.layout.error_dialog, null)
             val messageTextView: TextView = dialogView.findViewById(R.id.message_tv)
             messageTextView.text = message
 
             AlertDialog.Builder(this).apply {
+
                 setView(dialogView)
-                    .setPositiveButton(R.string.try_again) { _, _ ->
-                        replayAction.invoke()
-                    }
                     .setNeutralButton(android.R.string.cancel) { dialog, _ ->
                         dialog.cancel()
                     }
+
+                replayAction?.let {
+                    this.setPositiveButton(R.string.try_again) { _, _ ->
+                        replayAction.invoke()
+                    }
+                }
+
                 create()
                 show()
             }
