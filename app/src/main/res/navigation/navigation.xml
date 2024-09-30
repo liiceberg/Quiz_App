@@ -29,16 +29,20 @@
         tools:layout="@layout/fragment_categories">
         <action
             android:id="@+id/action_categoriesFragment_to_levelsFragment"
-            app:destination="@id/levelsFragment" />
+            app:destination="@id/levelsFragment">
+            <argument
+                android:name="categoryId"
+                app:argType="integer" />
+            <argument
+                android:name="categoryName"
+                app:argType="string" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.profile.ProfileFragment"
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile">
-        <action
-            android:id="@+id/action_profileFragment_to_startFragment"
-            app:destination="@id/startFragment" />
         <action
             android:id="@+id/action_profileFragment_to_signInFragment"
             app:destination="@id/signInFragment"
@@ -55,19 +59,52 @@
             android:id="@+id/action_multiplayerOptionsFragment_to_prelaunchFragment"
             app:destination="@id/prelaunchFragment"
             app:popUpTo="@id/multiplayerOptionsFragment"
-            app:popUpToSaveState="true" />
+            app:popUpToSaveState="true">
+            <argument
+                android:name="mode"
+                app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
+            <argument
+                android:name="playersNames"
+                app:argType="string[]" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/levelsFragment"
         android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.levels.LevelsFragment"
         android:label="LevelsFragment"
         tools:layout="@layout/fragment_levels">
+        <argument
+            android:name="categoryId"
+            app:argType="integer" />
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
         <action
             android:id="@+id/action_levelsFragment_to_prelaunchFragment"
-            app:destination="@id/prelaunchFragment" />
+            app:destination="@id/prelaunchFragment">
+            <argument
+                android:name="levelNumber"
+                app:argType="integer" />
+            <argument
+                android:name="categoryId"
+                app:argType="integer" />
+            <argument
+                android:name="mode"
+                app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
+        </action>
         <action
             android:id="@+id/action_levelsFragment_to_resultsViewFragment"
-            app:destination="@id/resultsViewFragment" />
+            app:destination="@id/resultsViewFragment">
+            <argument
+                android:name="categoryId"
+                app:argType="integer" />
+            <argument
+                android:name="categoryName"
+                app:argType="string" />
+            <argument
+                android:name="levelNumber"
+                app:argType="integer" />
+        </action>
 
     </fragment>
 
@@ -76,6 +113,14 @@
         android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.QuestionFragment"
         android:label="QuestionFragment"
         tools:layout="@layout/fragment_question">
+        <argument
+            android:name="categoryId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="levelNumber"
+            android:defaultValue="-1"
+            app:argType="integer" />
         <action
             android:id="@+id/action_questionFragment_to_categoryChoiceFragment"
             app:destination="@id/categoryChoiceFragment"
@@ -84,28 +129,76 @@
             android:id="@+id/action_questionFragment_to_resultsFragment"
             app:destination="@id/resultsFragment"
             app:popUpTo="@id/levelsFragment"
-            app:popUpToSaveState="true" />
+            app:popUpToSaveState="true">
+            <argument
+                android:name="mode"
+                app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
+
+            <argument
+                android:name="categoryId"
+                app:argType="integer" />
+            <argument
+                android:name="levelNumber"
+                app:argType="integer" />
+        </action>
         <action
             android:id="@+id/action_questionFragment_to_resultsFragment_multiplayer"
             app:destination="@id/resultsFragment"
             app:popUpTo="@id/multiplayerOptionsFragment"
-            app:popUpToSaveState="true" />
+            app:popUpToSaveState="true">
+            <argument
+                android:name="mode"
+                app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
+            <argument
+                android:name="playersNames"
+                app:argType="string[]" />
+            <argument
+                android:name="playersScores"
+                app:argType="integer[]" />
+        </action>
         <action
             android:id="@+id/action_questionFragment_to_roomFragment"
             app:destination="@id/roomFragment"
             app:popUpTo="@id/roomFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="true">
+            <argument
+                android:name="playersScores"
+                app:argType="integer[]" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/prelaunchFragment"
         android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.PrelaunchFragment"
         android:label="PrelaunchFragment"
         tools:layout="@layout/fragment_prelaunch">
+        <argument
+            android:name="mode"
+            app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
+        <argument
+            android:name="playersNames"
+            android:defaultValue="@null"
+            app:argType="string[]"
+            app:nullable="true" />
+        <argument
+            android:name="categoryId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="levelNumber"
+            android:defaultValue="-1"
+            app:argType="integer" />
         <action
             android:id="@+id/action_prelaunchFragment_to_questionFragment"
             app:destination="@id/questionFragment"
             app:popUpTo="@id/levelsFragment"
-            app:popUpToSaveState="true" />
+            app:popUpToSaveState="true">
+            <argument
+                android:name="categoryId"
+                app:argType="integer" />
+            <argument
+                android:name="levelNumber"
+                app:argType="integer" />
+        </action>
         <action
             android:id="@+id/action_prelaunchFragment_to_categoryChoiceFragment"
             app:destination="@id/categoryChoiceFragment"
@@ -126,6 +219,32 @@
         android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.results.ResultsFragment"
         android:label="ResultsFragment"
         tools:layout="@layout/fragment_results">
+        <argument
+            android:name="mode"
+            app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
+        <argument
+            android:name="playersNames"
+            android:defaultValue="@null"
+            app:argType="string[]"
+            app:nullable="true" />
+        <argument
+            android:name="playersScores"
+            android:defaultValue="@null"
+            app:argType="integer[]"
+            app:nullable="true" />
+        <argument
+            android:name="levelNumber"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="categoryId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="roomCode"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_resultsFragment_to_startFragment"
             app:destination="@id/startFragment" />
@@ -133,12 +252,29 @@
             android:id="@+id/action_resultsFragment_to_prelaunchFragment"
             app:destination="@id/prelaunchFragment"
             app:popUpTo="@id/levelsFragment"
-            app:popUpToSaveState="true" />
+            app:popUpToSaveState="true">
+            <argument
+                android:name="mode"
+                app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
+            <argument
+                android:name="levelNumber"
+                app:argType="integer" />
+            <argument
+                android:name="categoryId"
+                app:argType="integer" />
+        </action>
         <action
             android:id="@+id/action_resultsFragment_to_prelaunchFragment_multiplayer"
             app:destination="@id/prelaunchFragment"
             app:popUpTo="@id/multiplayerOptionsFragment"
-            app:popUpToSaveState="true" />
+            app:popUpToSaveState="true">
+            <argument
+                android:name="playersNames"
+                app:argType="string[]" />
+            <argument
+                android:name="mode"
+                app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
+        </action>
         <action
             android:id="@+id/action_resultsFragment_to_roomFragment"
             app:destination="@id/roomFragment"
@@ -150,12 +286,15 @@
         android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.results_view.ResultsViewFragment"
         android:label="ResultsViewFragment"
         tools:layout="@layout/fragment_results_view">
-        <action
-            android:id="@+id/action_resultsViewFragment_to_prelaunchFragment"
-            app:destination="@id/prelaunchFragment" />
-        <action
-            android:id="@+id/action_resultsViewFragment_to_levelsFragment"
-            app:destination="@id/levelsFragment" />
+        <argument
+            android:name="categoryId"
+            app:argType="integer" />
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
+        <argument
+            android:name="levelNumber"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
@@ -191,7 +330,11 @@
             app:destination="@id/createRoomFragment" />
         <action
             android:id="@+id/action_roomsListContainerFragment_to_roomFragment"
-            app:destination="@id/roomFragment" />
+            app:destination="@id/roomFragment">
+            <argument
+                android:name="roomCode"
+                app:argType="string" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/createRoomFragment"
@@ -209,6 +352,16 @@
         android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room.RoomFragment"
         android:label="RoomFragment"
         tools:layout="@layout/fragment_room">
+        <argument
+            android:name="roomCode"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="playersScores"
+            android:defaultValue="@null"
+            app:argType="integer[]"
+            app:nullable="true" />
         <action
             android:id="@+id/action_roomFragment_to_questionFragment"
             app:destination="@id/questionFragment" />
@@ -221,7 +374,14 @@
             android:id="@+id/action_roomFragment_to_resultsFragment"
             app:destination="@id/resultsFragment"
             app:popUpTo="@id/roomFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="true">
+            <argument
+                android:name="mode"
+                app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
+            <argument
+                android:name="roomCode"
+                app:argType="string" />
+        </action>
     </fragment>
 
 </navigation>

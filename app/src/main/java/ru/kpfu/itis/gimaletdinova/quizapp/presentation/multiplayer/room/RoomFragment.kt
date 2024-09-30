@@ -2,14 +2,13 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room
 
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -18,47 +17,45 @@ import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentRoomBinding
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.OnBackPressedDuringGameCallback
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.QuestionViewModel
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.ROOM_CODE
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
-import ru.kpfu.itis.gimaletdinova.quizapp.util.OnBackPressed
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+
 
 
 @AndroidEntryPoint
-class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
+class RoomFragment : BaseFragment(R.layout.fragment_room) {
+
     private val binding: FragmentRoomBinding by viewBinding(FragmentRoomBinding::bind)
     private val roomViewModel: RoomViewModel by activityViewModels()
     private val questionViewModel: QuestionViewModel by activityViewModels()
-
-    override fun onBackPressed() {
-        roomViewModel.exit()
-    }
+    private val args by navArgs<RoomFragmentArgs>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val room = arguments?.getString(ROOM_CODE)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            OnBackPressedDuringGameCallback(::onExitRoom)
+        )
+
         with(binding) {
 
             with(roomViewModel) {
 
                 if (!initialized) {
-                    initStomp(room)
+                    initStomp(args.roomCode)
                 }
 
                 getPlayers()
 
-                val scores = arguments?.getIntegerArrayList(PLAYERS_SCORES)
-
-                if (scores != null) {
+                args.playersScores?.let {
                     readyBtn.visibility = View.GONE
                     sendMessage(
                         Message(
                             sender = userId,
                             code = Code.SCORE,
-                            score = scores[0]
+                            score = it[0]
                         )
                     )
                 }
@@ -75,59 +72,64 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
                 teamIv.setOnClickListener {
                     showPlayers()
                 }
-                messageFlow.observe(this@RoomFragment) {
+
+                messageFlow.observe {
                     infoTv.text = buildToText(it)
                 }
 
-                waitFlow.observe(this@RoomFragment) {
+                waitFlow.observe {
                     if (it == 0) {
                         waitFlow.value = -1
                         with(questionViewModel) {
                             lifecycleScope.launch {
                                 clear()
                                 setMode(Mode.ONLINE)
-                                getQuestions(roomViewModel.room!!)
+                                getQuestions(roomViewModel.room)
                                 setPlayers()
-                                findNavController().navigate(R.id.action_roomFragment_to_questionFragment)
+                                findNavController().navigate(
+                                    RoomFragmentDirections.actionRoomFragmentToQuestionFragment()
+                                )
                             }
                         }
                     }
                 }
-                resultsWaitFlow.observe(this@RoomFragment) {
+                resultsWaitFlow.observe {
                     if (it == 0) {
                         resultsWaitFlow.value = -1
                         findNavController().navigate(
-                            R.id.action_roomFragment_to_resultsFragment,
-                            bundleOf(
-                                MODE to Mode.ONLINE,
-                                ROOM_CODE to roomViewModel.room
+                            RoomFragmentDirections.actionRoomFragmentToResultsFragment(
+                                mode = Mode.ONLINE,
+                                roomCode = roomViewModel.room
                             )
                         )
                     }
                 }
 
-                joinFlow.observe(this@RoomFragment) {
+                joinFlow.observe {
                     if (it < 0) {
                         readyBtn.isEnabled = false
                         roomViewModel.clear()
                     }
                 }
 
-                exitFlow.observe(this@RoomFragment) { exited ->
+                exitFlow.observe { exited ->
                     if (exited) {
                         clear()
-                        findNavController().navigate(R.id.action_roomFragment_to_roomsListContainerFragment)
+                        Log.d("CLEAR VIEW MODEL", "")
+                        findNavController().navigate(
+                            RoomFragmentDirections.actionRoomFragmentToRoomsListContainerFragment()
+                        )
                     }
                 }
 
-                errorsChannel.receiveAsFlow().observe(this@RoomFragment) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                errorsChannel.receiveAsFlow().observe {
+                    showError(it.message)
                 }
             }
 
         }
 
-        questionViewModel.loadingFlow.observe(this) { isLoad ->
+        questionViewModel.loadingFlow.observe { isLoad ->
             binding.progressBar.apply {
                 visibility = if (isLoad) {
                     View.VISIBLE
@@ -158,6 +160,10 @@ class RoomFragment : Fragment(R.layout.fragment_room), OnBackPressed {
             }
         }
         return builder.toString()
+    }
+
+    private fun onExitRoom() {
+        roomViewModel.exit()
     }
 
 }

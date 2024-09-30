@@ -2,7 +2,7 @@ package ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums
 
 import com.google.gson.annotations.SerializedName
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.exception.LevelDifficultyNotFoundException
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants
 
 
 enum class LevelDifficulty {
@@ -20,11 +20,11 @@ enum class LevelDifficulty {
     }
     companion object {
         fun get(number: Int): LevelDifficulty {
-            val minMediumLevel = Constants.MEDIUM_LEVELS_NUMBER + Constants.EASY_LEVELS_NUMBER
-            val minHardLevel = minMediumLevel + Constants.HARD_LEVELS_NUMBER
+            val minMediumLevel = GameConfigConstants.MEDIUM_LEVELS_NUMBER + GameConfigConstants.EASY_LEVELS_NUMBER
+            val minHardLevel = minMediumLevel + GameConfigConstants.HARD_LEVELS_NUMBER
             return when (number) {
-                in 1..Constants.EASY_LEVELS_NUMBER -> EASY
-                in Constants.EASY_LEVELS_NUMBER..minMediumLevel -> MEDIUM
+                in 1..GameConfigConstants.EASY_LEVELS_NUMBER -> EASY
+                in GameConfigConstants.EASY_LEVELS_NUMBER..minMediumLevel -> MEDIUM
                 in minMediumLevel..minHardLevel -> HARD
                 else -> throw LevelDifficultyNotFoundException()
             }

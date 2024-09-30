@@ -4,13 +4,15 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManager
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManagerImpl
+import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.ChangeThemeManagerImpl
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.JwtManager
+import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.JwtManagerImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.LevelsRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.RoomRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.ScoresRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.TriviaRepositoryImpl
 import ru.kpfu.itis.gimaletdinova.quizapp.data.repository.UserRepositoryImpl
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.ChangeThemeManager
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.LevelsRepository
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.RoomRepository
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.ScoresRepository
@@ -44,4 +46,7 @@ interface DataModule {
     @Binds
     @Singleton
     fun bindScoresRepositoryToScoresRepositoryImpl(scoresRepository: ScoresRepositoryImpl) : ScoresRepository
+
+    @Binds
+    fun bingChangeThemeManagerToChangeThemeManagerImpl(changeThemeManager: ChangeThemeManagerImpl) : ChangeThemeManager
 }

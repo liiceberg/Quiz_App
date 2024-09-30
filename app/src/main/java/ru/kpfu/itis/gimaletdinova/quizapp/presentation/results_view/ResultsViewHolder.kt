@@ -9,6 +9,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
 
 class ResultsViewHolder(private val binding: ItemQuestionBinding) :
     RecyclerView.ViewHolder(binding.root) {
+
     fun bindItem(item: QuestionEntity) {
         with(binding) {
             questionTv.text = item.question
@@ -26,8 +27,9 @@ class ResultsViewHolder(private val binding: ItemQuestionBinding) :
                         item.userAnswerPosition -> {
                             com.google.android.material.R.attr.colorSecondaryVariant
                         }
-                        else ->
+                        else -> {
                             com.google.android.material.R.attr.colorSecondary
+                        }
                     }
 
                     val buttonColor = when (i) {

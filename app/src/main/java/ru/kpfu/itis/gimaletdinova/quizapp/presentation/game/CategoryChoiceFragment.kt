@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -14,10 +12,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCategoryChoiceBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+
 
 @AndroidEntryPoint
-class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
+class CategoryChoiceFragment : BaseFragment(R.layout.fragment_category_choice) {
 
     private val binding: FragmentCategoryChoiceBinding by viewBinding(
         FragmentCategoryChoiceBinding::bind
@@ -33,23 +32,24 @@ class CategoryChoiceFragment : Fragment(R.layout.fragment_category_choice) {
 
                 usernameTv.text = getPlayerToCategoryChoice()
 
-                loadingFlow.observe(this@CategoryChoiceFragment) { isLoad ->
+                loadingFlow.observe { isLoad ->
                     progressBar.apply {
                         visibility = if (isLoad) {
                             View.VISIBLE
                         } else {
                             if (isQuestionsLoaded) {
                                 onPause = false
-                                findNavController()
-                                    .navigate(R.id.action_categoryChoiceFragment_to_questionFragment)
+                                findNavController().navigate(
+                                    CategoryChoiceFragmentDirections.actionCategoryChoiceFragmentToQuestionFragment()
+                                )
                             }
                             View.GONE
                         }
                     }
                 }
 
-                errorsChannel.receiveAsFlow().observe(this@CategoryChoiceFragment) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                errorsChannel.receiveAsFlow().observe {
+                    showError(it.message)
                 }
 
 

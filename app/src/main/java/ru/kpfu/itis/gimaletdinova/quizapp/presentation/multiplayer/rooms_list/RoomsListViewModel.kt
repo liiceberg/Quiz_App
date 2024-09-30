@@ -5,10 +5,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -29,31 +27,33 @@ class RoomsListViewModel @Inject constructor(
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate
 ) : ViewModel() {
 
-    private val _roomFlow = MutableSharedFlow<List<Room>>()
+    private val _roomFlow = MutableStateFlow<List<Room>>(emptyList())
     val roomFlow get() = _roomFlow
-    private var _currentRoomList: List<Room>? = null
-    val currentRoomList get() = _currentRoomList
+
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
+
+    private val _categoriesFlow = MutableStateFlow<CategoriesList?>(null)
+    val categoriesFlow get() = _categoriesFlow.asStateFlow()
+
     val errorsChannel = Channel<Throwable>()
 
     private var viewModelJob = Job()
     private val viewModelScope = CoroutineScope(Main + viewModelJob)
     private var isActive = true
-    suspend fun getCategoriesList(): CategoriesList? {
-        var categories: CategoriesList? = null
-        viewModelScope.async {
+
+    fun getCategoriesList() {
+        viewModelScope.launch {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
                 categoriesUseCase.invoke()
             }.onSuccess {
-                categories = it
-            }.onFailure { ex ->
-                errorsChannel.send(ex)
+                _categoriesFlow.value = it
+            }.onFailure {
+                _categoriesFlow.value = CategoriesList.empty()
             }
             _loadingFlow.value = false
-        }.await()
-        return categories
+        }
     }
 
     fun repeatCheckingRoomsForUpdates(allRooms: Boolean) {
@@ -62,7 +62,7 @@ class RoomsListViewModel @Inject constructor(
             while (this@RoomsListViewModel.isActive) {
                 getRoomList(allRooms)
                 if (this@RoomsListViewModel.isActive) {
-                    delay(100L)
+                    delay(REPEAT_CHECKING_INTERVAL)
                 }
             }
         }
@@ -76,10 +76,11 @@ class RoomsListViewModel @Inject constructor(
                 userInteractor.getRooms()
             }
         }.onSuccess {
-            roomFlow.emit(it)
-            _currentRoomList = it
+            _roomFlow.value = it
         }.onFailure { ex ->
+            stopRepeatWork()
             errorsChannel.send(ex)
+            _roomFlow.value = emptyList()
         }
     }
 
@@ -88,8 +89,12 @@ class RoomsListViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        isActive = false
+        stopRepeatWork()
         viewModelJob.cancel()
         errorsChannel.close()
+    }
+
+    companion object {
+        private const val REPEAT_CHECKING_INTERVAL = 1000L
     }
 }

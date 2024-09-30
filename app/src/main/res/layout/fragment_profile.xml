@@ -8,23 +8,26 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/username_tv"
         style="@style/TitleTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/theme_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/theme_btn"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="@id/username_edit_btn"
+        app:layout_constraintEnd_toStartOf="@id/theme_btn"
+        app:layout_constraintStart_toEndOf="@id/username_edit_btn"
+        app:layout_constraintTop_toTopOf="@id/username_edit_btn"
         tools:text="Username" />
 
     <ImageButton
         android:id="@+id/theme_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="@id/username_edit_btn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/username_edit_btn" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/username_edit_btn"
@@ -32,11 +35,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:backgroundTint="?attr/colorPrimaryVariant"
         android:text="@string/username_edit_bth_text"
-        app:layout_constraintBottom_toBottomOf="@id/username_tv"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/username_tv" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/username_et_layout"
@@ -57,6 +60,7 @@
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:inputType="text"
+            android:maxLength="30"
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -90,19 +94,19 @@
         android:layout_marginBottom="32dp"
         android:text="@string/back_btn"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logout_btn"
         style="@style/DefaultButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/pumpkin"
         android:layout_marginTop="32dp"
+        android:backgroundTint="@color/pumpkin"
         android:text="@string/logout_btn"
-        app:layout_constraintTop_toBottomOf="@id/total_questions_tv"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/total_questions_tv" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

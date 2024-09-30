@@ -1,6 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.util
 
-object Constants {
+object GameConfigConstants {
     const val EASY_LEVELS_NUMBER = 10
     const val MEDIUM_LEVELS_NUMBER = 20
     const val HARD_LEVELS_NUMBER = 20

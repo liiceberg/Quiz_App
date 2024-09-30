@@ -28,6 +28,12 @@ class UserInteractor @Inject constructor(
         }
     }
 
+    suspend fun getUserId(): Long {
+        return withContext(dispatcher) {
+            userRepository.getUserId()
+        }
+    }
+
     suspend fun setUsername(name: String) {
         return withContext(dispatcher) {
             userRepository.setUsername(name)
@@ -37,6 +43,12 @@ class UserInteractor @Inject constructor(
     suspend fun getRooms(): List<Room> {
         return withContext(dispatcher) {
             userRepository.getRooms()
+        }
+    }
+
+    suspend fun logout() {
+        return withContext(dispatcher) {
+            userRepository.logout()
         }
     }
 }

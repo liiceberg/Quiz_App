@@ -1,8 +1,6 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room
 
 import android.util.Log
-import androidx.datastore.DataStore
-import androidx.datastore.preferences.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -13,21 +11,25 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.BuildConfig
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.JwtManager
+import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message
+import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.RoomInteractor
-import ru.kpfu.itis.gimaletdinova.quizapp.util.PrefsKeys.USER_ID_KEY
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
+import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.JwtManager
+import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.HEADER_AUTHORIZATION
+import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.STOMP_CONNECTION_PATH
+import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.STOMP_SEND_PATH
+import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.STOMP_SUBSCRIBE_PATH
+import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.TOKEN_TYPE
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.LifecycleEvent
@@ -39,8 +41,9 @@ import javax.inject.Inject
 @HiltViewModel
 class RoomViewModel @Inject constructor(
     private val jwtManager: JwtManager,
-    private val prefs: DataStore<Preferences>,
-    private val roomInteractor: RoomInteractor
+    private val userInteractor: UserInteractor,
+    private val roomInteractor: RoomInteractor,
+    private val exceptionHandlerDelegate: ExceptionHandlerDelegate
 ) : ViewModel() {
 
     private var mStompClient: StompClient? = null
@@ -58,10 +61,11 @@ class RoomViewModel @Inject constructor(
     val joinFlow = MutableStateFlow(0)
     val exitFlow = MutableStateFlow(false)
     private var _room: String? = null
-    val room get() = _room
+    val room get() = _room ?: ""
 
     private var _players: List<String>? = null
     val players get() = _players
+
     val errorsChannel = Channel<Throwable>()
 
     private var viewModelJob = SupervisorJob()
@@ -71,20 +75,19 @@ class RoomViewModel @Inject constructor(
     fun initStomp(room: String?) {
         _room = room
         viewModelScope.launch {
-            _userId = prefs.data.map { it[USER_ID_KEY] }.first()
+            _userId = userInteractor.getUserId()
             val token = jwtManager.getAccessJwt()
-            val headerMap = Collections.singletonMap("Authorization", "Bearer $token")
+            val headerMap = Collections.singletonMap(HEADER_AUTHORIZATION, "$TOKEN_TYPE $token")
             mStompClient = Stomp.over(
                 Stomp.ConnectionProvider.OKHTTP,
-                BuildConfig.BASE_URL + "game-websocket/websocket",
+                BuildConfig.BASE_URL + STOMP_CONNECTION_PATH,
                 headerMap
             )
-            println(mStompClient)
 
             resetSubscriptions()
 
             if (mStompClient != null) {
-                val topicSubscribe = mStompClient!!.topic("/topic/game/$room")
+                val topicSubscribe = mStompClient!!.topic(STOMP_SUBSCRIBE_PATH + room)
                     .subscribeOn(Schedulers.io(), false)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ topicMessage: StompMessage ->
@@ -151,7 +154,8 @@ class RoomViewModel @Inject constructor(
     fun sendMessage(message: Message) {
         if (_room != null) {
             sendCompletable(
-                mStompClient!!.send("/app/game/$_room", gson.toJson(message)),
+                mStompClient!!.send(
+                    STOMP_SEND_PATH + _room, gson.toJson(message)),
                 message.code == Code.EXIT
             )
         }
@@ -189,8 +193,8 @@ class RoomViewModel @Inject constructor(
 
     fun getPlayers() {
         viewModelScope.launch {
-            runCatching {
-                room?.let { roomInteractor.getPlayers(it) }
+            runCatching(exceptionHandlerDelegate) {
+                roomInteractor.getPlayers(room)
             }.onSuccess {
                 _players = it
             }.onFailure {

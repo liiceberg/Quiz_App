@@ -1,48 +1,45 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.game
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
-import androidx.core.os.bundleOf
 import androidx.core.view.children
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentQuestionBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.CATEGORY_ID
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.LEVEL_NUMBER
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.MODE
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_NAMES
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Keys.PLAYERS_SCORES
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.OnBackPressedDuringGameCallback
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
-import ru.kpfu.itis.gimaletdinova.quizapp.util.OnBackPressed
 import ru.kpfu.itis.gimaletdinova.quizapp.util.getThemeColor
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
 
 @AndroidEntryPoint
-class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
-    override fun onBackPressed() {
-        if (questionViewModel.mode == Mode.ONLINE) {
-            navigateToResults()
-        } else {
-            activity?.onBackPressed()
-        }
-    }
+class QuestionFragment : BaseFragment(R.layout.fragment_question) {
 
     private val binding: FragmentQuestionBinding by viewBinding(
         FragmentQuestionBinding::bind
     )
 
     private val questionViewModel: QuestionViewModel by activityViewModels()
+    private val args by navArgs<QuestionFragmentArgs>()
+    private val categoryId by lazy { args.categoryId }
+    private val levelNumber by lazy { args.levelNumber }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            OnBackPressedDuringGameCallback(::onExitGame)
+        )
+
         binding.run {
 
             with(questionViewModel) {
@@ -69,7 +66,7 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
                 }
 
 
-                questionsFlow.observe(this@QuestionFragment) { q ->
+                questionsFlow.observe { q ->
                     q?.let {
                         usernameTv.text = getPlayer()
                         questionNumberTv.text =
@@ -90,12 +87,12 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
                                 (this as? Button)?.text = q.answers[i]
                             }
                         }
-                        println(q.correctAnswerPosition)
+                        Log.d("CORRECT ANSWER", q.correctAnswerPosition.toString())
                     }
 
                 }
 
-                timeFlow.observe(this@QuestionFragment) {
+                timeFlow.observe {
                     timerPb.progress = it
                     if (it == 0) {
                         lifecycleScope.launch {
@@ -124,7 +121,9 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
                 if (isGameOver()) {
                     finishGame()
                 } else {
-                    findNavController().navigate(R.id.action_questionFragment_to_categoryChoiceFragment)
+                    findNavController().navigate(
+                        QuestionFragmentDirections.actionQuestionFragmentToCategoryChoiceFragment()
+                    )
                 }
             }
         }
@@ -160,8 +159,8 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
         with(questionViewModel) {
             if (mode == Mode.SINGLE && scores.values.first() >= MIN_CORRECT_ANSWERS_NUMBER_TO_WIN) {
                 saveLevel(
-                    categoryId = requireArguments().getInt(CATEGORY_ID),
-                    levelNumber = requireArguments().getInt(LEVEL_NUMBER)
+                    categoryId = categoryId,
+                    levelNumber = levelNumber
                 )
             }
         }
@@ -173,25 +172,41 @@ class QuestionFragment : Fragment(R.layout.fragment_question), OnBackPressed {
 
             val playersNames = mutableListOf<String>()
             val playersScores = mutableListOf<Int>()
+
             scores.toList().sortedByDescending { it.second }.map {
                 playersNames.add(it.first)
                 playersScores.add(it.second)
             }
+
             val action = when (mode) {
-                Mode.SINGLE -> R.id.action_questionFragment_to_resultsFragment
-                Mode.MULTIPLAYER -> R.id.action_questionFragment_to_resultsFragment_multiplayer
-                Mode.ONLINE -> R.id.action_questionFragment_to_roomFragment
+                Mode.SINGLE -> QuestionFragmentDirections.actionQuestionFragmentToResultsFragment(
+                    mode,
+                    playersNames = playersNames.toTypedArray(),
+                    playersScores = playersScores.toIntArray(),
+                    categoryId = categoryId,
+                    levelNumber = levelNumber
+                )
+
+                Mode.MULTIPLAYER -> QuestionFragmentDirections.actionQuestionFragmentToResultsFragmentMultiplayer(
+                    mode,
+                    playersNames.toTypedArray(),
+                    playersScores.toIntArray()
+                )
+
+                Mode.ONLINE -> QuestionFragmentDirections.actionQuestionFragmentToRoomFragment(
+                    playersScores = playersScores.toIntArray()
+                )
             }
             findNavController().navigate(
-                action,
-                bundleOf(
-                    MODE to mode,
-                    PLAYERS_NAMES to playersNames,
-                    PLAYERS_SCORES to playersScores,
-                    CATEGORY_ID to arguments?.getInt(CATEGORY_ID),
-                    LEVEL_NUMBER to arguments?.getInt(LEVEL_NUMBER),
-                )
+                action
             )
+        }
+    }
+
+    private fun onExitGame() {
+        when (questionViewModel.mode) {
+            Mode.ONLINE -> navigateToResults()
+            else -> findNavController().popBackStack()
         }
     }
 

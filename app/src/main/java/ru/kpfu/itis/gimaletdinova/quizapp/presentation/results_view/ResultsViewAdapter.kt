@@ -8,6 +8,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemQuestionBinding
 
 class ResultsViewAdapter(private val items: List<QuestionEntity>) :
     RecyclerView.Adapter<ResultsViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultsViewHolder {
         return ResultsViewHolder(
             ItemQuestionBinding.inflate(LayoutInflater.from(parent.context), parent, false)

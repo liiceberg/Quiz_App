@@ -3,7 +3,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.create_room
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,30 +21,30 @@ class CreateRoomViewModel @Inject constructor(
     private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
     private val roomInteractor: RoomInteractor
 ) : ViewModel() {
+
     private val _categoriesFlow = MutableStateFlow<CategoriesList?>(null)
     val categoriesFlow get() = _categoriesFlow
 
     private val _loadingFlow = MutableStateFlow(false)
     val loadingFlow get() = _loadingFlow.asStateFlow()
+
+    private val _createRoomFlow = MutableStateFlow<String?>(null)
+    val createRoomFlow get() = _createRoomFlow.asStateFlow()
+
     val errorsChannel = Channel<Throwable>()
-    suspend fun create(
-        playersNumber: Int,
-        categoryId: Int?,
-        difficulty: LevelDifficulty?
-    ): String? {
-        var code: String? = null
-        viewModelScope.async {
+
+    fun create(playersNumber: Int, categoryId: Int?, difficulty: LevelDifficulty?) {
+        viewModelScope.launch {
             _loadingFlow.value = true
             runCatching(exceptionHandlerDelegate) {
                 roomInteractor.createRoom(playersNumber, categoryId, difficulty)
             }.onSuccess {
-                code = it
+                _createRoomFlow.value = it
             }.onFailure {
                 errorsChannel.send(it)
             }
-        }.await()
-        _loadingFlow.value = false
-        return code
+            _loadingFlow.value = false
+        }
     }
 
     fun getCategoriesList() {

@@ -3,44 +3,37 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.authorization
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
+import ru.kpfu.itis.gimaletdinova.quizapp.data.exceptions.AppException
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentSignUpBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+
 
 @AndroidEntryPoint
-class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
+class SignUpFragment : BaseFragment(R.layout.fragment_sign_up) {
 
     private val binding: FragmentSignUpBinding by viewBinding(FragmentSignUpBinding::bind)
-    private val viewModel: SignUpViewModel by viewModels()
+    private val signUpViewModel: SignUpViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
 
             signUpBtn.setOnClickListener {
-                lifecycleScope.launch {
-                    if (validate()) {
-                        if (viewModel.save(emailEt.text.toString(), passwordEt.text.toString())) {
-
-                            Toast.makeText(context, R.string.account_created, Toast.LENGTH_SHORT)
-                                .show()
-
-                            findNavController().navigate(R.id.action_signUpFragment_to_signInFragment)
-
-                        }
-                    }
+                if (validate()) {
+                    signUpViewModel.save(
+                        emailEt.text.toString(),
+                        passwordEt.text.toString()
+                    )
                 }
             }
 
-            with(viewModel) {
-                loadingFlow.observe(this@SignUpFragment) { isLoad ->
+            with(signUpViewModel) {
+                loadingFlow.observe { isLoad ->
                     progressBar.apply {
                         visibility = if (isLoad) {
                             View.VISIBLE
@@ -50,8 +43,25 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                     }
                     signUpBtn.isEnabled = isLoad.not()
                 }
-                errorsChannel.receiveAsFlow().observe(this@SignUpFragment) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                signedInFlow.observe { isSignedIn ->
+                    if (isSignedIn) {
+
+                        Toast.makeText(
+                            context,
+                            R.string.account_created,
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        findNavController().navigate(
+                            SignUpFragmentDirections.actionSignUpFragmentToSignInFragment()
+                        )
+                    }
+                }
+                errorsChannel.receiveAsFlow().observe { error ->
+                    when(error) {
+                        is AppException.SuchEmailAlreadyRegistered -> emailTil.error = error.message
+                        else -> showError(error.message)
+                    }
                 }
             }
         }
@@ -59,33 +69,26 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
 
     private fun validate(): Boolean {
         with(binding) {
-            val email = emailEt.text.toString().trim()
-            if (email.isEmpty() ||
-                email.matches(Regex("\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*\\.\\w{2,4}")).not()) {
-                emailTil.error = getString(R.string.email_error)
+
+            val emailValidation = signUpViewModel.validateEmail(
+                emailEt.text.toString().trim()
+            )
+            emailTil.error = emailValidation.error
+            if (emailValidation.isValid.not()) {
                 return false
             }
-            emailTil.error = null
+
             val password = passwordEt.text.toString().trim()
-            if (password.matches(Regex("\\w{8,}")).not()) {
-                passwordTil.error = getString(R.string.password_length_error)
+            val passwordValidator = signUpViewModel.validatePassword(
+                password
+            )
+            passwordTil.error = passwordValidator.error
+            if (passwordValidator.isValid.not()) {
                 return false
             }
-            if (password.matches(Regex(".*[A-Z].*")).not()) {
-                passwordTil.error = getString(R.string.password_upper_case_char_error)
-                return false
-            }
-            if (password.matches(Regex(".*[a-z].*")).not()) {
-                passwordTil.error = getString(R.string.password_lower_case_char_error)
-                return false
-            }
-            if (password.matches(Regex(".*\\d.*")).not()) {
-                passwordTil.error = getString(R.string.password_digit_char_error)
-                return false
-            }
-            passwordTil.error = null
+
             val repeatPassword = repeatPasswordEt.text.toString().trim()
-            if(password != repeatPassword) {
+            if (password != repeatPassword) {
                 repeatPasswordTil.error = getString(R.string.passwords_not_equals_error)
                 return false
             }

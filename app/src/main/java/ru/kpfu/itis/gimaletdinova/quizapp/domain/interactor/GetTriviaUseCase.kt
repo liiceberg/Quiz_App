@@ -6,7 +6,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.QuestionType
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.QuestionsList
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.TriviaRepository
-import ru.kpfu.itis.gimaletdinova.quizapp.util.Constants
+import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants
 import javax.inject.Inject
 
 class GetTriviaUseCase @Inject constructor(
@@ -14,7 +14,7 @@ class GetTriviaUseCase @Inject constructor(
     private val repository: TriviaRepository
 ) {
     suspend operator fun invoke(
-        amount: Int = Constants.QUESTIONS_NUMBER,
+        amount: Int = GameConfigConstants.QUESTIONS_NUMBER,
         categoryId: Int,
         difficulty: LevelDifficulty,
         type: QuestionType = QuestionType.MULTIPLE_CHOICE

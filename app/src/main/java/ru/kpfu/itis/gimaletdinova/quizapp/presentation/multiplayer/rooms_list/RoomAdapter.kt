@@ -11,8 +11,9 @@ import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
 class RoomAdapter(
     diffCallback: DiffUtil.ItemCallback<Room>,
     private val onItemClicked: ((Room) -> Unit),
-    private val categoriesList: CategoriesList?
+    private val categoriesList: CategoriesList
 ): ListAdapter<Room, RoomHolder>(diffCallback) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomHolder =
         RoomHolder(
             ItemRoomBinding.inflate(LayoutInflater.from(parent.context), parent, false),

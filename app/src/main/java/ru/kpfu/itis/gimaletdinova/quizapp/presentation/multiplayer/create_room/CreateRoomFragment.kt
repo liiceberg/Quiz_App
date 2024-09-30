@@ -6,22 +6,22 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SeekBar
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty
-import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty.*
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty.EASY
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty.HARD
+import ru.kpfu.itis.gimaletdinova.quizapp.data.model.enums.LevelDifficulty.MEDIUM
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentCreateRoomBinding
-import ru.kpfu.itis.gimaletdinova.quizapp.util.observe
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
+
 
 @AndroidEntryPoint
-class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
+class CreateRoomFragment : BaseFragment(R.layout.fragment_create_room) {
 
     private val binding: FragmentCreateRoomBinding by viewBinding(FragmentCreateRoomBinding::bind)
     private val createRoomViewModel: CreateRoomViewModel by viewModels()
@@ -38,21 +38,11 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
                 var category: Int? = null
 
                 createBtn.setOnClickListener {
-                    lifecycleScope.launch {
-                        val code = create(
-                            playersNumber = playersNumberTv.text.toString().toInt(),
-                            categoryId = category,
-                            difficulty = difficulty
-                        )
-                        if (code != null) {
-                            findNavController().navigate(R.id.action_createRoomFragment_to_roomsListContainerFragment)
-                            Toast.makeText(
-                                context,
-                                getString(R.string.room_created, code),
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
+                    create(
+                        playersNumber = playersNumberTv.text.toString().toInt(),
+                        categoryId = category,
+                        difficulty = difficulty
+                    )
                 }
 
                 playersNumberTv.text = numberSb.progress.toString()
@@ -82,7 +72,7 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
 
 
 
-                loadingFlow.observe(this@CreateRoomFragment) { isLoad ->
+                loadingFlow.observe { isLoad ->
                     binding.progressBar.apply {
                         visibility = if (isLoad) {
                             View.VISIBLE
@@ -91,12 +81,12 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
                         }
                     }
                 }
-                categoriesFlow.observe(this@CreateRoomFragment) {
+                categoriesFlow.observe {
                     it?.let {
                         categoriesSpinner.apply {
 
                             val list = mutableListOf<String>()
-                            list.add("No category selected")
+                            list.add(getString(R.string.unselected_category))
 
                             list.addAll(it.categoriesList.map { model -> model.displayName })
 
@@ -124,8 +114,21 @@ class CreateRoomFragment : Fragment(R.layout.fragment_create_room) {
                     }
                 }
 
-                errorsChannel.receiveAsFlow().observe(this@CreateRoomFragment) {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                createRoomFlow.observe { code ->
+                    if (code != null) {
+                        findNavController().navigate(
+                            CreateRoomFragmentDirections.actionCreateRoomFragmentToRoomsListContainerFragment()
+                        )
+                        Toast.makeText(
+                            context,
+                            getString(R.string.room_created, code),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
+                errorsChannel.receiveAsFlow().observe {
+                    showError(it.message)
                 }
 
             }

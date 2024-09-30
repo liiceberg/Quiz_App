@@ -6,12 +6,13 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.ItemInputBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer_local_options.model.InputModel
-import ru.kpfu.itis.gimaletdinova.quizapp.util.ValidationUtil
+import ru.kpfu.itis.gimaletdinova.quizapp.util.Validator
 import ru.kpfu.itis.gimaletdinova.quizapp.util.hideKeyboard
 
 class InputHolder(
     private val binding: ItemInputBinding,
-    private val onTextChanged: ((InputModel) -> Unit)
+    private val onTextChanged: ((InputModel) -> Unit),
+    private val validate: (String) -> Validator.ValidationResult
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var item: InputModel? = null
@@ -21,14 +22,10 @@ class InputHolder(
             addTextChangedListener {
                 item?.let { input ->
                     val name = text.toString()
-                    input.isCorrect = ValidationUtil.validateName(name)
+                    val validationResult = validate(name)
+                    input.isCorrect = validationResult.isValid
                     if (input.isCorrect.not()) {
-                        if (name.trim().isEmpty()) {
-                            error = context.getString(R.string.empty_username_error)
-                        } else if (name.matches(Regex("[A-Za-z]+")).not()) {
-                            error = context.getString(R.string.incorrect_username_error)
-                        }
-
+                        error = validationResult.error
                     }
                     input.text = name
                     onTextChanged(input)
@@ -37,7 +34,7 @@ class InputHolder(
                 setOnEditorActionListener { _, actionId, _ ->
                     when (actionId) {
                         EditorInfo.IME_ACTION_DONE -> {
-                            hideKeyboard(context, rootView)
+                            rootView.hideKeyboard()
                             clearFocus()
                         }
                     }
@@ -52,6 +49,10 @@ class InputHolder(
         with(binding) {
             usernameEtLayout.hint =
                 root.context.getString(R.string.player_input_hint, item.position)
+
+            if (item.isCorrect.not()) {
+                usernameEt.error = validate(item.text).error
+            }
         }
     }
 
