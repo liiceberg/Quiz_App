@@ -1,65 +1,58 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.kpfu.itis.gimaletdinova.quizapp.BuildConfig
 import ru.kpfu.itis.gimaletdinova.quizapp.data.ExceptionHandlerDelegate
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.RoomStompClient
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message
+import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message.Code
 import ru.kpfu.itis.gimaletdinova.quizapp.data.runCatching
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.RoomInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
-import ru.kpfu.itis.gimaletdinova.quizapp.domain.repository.JwtManager
-import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.HEADER_AUTHORIZATION
-import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.STOMP_CONNECTION_PATH
-import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.STOMP_SEND_PATH
-import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.STOMP_SUBSCRIBE_PATH
-import ru.kpfu.itis.gimaletdinova.quizapp.util.NetworkConstants.TOKEN_TYPE
-import ua.naiksoftware.stomp.Stomp
-import ua.naiksoftware.stomp.StompClient
-import ua.naiksoftware.stomp.dto.LifecycleEvent
+import ru.kpfu.itis.gimaletdinova.quizapp.util.WorkRepeater
 import ua.naiksoftware.stomp.dto.StompMessage
-import java.util.Collections
 import javax.inject.Inject
 
 
 @HiltViewModel
 class RoomViewModel @Inject constructor(
-    private val jwtManager: JwtManager,
     private val userInteractor: UserInteractor,
     private val roomInteractor: RoomInteractor,
-    private val exceptionHandlerDelegate: ExceptionHandlerDelegate
+    private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
+    private val stompClient: RoomStompClient,
+    private val workRepeater: WorkRepeater
 ) : ViewModel() {
 
-    private var mStompClient: StompClient? = null
-    var initialized = false
-    private var compositeDisposable: CompositeDisposable? = null
-    private val gson = Gson()
+    private var _initialized = false
+    val initialized get() = _initialized
 
-    private var _userId: Long? = -1
-    val userId get() = _userId
+    private var userId: Long = -1
 
-    val messages = mutableListOf<String>()
-    val messageFlow = MutableSharedFlow<List<String>>()
-    val waitFlow = MutableStateFlow(-1)
-    val resultsWaitFlow = MutableStateFlow(-1)
-    val joinFlow = MutableStateFlow(0)
-    val exitFlow = MutableStateFlow(false)
+    private val _messages = mutableListOf<String>()
+    val messages get() = _messages.toList()
+
+    private val _messageFlow = MutableSharedFlow<String>()
+    val messageFlow get() = _messageFlow.asSharedFlow()
+    
+    private val _unreadyPlayersNumberFlow = MutableStateFlow(UNREADY_PLAYERS_INIT_VALUE)
+    val unreadyPlayersNumberFlow get() = _unreadyPlayersNumberFlow.asStateFlow()
+
+    private val _notFinishedPlayersNumberFlow = MutableStateFlow(NOT_FINISHED_PLAYERS_INIT_VALUE)
+    val notFinishedPlayersNumberFlow get() = _notFinishedPlayersNumberFlow.asStateFlow()
+    
+    private val _remainingCapacityFlow = MutableStateFlow(REMAINING_CAPACITY_INIT_VALUE)
+    val remainingCapacityFlow get() = _remainingCapacityFlow.asStateFlow()
+    
+    private val _exitFlow = MutableStateFlow(false)
+    val exitFlow get() = _exitFlow.asStateFlow()
+    
     private var _room: String? = null
     val room get() = _room ?: ""
 
@@ -68,127 +61,25 @@ class RoomViewModel @Inject constructor(
 
     val errorsChannel = Channel<Throwable>()
 
-    private var viewModelJob = SupervisorJob()
-    private val viewModelScopeWithJob = CoroutineScope(Dispatchers.Main + viewModelJob)
-    private var isActive = true
-
-    fun initStomp(room: String?) {
+    fun initStomp(room: String) {
         _room = room
         viewModelScope.launch {
-            _userId = userInteractor.getUserId()
-            val token = jwtManager.getAccessJwt()
-            val headerMap = Collections.singletonMap(HEADER_AUTHORIZATION, "$TOKEN_TYPE $token")
-            mStompClient = Stomp.over(
-                Stomp.ConnectionProvider.OKHTTP,
-                BuildConfig.BASE_URL + STOMP_CONNECTION_PATH,
-                headerMap
+            userId = userInteractor.getUserId()
+            stompClient.init(
+                ::onReceiveMessage,
+                ::onSendMessage,
+                ::onSendMessageError,
+                room,
+                userId
             )
-
-            resetSubscriptions()
-
-            if (mStompClient != null) {
-                val topicSubscribe = mStompClient!!.topic(STOMP_SUBSCRIBE_PATH + room)
-                    .subscribeOn(Schedulers.io(), false)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ topicMessage: StompMessage ->
-                        val message = gson.fromJson(topicMessage.payload, Message::class.java)
-                        message.run {
-                            this.message?.let {
-                                messages.add(it)
-                                viewModelScope.launch {
-                                    messageFlow.emit(messages)
-                                }
-                            }
-                            wait?.let {
-                                when (code) {
-                                    Code.READY -> waitFlow.value = it
-                                    Code.SCORE -> resultsWaitFlow.value = it
-                                    Code.JOIN -> joinFlow.value = it
-                                    else -> {}
-                                }
-                            }
-                        }
-                    },
-                        {
-                            Log.e("ERROR TAG", "Error!", it)
-                        }
-                    )
-
-                val lifecycleSubscribe = mStompClient!!.lifecycle()
-                    .subscribeOn(Schedulers.io(), false)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { lifecycleEvent: LifecycleEvent ->
-                        when (lifecycleEvent.type!!) {
-                            LifecycleEvent.Type.OPENED -> Log.d("TAG", "Stomp connection opened")
-                            LifecycleEvent.Type.ERROR -> Log.e(
-                                "TAG",
-                                "Error",
-                                lifecycleEvent.exception
-                            )
-
-                            LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT,
-                            LifecycleEvent.Type.CLOSED -> {
-                                Log.d("TAG", "Stomp connection closed")
-                            }
-                        }
-                    }
-
-                compositeDisposable!!.add(lifecycleSubscribe)
-                compositeDisposable!!.add(topicSubscribe)
-
-                if (!mStompClient!!.isConnected) {
-                    mStompClient!!.connect()
-                    sendMessage(
-                        Message(sender = _userId, code = Code.JOIN)
-                    )
-                }
-
-                sendAliveMessage()
-            } else {
-                Log.e("TAG", "mStompClient is null!")
-            }
-            initialized = true
+            workRepeater.doRepeatWork(ALIVE_MESSAGE_SEND_INTERVAL, ::sendAliveMessage)
         }
+        _initialized = true
     }
 
-    fun sendMessage(message: Message) {
-        if (_room != null) {
-            sendCompletable(
-                mStompClient!!.send(
-                    STOMP_SEND_PATH + _room, gson.toJson(message)),
-                message.code == Code.EXIT
-            )
-        }
-    }
-
-    private fun sendCompletable(request: Completable, exit: Boolean) {
-        compositeDisposable?.add(
-            request.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    {
-                        Log.i("TAG", "Stomp send")
-                        if (exit) exitFlow.value = true
-                    },
-                    {
-                        Log.e("TAG", "Stomp error", it)
-                        viewModelScope.launch {
-                            errorsChannel.send(it)
-                        }
-                    }
-                )
-        )
-    }
-
-    private fun resetSubscriptions() {
-        if (compositeDisposable != null) {
-            compositeDisposable!!.dispose()
-        }
-        compositeDisposable = CompositeDisposable()
-    }
 
     fun exit() {
-        sendMessage(Message(sender = _userId, code = Code.EXIT))
+        stompClient.sendMessage(Message(sender = userId, code = Code.EXIT))
     }
 
     fun getPlayers() {
@@ -204,38 +95,86 @@ class RoomViewModel @Inject constructor(
     }
 
     private fun sendAliveMessage() {
-        isActive = true
-        viewModelScopeWithJob.launch {
-            while (this@RoomViewModel.isActive) {
-                sendMessage(Message(_userId, Code.ALIVE))
-                if (this@RoomViewModel.isActive) {
-                    delay(ALIVE_MESSAGE_SEND_INTERVAL)
+        stompClient.sendMessage(Message(userId, Code.ALIVE))
+    }
+
+    fun sendScores(scores: Int) {
+        stompClient.sendMessage(
+            Message(sender = userId, code = Code.SCORE, score = scores)
+        )
+    }
+
+    fun sendReadyMessage() {
+        stompClient.sendMessage(Message(userId, Code.READY))
+    }
+
+    fun resetUnreadyPlayersNumber() {
+        _unreadyPlayersNumberFlow.value = UNREADY_PLAYERS_INIT_VALUE
+    }
+
+    fun resetNotFinishedPlayersNumber() {
+        _notFinishedPlayersNumberFlow.value = NOT_FINISHED_PLAYERS_INIT_VALUE
+    }
+
+    private fun resetJoinFlow() {
+        _remainingCapacityFlow.value = REMAINING_CAPACITY_INIT_VALUE
+    }
+
+    private fun onReceiveMessage(topicMessage: StompMessage) {
+        Message.fromJson(topicMessage.payload).run {
+            message?.let {
+                viewModelScope.launch {
+                    _messageFlow.emit(message)
+                    _messages.add(message)
+                }
+            }
+            wait?.let {
+                when (code) {
+                    Code.READY -> _unreadyPlayersNumberFlow.value = it
+                    Code.SCORE -> _notFinishedPlayersNumberFlow.value = it
+                    Code.JOIN -> _remainingCapacityFlow.value = it
+                    else -> {}
                 }
             }
         }
     }
 
+    private fun onSendMessage(message: Message) {
+        if (message.code == Code.EXIT) {
+            _exitFlow.value = true
+        }
+    }
+
+    private fun onSendMessageError(error: Throwable) {
+        viewModelScope.launch {
+            errorsChannel.send(error)
+        }
+    }
+
     fun clear() {
-        isActive = false
-        viewModelJob.cancel()
-        viewModelJob = SupervisorJob()
-        mStompClient?.disconnect()
-        compositeDisposable?.dispose()
-        mStompClient = null
-        initialized = false
-        messages.clear()
-        exitFlow.value = false
-        resultsWaitFlow.value = -1
-        waitFlow.value = -1
-        joinFlow.value = 0
+        workRepeater.stopRepeatWork()
+        stompClient.close()
+        _initialized = false
+        _messages.clear()
+        resetNotFinishedPlayersNumber()
+        resetUnreadyPlayersNumber()
+        resetJoinFlow()
+        _exitFlow.value = false
     }
 
     override fun onCleared() {
+        workRepeater.cancel()
+        errorsChannel.close()
+        stompClient.close()
         clear()
     }
 
     companion object {
         private const val ALIVE_MESSAGE_SEND_INTERVAL = 10_000L
+
+        private const val UNREADY_PLAYERS_INIT_VALUE = -1
+        private const val NOT_FINISHED_PLAYERS_INIT_VALUE = -1
+        private const val REMAINING_CAPACITY_INIT_VALUE = 0
     }
 
 }

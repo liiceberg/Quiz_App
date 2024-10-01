@@ -51,6 +51,7 @@
     <string name="no_rooms">The available rooms will be displayed here</string>
     <string name="dialog_error_title">Oops.. Some error occurred</string>
     <string name="try_again">Try again</string>
+    <string name="loading">Loading… Please, wait</string>
 
 
         <!--    EditText    -->
@@ -76,5 +77,6 @@
     <string name="data_loading_error">The data could not be uploaded. Please, check your internet connection and try again.</string>
     <string name="unauthorized_error">Your session is outdated. Please, reauthorize.</string>
     <string name="unknown_error">An unexpected error occurred. Please, try again later.</string>
+    <string name="game_start_loading_title_text">Game will start right now</string>
 
 </resources>

@@ -1,12 +1,9 @@
 package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.rooms_list
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -17,6 +14,7 @@ import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.GetCategoriesUseCase
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.RoomInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.interactor.UserInteractor
 import ru.kpfu.itis.gimaletdinova.quizapp.domain.model.CategoriesList
+import ru.kpfu.itis.gimaletdinova.quizapp.util.WorkRepeater
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,10 +22,11 @@ class RoomsListViewModel @Inject constructor(
     private val roomInteractor: RoomInteractor,
     private val userInteractor: UserInteractor,
     private val categoriesUseCase: GetCategoriesUseCase,
-    private val exceptionHandlerDelegate: ExceptionHandlerDelegate
+    private val exceptionHandlerDelegate: ExceptionHandlerDelegate,
+    private val workRepeater: WorkRepeater
 ) : ViewModel() {
 
-    private val _roomFlow = MutableStateFlow<List<Room>>(emptyList())
+    private val _roomFlow = MutableStateFlow<List<Room>?>(null)
     val roomFlow get() = _roomFlow
 
     private val _loadingFlow = MutableStateFlow(false)
@@ -37,10 +36,6 @@ class RoomsListViewModel @Inject constructor(
     val categoriesFlow get() = _categoriesFlow.asStateFlow()
 
     val errorsChannel = Channel<Throwable>()
-
-    private var viewModelJob = Job()
-    private val viewModelScope = CoroutineScope(Main + viewModelJob)
-    private var isActive = true
 
     fun getCategoriesList() {
         viewModelScope.launch {
@@ -57,24 +52,29 @@ class RoomsListViewModel @Inject constructor(
     }
 
     fun repeatCheckingRoomsForUpdates(allRooms: Boolean) {
-        isActive = true
-        viewModelScope.launch {
-            while (this@RoomsListViewModel.isActive) {
-                getRoomList(allRooms)
-                if (this@RoomsListViewModel.isActive) {
-                    delay(REPEAT_CHECKING_INTERVAL)
-                }
-            }
+        val function = if (allRooms) {
+            ::getAllRooms
+        } else {
+            ::getUserRooms
+        }
+        workRepeater.doRepeatWork(REPEAT_CHECKING_INTERVAL, function)
+    }
+
+    private suspend inline fun getAllRooms() {
+        runCatching(exceptionHandlerDelegate) {
+            roomInteractor.getAll()
+        }.onSuccess {
+            _roomFlow.value = it
+        }.onFailure { ex ->
+            stopRepeatWork()
+            errorsChannel.send(ex)
+            _roomFlow.value = emptyList()
         }
     }
 
-    private suspend fun getRoomList(allRooms: Boolean) {
+    private suspend inline fun getUserRooms() {
         runCatching(exceptionHandlerDelegate) {
-            if (allRooms) {
-                roomInteractor.getAll()
-            } else {
-                userInteractor.getRooms()
-            }
+            userInteractor.getRooms()
         }.onSuccess {
             _roomFlow.value = it
         }.onFailure { ex ->
@@ -85,12 +85,11 @@ class RoomsListViewModel @Inject constructor(
     }
 
     fun stopRepeatWork() {
-        isActive = false
+        workRepeater.stopRepeatWork()
     }
 
     override fun onCleared() {
-        stopRepeatWork()
-        viewModelJob.cancel()
+        workRepeater.cancel()
         errorsChannel.close()
     }
 
