@@ -133,7 +133,6 @@
             <argument
                 android:name="mode"
                 app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
-
             <argument
                 android:name="categoryId"
                 app:argType="integer" />
@@ -160,7 +159,8 @@
             android:id="@+id/action_questionFragment_to_roomFragment"
             app:destination="@id/roomFragment"
             app:popUpTo="@id/roomFragment"
-            app:popUpToInclusive="true">
+            app:popUpToInclusive="true"
+            app:restoreState="false">
             <argument
                 android:name="playersScores"
                 app:argType="integer[]" />
@@ -363,18 +363,16 @@
             app:argType="integer[]"
             app:nullable="true" />
         <action
-            android:id="@+id/action_roomFragment_to_questionFragment"
-            app:destination="@id/questionFragment" />
-        <action
-            android:id="@+id/action_roomFragment_to_roomsListContainerFragment"
-            app:destination="@id/roomsListContainerFragment"
-            app:popUpTo="@id/roomsListContainerFragment"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_roomFragment_to_loadingFragment"
+            app:destination="@id/loadingFragment" >
+            <argument
+                android:name="room"
+                app:argType="string"/>
+        </action>
         <action
             android:id="@+id/action_roomFragment_to_resultsFragment"
             app:destination="@id/resultsFragment"
-            app:popUpTo="@id/roomFragment"
-            app:popUpToInclusive="true">
+            app:popUpTo="@id/roomFragment">
             <argument
                 android:name="mode"
                 app:argType="ru.kpfu.itis.gimaletdinova.quizapp.util.Mode" />
@@ -382,6 +380,18 @@
                 android:name="roomCode"
                 app:argType="string" />
         </action>
+    </fragment>
+    <fragment android:id="@+id/loadingFragment"
+        android:name="ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room.LoadingFragment"
+        android:label="LoadingFragment"
+        tools:layout="@layout/fragment_loading">
+        <argument
+            android:name="room"
+            app:argType="string"/>
+        <action
+            android:id="@+id/action_loadingFragment_to_questionFragment"
+            app:destination="@id/questionFragment"
+            app:popUpTo="@id/roomFragment"/>
     </fragment>
 
 </navigation>

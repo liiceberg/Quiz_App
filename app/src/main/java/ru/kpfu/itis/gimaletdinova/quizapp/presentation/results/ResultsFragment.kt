@@ -2,7 +2,6 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.results
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -14,8 +13,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import ru.kpfu.itis.gimaletdinova.quizapp.R
 import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.response.Score
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentResultsBinding
+import ru.kpfu.itis.gimaletdinova.quizapp.presentation.OnBackPressedDuringGameCallback
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room.RoomViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants
 import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.LEVELS_NUMBER
 import ru.kpfu.itis.gimaletdinova.quizapp.util.GameConfigConstants.MIN_CORRECT_ANSWERS_NUMBER_TO_WIN
@@ -29,7 +28,6 @@ class ResultsFragment : BaseFragment(R.layout.fragment_results) {
         FragmentResultsBinding::bind
     )
     private val resultsViewModel: ResultsViewModel by viewModels()
-    private val roomViewModel: RoomViewModel by activityViewModels()
     private val args by navArgs<ResultsFragmentArgs>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -109,6 +107,15 @@ class ResultsFragment : BaseFragment(R.layout.fragment_results) {
                 }
 
                 Mode.ONLINE -> {
+                    requireActivity().onBackPressedDispatcher.addCallback(
+                        viewLifecycleOwner,
+                        OnBackPressedDuringGameCallback {
+                            findNavController().navigate(
+                                ResultsFragmentDirections.actionResultsFragmentToRoomFragment()
+                            )
+                        }
+                    )
+
                     gameStatusTitleTv.visibility = View.GONE
                     resultsTv.visibility = View.GONE
                     imageIv.visibility = View.GONE
@@ -133,18 +140,7 @@ class ResultsFragment : BaseFragment(R.layout.fragment_results) {
                         )
                     }
 
-                    exitBtn.setOnClickListener {
-                        roomViewModel.exit()
-                    }
-
-                    roomViewModel.exitFlow.observe { exited ->
-                        if (exited) {
-                            roomViewModel.clear()
-                            findNavController().navigate(
-                                ResultsFragmentDirections.actionResultsFragmentToStartFragment()
-                            )
-                        }
-                    }
+                    exitBtn.visibility = View.GONE
 
                     resultsViewModel.errorsChannel.receiveAsFlow().observe {
                         showError(it.message)

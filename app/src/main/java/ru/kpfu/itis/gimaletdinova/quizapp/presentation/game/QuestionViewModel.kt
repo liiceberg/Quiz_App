@@ -104,17 +104,18 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    suspend fun getQuestions(room: String) {
-        _loadingFlow.value = true
-        runCatching(exceptionHandlerDelegate) {
-            roomInteractor.getGameContent(room)
-        }.onSuccess {
-            questionsList = it
-        }.onFailure { ex ->
-            errorsChannel.send(ex)
-        }
-        _loadingFlow.value = false
-
+     fun getQuestions(room: String) {
+         viewModelScope.launch {
+             _loadingFlow.value = true
+             runCatching(exceptionHandlerDelegate) {
+                 roomInteractor.getGameContent(room)
+             }.onSuccess {
+                 questionsList = it
+             }.onFailure { ex ->
+                 errorsChannel.send(ex)
+             }
+             _loadingFlow.value = false
+         }
     }
 
     fun saveLevel(categoryId: Int, levelNumber: Int) {
@@ -195,7 +196,8 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun saveScores(player: String) {
-        scores[player] = scores.getValue(player) + 1
+        val saved = scores[player] ?: 0
+        scores[player] = saved + 1
     }
 
     fun saveUserAnswer(position: Int) {

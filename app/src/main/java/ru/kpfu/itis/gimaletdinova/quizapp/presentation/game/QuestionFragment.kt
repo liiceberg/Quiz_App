@@ -95,35 +95,35 @@ class QuestionFragment : BaseFragment(R.layout.fragment_question) {
                 timeFlow.observe {
                     timerPb.progress = it
                     if (it == 0) {
-                        lifecycleScope.launch {
-                            verifyAnswer(-1)
-                        }
+                        verifyAnswer(-1)
                     }
                 }
             }
         }
     }
 
-    private suspend fun verifyAnswer(userAnswerPosition: Int) {
-        with(questionViewModel) {
-            if (mode == Mode.SINGLE) saveUserAnswer(userAnswerPosition)
+    private fun verifyAnswer(userAnswerPosition: Int) {
+        lifecycleScope.launch {
+            with(questionViewModel) {
+                if (mode == Mode.SINGLE) saveUserAnswer(userAnswerPosition)
 
-            val correctAnswerPosition = questionsFlow.value?.correctAnswerPosition
-            setAnswerColor(userAnswerPosition, correctAnswerPosition)
+                val correctAnswerPosition = questionsFlow.value?.correctAnswerPosition
+                setAnswerColor(userAnswerPosition, correctAnswerPosition)
 
-            if (userAnswerPosition == correctAnswerPosition) {
-                saveScores(binding.usernameTv.text.toString())
-            }
+                if (userAnswerPosition == correctAnswerPosition) {
+                    saveScores(binding.usernameTv.text.toString())
+                }
 
-            delay(1_000)
-            updateTimer()
-            if (timeFlow.value == -1) {
-                if (isGameOver()) {
-                    finishGame()
-                } else {
-                    findNavController().navigate(
-                        QuestionFragmentDirections.actionQuestionFragmentToCategoryChoiceFragment()
-                    )
+                delay(1_000)
+                updateTimer()
+                if (timeFlow.value == -1) {
+                    if (isGameOver()) {
+                        finishGame()
+                    } else {
+                        findNavController().navigate(
+                            QuestionFragmentDirections.actionQuestionFragmentToCategoryChoiceFragment()
+                        )
+                    }
                 }
             }
         }

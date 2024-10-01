@@ -46,13 +46,13 @@ class RoomsListFragment : BaseFragment(R.layout.fragment_rooms_list) {
 
 
             loadingFlow.observe { isLoad ->
-                binding.progressBar.apply {
-                    visibility = if (isLoad) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
+                binding.run {
+                    progressBar.visibility = if (isLoad) {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
+                        }
                     }
-                }
             }
 
             categoriesFlow.observe { categories ->
@@ -63,11 +63,13 @@ class RoomsListFragment : BaseFragment(R.layout.fragment_rooms_list) {
             }
 
             roomFlow.observe { roomsList ->
-                if (roomsList.isEmpty()) {
-                    binding.noRoomsTv.visibility = View.VISIBLE
-                } else {
-                    binding.noRoomsTv.visibility = View.GONE
-                    roomAdapter?.setItems(roomsList)
+                roomsList?.let {
+                    if (roomsList.isEmpty()) {
+                        binding.noRoomsTv.visibility = View.VISIBLE
+                    } else {
+                        binding.noRoomsTv.visibility = View.GONE
+                        roomAdapter?.setItems(roomsList)
+                    }
                 }
             }
 
@@ -106,9 +108,9 @@ class RoomsListFragment : BaseFragment(R.layout.fragment_rooms_list) {
     private fun filterRoomList(text: String) {
         val query = text.trim().lowercase()
         roomsListViewModel.roomFlow.value
-            .filter { it.code.lowercase().startsWith(query) }
-            .toList()
-            .let { roomAdapter?.setItems(it) }
+            ?.filter { it.code.lowercase().startsWith(query) }
+            ?.toList()
+            ?.let { roomAdapter?.setItems(it) }
     }
 
     private fun initRv(categoriesList: CategoriesList) {

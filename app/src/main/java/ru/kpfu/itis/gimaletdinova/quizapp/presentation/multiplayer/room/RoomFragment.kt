@@ -2,26 +2,21 @@ package ru.kpfu.itis.gimaletdinova.quizapp.presentation.multiplayer.room
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import ru.kpfu.itis.gimaletdinova.quizapp.R
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Code
-import ru.kpfu.itis.gimaletdinova.quizapp.data.remote.pojo.request.Message
 import ru.kpfu.itis.gimaletdinova.quizapp.databinding.FragmentRoomBinding
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.OnBackPressedDuringGameCallback
 import ru.kpfu.itis.gimaletdinova.quizapp.presentation.base.BaseFragment
-import ru.kpfu.itis.gimaletdinova.quizapp.presentation.game.QuestionViewModel
 import ru.kpfu.itis.gimaletdinova.quizapp.util.Mode
-
 
 
 @AndroidEntryPoint
@@ -29,8 +24,9 @@ class RoomFragment : BaseFragment(R.layout.fragment_room) {
 
     private val binding: FragmentRoomBinding by viewBinding(FragmentRoomBinding::bind)
     private val roomViewModel: RoomViewModel by activityViewModels()
-    private val questionViewModel: QuestionViewModel by activityViewModels()
     private val args by navArgs<RoomFragmentArgs>()
+
+    private var messagesAdapter: MessagesAdapter? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
@@ -43,29 +39,23 @@ class RoomFragment : BaseFragment(R.layout.fragment_room) {
 
             with(roomViewModel) {
 
-                if (!initialized) {
-                    initStomp(args.roomCode)
+                if (initialized.not()) {
+                    args.roomCode?.let {
+                        initStomp(it)
+                    }
                 }
 
                 getPlayers()
 
                 args.playersScores?.let {
                     readyBtn.visibility = View.GONE
-                    sendMessage(
-                        Message(
-                            sender = userId,
-                            code = Code.SCORE,
-                            score = it[0]
-                        )
-                    )
+                    sendScores(it[0])
                 }
 
-                if (messages.isNotEmpty()) {
-                    infoTv.text = buildToText(messages)
-                }
+                initRv()
 
                 readyBtn.setOnClickListener {
-                    sendMessage(Message(userId, Code.READY))
+                    sendReadyMessage()
                     readyBtn.isEnabled = false
                 }
 
@@ -74,38 +64,30 @@ class RoomFragment : BaseFragment(R.layout.fragment_room) {
                 }
 
                 messageFlow.observe {
-                    infoTv.text = buildToText(it)
+                    messagesAdapter?.add(it)
                 }
 
-                waitFlow.observe {
+                unreadyPlayersNumberFlow.observe {
                     if (it == 0) {
-                        waitFlow.value = -1
-                        with(questionViewModel) {
-                            lifecycleScope.launch {
-                                clear()
-                                setMode(Mode.ONLINE)
-                                getQuestions(roomViewModel.room)
-                                setPlayers()
-                                findNavController().navigate(
-                                    RoomFragmentDirections.actionRoomFragmentToQuestionFragment()
-                                )
-                            }
-                        }
+                        resetUnreadyPlayersNumber()
+                        findNavController().navigate(
+                            RoomFragmentDirections.actionRoomFragmentToLoadingFragment(room)
+                        )
                     }
                 }
-                resultsWaitFlow.observe {
+                notFinishedPlayersNumberFlow.observe {
                     if (it == 0) {
-                        resultsWaitFlow.value = -1
+                        resetNotFinishedPlayersNumber()
                         findNavController().navigate(
                             RoomFragmentDirections.actionRoomFragmentToResultsFragment(
                                 mode = Mode.ONLINE,
-                                roomCode = roomViewModel.room
+                                roomCode = room
                             )
                         )
                     }
                 }
 
-                joinFlow.observe {
+                remainingCapacityFlow.observe {
                     if (it < 0) {
                         readyBtn.isEnabled = false
                         roomViewModel.clear()
@@ -115,10 +97,7 @@ class RoomFragment : BaseFragment(R.layout.fragment_room) {
                 exitFlow.observe { exited ->
                     if (exited) {
                         clear()
-                        Log.d("CLEAR VIEW MODEL", "")
-                        findNavController().navigate(
-                            RoomFragmentDirections.actionRoomFragmentToRoomsListContainerFragment()
-                        )
+                        findNavController().navigateUp()
                     }
                 }
 
@@ -129,16 +108,16 @@ class RoomFragment : BaseFragment(R.layout.fragment_room) {
 
         }
 
-        questionViewModel.loadingFlow.observe { isLoad ->
-            binding.progressBar.apply {
-                visibility = if (isLoad) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
-                }
-            }
-        }
+    }
 
+    private fun initRv() {
+        binding.messagesRv.apply {
+            messagesAdapter = MessagesAdapter(
+                roomViewModel.messages.toMutableList()
+            )
+            adapter = messagesAdapter
+            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        }
     }
 
     private fun showPlayers() {
@@ -163,7 +142,11 @@ class RoomFragment : BaseFragment(R.layout.fragment_room) {
     }
 
     private fun onExitRoom() {
-        roomViewModel.exit()
+        if (roomViewModel.initialized) {
+            roomViewModel.exit()
+        } else {
+            findNavController().navigateUp()
+        }
     }
 
 }
